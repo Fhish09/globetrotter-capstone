@@ -6,8 +6,13 @@ services:
     container_name: globetrotter_app
     ports:
       - "5000:5000"
-    # Mount local code so changes are reflected without rebuilding the image
     volumes:
       - .:/globetrotter
     environment:
       - PORT=5000
+      - FLASK_DEBUG=1
+      - SECRET_KEY=dev-secret-key-please-change-in-prod
+    restart: unless-stopped
+    command: python -m flask run --host=0.0.0.0 --port=5000 --debug --reload
+    stdin_open: true
+    tty: true
