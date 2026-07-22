@@ -6,7 +6,6 @@ Flask application factory.
 import os
 from flask import Flask
 
-
 def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
@@ -18,7 +17,11 @@ def create_app():
         "SECRET_KEY", "globetrotter-secret-change-in-prod"
     )
 
-    # Register all route blueprints
+    # Register main frontend routes
+    from app.routes import main_bp
+    app.register_blueprint(main_bp)
+
+    # Register all API blueprints
     from app.auth import auth_bp
     from app.destinations import destinations_bp
     from app.recommendations import recommendations_bp
