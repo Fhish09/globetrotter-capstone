@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white">
+  <!-- Hero -->
+  <div class="container mx-auto px-6 py-20 text-center">
+    <h1 class="heading text-6xl md:text-7xl font-bold mb-6">Discover the World</h1>
+    <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">Your personal travel assistant for unforgettable adventures</p>
+    
+    <div class="max-w-md mx-auto">
+      <div class="bg-white/10 backdrop-blur-md rounded-3xl p-2">
+        <input type="text" id="search" placeholder="Where to next?" 
+               class="w-full bg-transparent border-0 focus:outline-none text-white placeholder-white/70 px-6 py-4 text-lg">
+      </div>
+    </div>
+  </div>
+
+  <!-- Destinations Grid -->
+  <div class="container mx-auto px-6 py-16">
+    <h2 class="text-4xl font-semibold mb-10 text-center">Popular Destinations</h2>
+    <div id="destinations" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Fetch destinations from API
+  fetch('/destinations')
+    .then(r => r.json())
+    .then(data => {
+      const container = document.getElementById('destinations');
+      data.forEach(dest => {
+        const card = `
+          <div class="bg-white rounded-3xl overflow-hidden shadow-xl text-gray-900">
+            <img src="https://picsum.photos/id/${Math.floor(Math.random()*100)}/600/400" class="w-full h-56 object-cover">
+            <div class="p-6">
+              <h3 class="text-2xl font-semibold mb-2">${dest.name || 'Beautiful Place'}</h3>
+              <p class="text-gray-600 mb-4">${dest.description || ''}</p>
+              <div class="flex justify-between items-center">
+                <span class="text-emerald-600 font-medium">$${dest.cost || 'N/A'}</span>
+                <button onclick="viewDetails('${dest.id || ''}')" 
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-2xl hover:bg-indigo-700 transition">
+                  Explore
+                </button>
+              </div>
+            </div>
+          </div>`;
+        container.innerHTML += card;
+      });
+    });
+</script>
+{% endblock %}
