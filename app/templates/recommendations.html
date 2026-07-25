@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendations{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-6 py-12">
+    <div class="mb-10">
+        <h1 class="heading text-4xl font-bold text-gray-900 mb-2">For You</h1>
+        <p class="text-gray-500">Personalized recommendations based on your preferences</p>
+    </div>
+
+    <div id="status" class="mb-8"></div>
+
+    <div id="recs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Loaded by JS -->
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadRecommendations() {
+    const token = localStorage.getItem('token');
+    const status = document.getElementById('status');
+    const container = document.getElementById('recs');
+
+    if (!token) {
+        status.innerHTML = `
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl p-6 flex items-center gap-4">
+                <i class="fas fa-lock text-2xl"></i>
+                <div>
+                    <p class="font-medium">Login required</p>
+                    <p class="text-sm">Please log in to see personalized recommendations.</p>
+                </div>
+                <button onclick="openLogin()" class="ml-auto bg-amber-600 text-white px-4 py-2 rounded-xl text-sm">Login</button>
+            </div>`;
+        container.innerHTML = '';
+        return;
+    }
+
+    status.innerHTML = `<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-3xl"></i></div>`;
+
+    try {
+        const res = await fetch('/recommendations', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6">${data.error || 'Failed to load recommendations'}</div>`;
+            return;
+        }
+
+        status.innerHTML = '';
+        if (!data.length) {
+            container.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400">No recommendations yet. Update your preferences!</div>`;
+            return;
+        }
+
+        container.innerHTML = data.map(dest => `
+            <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition">
+                <img src="https://picsum.photos/seed/${dest.name}/600/400" class="w-full h-52 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-1">${dest.name}</h3>
+                    <p class="text-sm text-gray-500 mb-3">${dest.country || ''}</p>
+                    <p class="text-gray-600 text-sm mb-4">${dest.description || ''}</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${(dest.tags || []).map(t => `<span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full">${t}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6">Network error</div>`;
+    }
+}
+
+loadRecommendations();
+</script>
+{% endblock %}

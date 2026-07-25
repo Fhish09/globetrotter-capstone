@@ -3,16 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlobeTrotter - Travel Assistant</title>
+    <title>{% block title %}GlobeTrotter{% endblock %} - Travel Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .heading { font-family: 'Playfair Display', sans-serif; }
+        .heading { font-family: 'Playfair Display', serif; }
     </style>
 </head>
-<body class="bg-gray-50">
-    {% block content %}{% endblock %}
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="/" class="flex items-center gap-2">
+                    <i class="fas fa-globe-americas text-indigo-600 text-2xl"></i>
+                    <span class="heading text-xl font-bold text-gray-900">GlobeTrotter</span>
+                </a>
+
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="/" class="text-gray-700 hover:text-indigo-600 font-medium transition">Home</a>
+                    <a href="/destinations" class="text-gray-700 hover:text-indigo-600 font-medium transition">Destinations</a>
+                    <a href="/recommendations" class="text-gray-700 hover:text-indigo-600 font-medium transition">Recommendations</a>
+                    <a href="/itineraries" class="text-gray-700 hover:text-indigo-600 font-medium transition">My Trips</a>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="openLogin()" class="text-gray-700 hover:text-indigo-600 font-medium">Login</button>
+                    <button onclick="openRegister()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition text-sm font-medium">
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-10 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-sm">© 2026 GlobeTrotter Capstone Project • Built with Flask + Tailwind</p>
+        </div>
+    </footer>
+
+    <!-- Simple Login/Register Modals (placeholder) -->
+    <div id="loginModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold mb-6">Login</h2>
+            <input type="text" id="loginUser" placeholder="Username" class="w-full border rounded-xl px-4 py-3 mb-4">
+            <input type="password" id="loginPass" placeholder="Password" class="w-full border rounded-xl px-4 py-3 mb-6">
+            <button onclick="doLogin()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium">Login</button>
+            <button onclick="closeModals()" class="mt-4 text-gray-500 w-full">Cancel</button>
+        </div>
+    </div>
+
+    <div id="registerModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold mb-6">Create Account</h2>
+            <input type="text" id="regUser" placeholder="Username" class="w-full border rounded-xl px-4 py-3 mb-4">
+            <input type="password" id="regPass" placeholder="Password" class="w-full border rounded-xl px-4 py-3 mb-4">
+            <input type="text" id="regPrefs" placeholder="Preferences (e.g. beach, food)" class="w-full border rounded-xl px-4 py-3 mb-6">
+            <button onclick="doRegister()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium">Sign Up</button>
+            <button onclick="closeModals()" class="mt-4 text-gray-500 w-full">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        function openLogin() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').classList.add('flex');
+        }
+        function openRegister() {
+            document.getElementById('registerModal').classList.remove('hidden');
+            document.getElementById('registerModal').classList.add('flex');
+        }
+        function closeModals() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('registerModal').classList.add('hidden');
+        }
+
+        async function doLogin() {
+            const username = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            });
+            const data = await res.json();
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                alert('Logged in successfully!');
+                closeModals();
+                location.reload();
+            } else {
+                alert(data.error || 'Login failed');
+            }
+        }
+
+        async function doRegister() {
+            const username = document.getElementById('regUser').value;
+            const password = document.getElementById('regPass').value;
+            const prefs = document.getElementById('regPrefs').value.split(',').map(p => p.trim());
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password, preferences: prefs})
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Account created! Please login.');
+                closeModals();
+                openLogin();
+            } else {
+                alert(data.error || 'Registration failed');
+            }
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
 </body>
 </html>
