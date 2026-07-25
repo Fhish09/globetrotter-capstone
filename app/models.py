@@ -71,6 +71,20 @@ def save_user(user: dict) -> None:
     _write_json(USERS_FILE, users)
 
 
+def update_user_preferences(username: str, preferences: list) -> bool:
+    """Update the preferences list for an existing user.
+
+    Returns True if the user was found and updated, False otherwise.
+    """
+    users = get_all_users()
+    for user in users:
+        if user.get("username") == username:
+            user["preferences"] = preferences
+            _write_json(USERS_FILE, users)
+            return True
+    return False
+
+
 # ---------------------------------------------------------------------------
 # Destination helpers
 # ---------------------------------------------------------------------------
