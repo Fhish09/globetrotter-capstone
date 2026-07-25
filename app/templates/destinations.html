@@ -60,11 +60,13 @@ async function loadResults(params = '') {
     }
 
     container.innerHTML = data.map(dest => `
-        <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition">
-            <img src="https://picsum.photos/seed/${dest.name}/600/400" class="w-full h-52 object-cover" alt="${dest.name}">
+        <a href="/destinations/${dest.id}" class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition block group">
+            <div class="relative h-52 overflow-hidden">
+                <img src="https://picsum.photos/seed/${dest.name}/600/400" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${dest.name}">
+            </div>
             <div class="p-6">
                 <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-xl font-bold text-gray-900">${dest.name}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition">${dest.name}</h3>
                     <span class="text-emerald-600 font-semibold">$${dest.avg_cost_per_day || '—'}</span>
                 </div>
                 <p class="text-sm text-gray-500 mb-3">${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</p>
@@ -73,7 +75,7 @@ async function loadResults(params = '') {
                     ${(dest.tags || []).map(t => `<span class="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full">${t}</span>`).join('')}
                 </div>
             </div>
-        </div>
+        </a>
     `).join('');
 }
 
@@ -90,7 +92,6 @@ function applyFilters() {
     loadResults(params.length ? '?' + params.join('&') : '');
 }
 
-// Load with URL params if present
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.toString()) {
     if (urlParams.get('q')) document.getElementById('searchQ').value = urlParams.get('q');
