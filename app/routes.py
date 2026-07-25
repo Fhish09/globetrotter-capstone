@@ -10,6 +10,10 @@ def index():
 def destinations():
     return render_template('destinations.html')
 
+@main_bp.route('/destinations/<int:dest_id>')
+def destination_detail(dest_id):
+    return render_template('destination_detail.html', dest_id=dest_id)
+
 @main_bp.route('/recommendations')
 def recommendations():
     return render_template('recommendations.html')

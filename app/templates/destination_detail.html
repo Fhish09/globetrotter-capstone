@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Destination{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-6 py-12">
+    <div id="loading" class="text-center py-20 text-gray-400">
+        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+        <p>Loading destination...</p>
+    </div>
+
+    <div id="content" class="hidden">
+        <!-- Back button -->
+        <a href="/destinations" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 mb-8 font-medium">
+            <i class="fas fa-arrow-left"></i> Back to Destinations
+        </a>
+
+        <!-- Hero Image -->
+        <div class="relative rounded-3xl overflow-hidden shadow-xl mb-10 h-72 md:h-96">
+            <img id="destImage" src="" alt="" class="w-full h-full object-cover">
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 md:p-8">
+                <h1 id="destName" class="heading text-3xl md:text-5xl font-bold text-white"></h1>
+                <p id="destLocation" class="text-white/80 mt-2 text-lg"></p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Main Info -->
+            <div class="md:col-span-2 space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-3">About</h2>
+                    <p id="destDescription" class="text-gray-600 leading-relaxed"></p>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-3">Tags</h2>
+                    <div id="destTags" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-4">
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <p class="text-sm text-gray-500 mb-1">Average cost per day</p>
+                    <p id="destCost" class="text-3xl font-bold text-indigo-600"></p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <p class="text-sm text-gray-500 mb-1">Continent</p>
+                    <p id="destContinent" class="text-lg font-semibold text-gray-900"></p>
+                </div>
+
+                <button onclick="addToItinerary()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition shadow-lg shadow-indigo-200">
+                    <i class="fas fa-plus mr-2"></i> Add to Itinerary
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="error" class="hidden text-center py-20">
+        <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-4"></i>
+        <p class="text-gray-600 text-lg">Destination not found</p>
+        <a href="/destinations" class="text-indigo-600 mt-4 inline-block hover:underline">Back to all destinations</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const destId = {{ dest_id }};
+
+async function loadDestination() {
+    try {
+        const res = await fetch('/destinations');
+        const data = await res.json();
+        const dest = data.find(d => d.id === destId);
+
+        if (!dest) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            return;
+        }
+
+        document.getElementById('destImage').src = `https://picsum.photos/seed/${dest.name}/1200/600`;
+        document.getElementById('destImage').alt = dest.name;
+        document.getElementById('destName').textContent = dest.name;
+        document.getElementById('destLocation').textContent = `${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}`;
+        document.getElementById('destDescription').textContent = dest.description || 'No description available.';
+        document.getElementById('destCost').textContent = dest.avg_cost_per_day ? `$${dest.avg_cost_per_day}` : '—';
+        document.getElementById('destContinent').textContent = dest.continent || '—';
+
+        document.getElementById('destTags').innerHTML = (dest.tags || []).map(t =>
+            `<span class="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full text-sm font-medium">${t}</span>`
+        ).join('');
+
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('content').classList.remove('hidden');
+
+        // Store for add to itinerary
+        window.currentDest = dest;
+    } catch (e) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+    }
+}
+
+function addToItinerary() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        openLogin();
+        return;
+    }
+    // Simple redirect to itineraries with suggestion
+    alert(`You can create a new itinerary and add "${window.currentDest?.name}" as a destination.`);
+    window.location.href = '/itineraries';
+}
+
+loadDestination();
+</script>
+{% endblock %}

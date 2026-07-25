@@ -23,11 +23,13 @@
     <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
                 <a href="/" class="flex items-center gap-2">
                     <i class="fas fa-globe-americas text-indigo-600 text-2xl"></i>
                     <span class="heading text-xl font-bold text-gray-900">GlobeTrotter</span>
                 </a>
 
+                <!-- Desktop Links -->
                 <div class="hidden md:flex items-center gap-8">
                     <a href="/" class="text-gray-700 hover:text-indigo-600 font-medium transition">Home</a>
                     <a href="/destinations" class="text-gray-700 hover:text-indigo-600 font-medium transition">Destinations</a>
@@ -35,16 +37,42 @@
                     <a href="/itineraries" class="text-gray-700 hover:text-indigo-600 font-medium transition">My Trips</a>
                 </div>
 
-                <div id="authButtons" class="flex items-center gap-3">
-                    <button onclick="openLogin()" class="text-gray-700 hover:text-indigo-600 font-medium transition">Login</button>
-                    <button onclick="openRegister()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition text-sm font-medium shadow-sm">
-                        Sign Up
-                    </button>
+                <!-- Auth / User (Desktop) -->
+                <div class="hidden md:flex items-center gap-3">
+                    <div id="authButtons" class="flex items-center gap-3">
+                        <button onclick="openLogin()" class="text-gray-700 hover:text-indigo-600 font-medium transition">Login</button>
+                        <button onclick="openRegister()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition text-sm font-medium shadow-sm">
+                            Sign Up
+                        </button>
+                    </div>
+                    <div id="userMenu" class="hidden items-center gap-3">
+                        <span id="usernameDisplay" class="text-sm text-gray-600"></span>
+                        <button onclick="logout()" class="text-red-500 hover:text-red-600 text-sm font-medium">Logout</button>
+                    </div>
                 </div>
 
-                <div id="userMenu" class="hidden items-center gap-3">
-                    <span id="usernameDisplay" class="text-sm text-gray-600"></span>
-                    <button onclick="logout()" class="text-red-500 hover:text-red-600 text-sm font-medium">Logout</button>
+                <!-- Mobile Hamburger -->
+                <button id="mobileMenuBtn" class="md:hidden p-2 text-gray-700 hover:text-indigo-600" onclick="toggleMobileMenu()">
+                    <i id="menuIcon" class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-100 bg-white">
+            <div class="px-4 py-4 space-y-3">
+                <a href="/" class="block py-2 text-gray-700 hover:text-indigo-600 font-medium">Home</a>
+                <a href="/destinations" class="block py-2 text-gray-700 hover:text-indigo-600 font-medium">Destinations</a>
+                <a href="/recommendations" class="block py-2 text-gray-700 hover:text-indigo-600 font-medium">Recommendations</a>
+                <a href="/itineraries" class="block py-2 text-gray-700 hover:text-indigo-600 font-medium">My Trips</a>
+                <hr class="my-2">
+                <div id="mobileAuth">
+                    <button onclick="openLogin(); toggleMobileMenu();" class="block w-full text-left py-2 text-gray-700 font-medium">Login</button>
+                    <button onclick="openRegister(); toggleMobileMenu();" class="block w-full text-left py-2 text-indigo-600 font-medium">Sign Up</button>
+                </div>
+                <div id="mobileUser" class="hidden">
+                    <p id="mobileUsername" class="text-sm text-gray-500 py-1"></p>
+                    <button onclick="logout()" class="block w-full text-left py-2 text-red-500 font-medium">Logout</button>
                 </div>
             </div>
         </div>
@@ -65,7 +93,6 @@
     <!-- ==================== LOGIN MODAL ==================== -->
     <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden">
-            <!-- Header -->
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white relative">
                 <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl">
                     <i class="fas fa-times"></i>
@@ -80,11 +107,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Body -->
             <div class="p-8">
                 <div id="loginError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
-
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
@@ -94,7 +118,6 @@
                                    class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                         <div class="relative">
@@ -104,12 +127,10 @@
                         </div>
                     </div>
                 </div>
-
                 <button id="loginBtn" onclick="doLogin()"
                         class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
                     <span>Login</span>
                 </button>
-
                 <p class="text-center text-sm text-gray-500 mt-6">
                     Don't have an account?
                     <button onclick="switchToRegister()" class="text-indigo-600 font-medium hover:underline">Sign up</button>
@@ -121,7 +142,6 @@
     <!-- ==================== REGISTER MODAL ==================== -->
     <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden">
-            <!-- Header -->
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white relative">
                 <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl">
                     <i class="fas fa-times"></i>
@@ -136,11 +156,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Body -->
             <div class="p-8">
                 <div id="regError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
-
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
@@ -150,7 +167,6 @@
                                    class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                         <div class="relative">
@@ -159,7 +175,6 @@
                                    class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Travel Preferences</label>
                         <div class="relative">
@@ -170,12 +185,10 @@
                         <p class="text-xs text-gray-400 mt-1.5">Separate with commas — this powers your recommendations</p>
                     </div>
                 </div>
-
                 <button id="regBtn" onclick="doRegister()"
                         class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
                     <span>Create Account</span>
                 </button>
-
                 <p class="text-center text-sm text-gray-500 mt-6">
                     Already have an account?
                     <button onclick="switchToLogin()" class="text-indigo-600 font-medium hover:underline">Login</button>
@@ -185,15 +198,27 @@
     </div>
 
     <script>
-        // Check login state on page load
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('menuIcon');
+            menu.classList.toggle('hidden');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        }
+
+        // Check login state
         document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('token');
             if (token) {
-                document.getElementById('authButtons').classList.add('hidden');
-                document.getElementById('userMenu').classList.remove('hidden');
-                document.getElementById('userMenu').classList.add('flex');
-                // Simple display (we don't store username separately yet)
+                document.getElementById('authButtons')?.classList.add('hidden');
+                document.getElementById('userMenu')?.classList.remove('hidden');
+                document.getElementById('userMenu')?.classList.add('flex');
                 document.getElementById('usernameDisplay').textContent = 'Logged in';
+
+                document.getElementById('mobileAuth')?.classList.add('hidden');
+                document.getElementById('mobileUser')?.classList.remove('hidden');
+                document.getElementById('mobileUsername').textContent = 'Logged in';
             }
         });
 
@@ -302,13 +327,13 @@
 
                 if (res.ok) {
                     closeModals();
-                    // Auto-fill login form and switch
                     document.getElementById('loginUser').value = username;
                     openLogin();
-                    document.getElementById('loginError').textContent = 'Account created! Please login.';
-                    document.getElementById('loginError').classList.remove('hidden');
-                    document.getElementById('loginError').classList.replace('bg-red-50', 'bg-emerald-50');
-                    document.getElementById('loginError').classList.replace('text-red-600', 'text-emerald-600');
+                    const loginErr = document.getElementById('loginError');
+                    loginErr.textContent = 'Account created! Please login.';
+                    loginErr.classList.remove('hidden');
+                    loginErr.classList.replace('bg-red-50', 'bg-emerald-50');
+                    loginErr.classList.replace('text-red-600', 'text-emerald-600');
                 } else {
                     errorEl.textContent = data.error || 'Registration failed';
                     errorEl.classList.remove('hidden');
@@ -322,7 +347,6 @@
             }
         }
 
-        // Close modal on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModals();
         });
