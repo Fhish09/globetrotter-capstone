@@ -1,12 +1,14 @@
 """
 app/auth.py
 
-User registration, login, and JWT handling.
+User registration, login, JWT handling, and profile management.
 
 Routes
 ------
-POST /register  – create a new user account
-POST /login     – authenticate and return a JWT token
+POST /register     – create a new user account
+POST /login        – authenticate and return a JWT token
+GET  /me           – return the current user's profile (preferences)
+PUT  /preferences  – update the current user's preferences
 """
 import uuid
 import datetime
@@ -15,7 +17,7 @@ import jwt
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app.models import get_user_by_username, save_user
+from app.models import get_user_by_username, save_user, update_user_preferences
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -114,4 +116,56 @@ def login():
         return jsonify({"error": "invalid credentials"}), 401
 
     token = create_token(username, current_app.config["SECRET_KEY"])
-    return jsonify({"token": token}), 200
+    return jsonify({"token": token, "username": username}), 200
+
+
+@auth_bp.route("/me", methods=["GET"])
+def get_me():
+    """Return the current authenticated user's profile (without password hash)."""
+    username = get_current_user(request)
+    if not username:
+        return jsonify({"error": "authentication required"}), 401
+
+    user = get_user_by_username(username)
+    if not user:
+        return jsonify({"error": "user not found"}), 404
+
+    return jsonify({
+        "username": user["username"],
+        "preferences": user.get("preferences", []),
+    }), 200
+
+
+@auth_bp.route("/preferences", methods=["PUT"])
+def update_preferences():
+    """Update the current user's travel preferences.
+
+    Expected JSON body:
+        { "preferences": ["beach", "food", "adventure"] }
+
+    Requires: Authorization: Bearer <token>
+    """
+    username = get_current_user(request)
+    if not username:
+        return jsonify({"error": "authentication required"}), 401
+
+    data = request.get_json(silent=True) or {}
+    preferences = data.get("preferences")
+
+    if preferences is None:
+        return jsonify({"error": "preferences field is required"}), 400
+
+    if not isinstance(preferences, list):
+        return jsonify({"error": "preferences must be a list"}), 400
+
+    # Clean up: strip whitespace and remove empties
+    cleaned = [p.strip().lower() for p in preferences if isinstance(p, str) and p.strip()]
+
+    success = update_user_preferences(username, cleaned)
+    if not success:
+        return jsonify({"error": "user not found"}), 404
+
+    return jsonify({
+        "message": "preferences updated successfully",
+        "preferences": cleaned,
+    }), 200
