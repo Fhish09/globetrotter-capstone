@@ -34,7 +34,6 @@
     </div>
 
     <div id="destinations" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Cards loaded by JS -->
         <div class="col-span-full text-center py-20 text-gray-400">
             <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
             <p>Loading destinations...</p>
@@ -70,7 +69,7 @@ async function loadDestinations() {
         }
 
         container.innerHTML = data.slice(0, 6).map(dest => `
-            <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
+            <a href="/destinations/${dest.id}" class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition group block">
                 <div class="relative h-56 overflow-hidden">
                     <img src="https://picsum.photos/seed/${dest.name}/600/400" 
                          class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${dest.name}">
@@ -83,13 +82,13 @@ async function loadDestinations() {
                         <i class="fas fa-map-marker-alt"></i>
                         <span>${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">${dest.name}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition">${dest.name}</h3>
                     <p class="text-gray-600 text-sm line-clamp-2 mb-4">${dest.description || 'Beautiful destination waiting for you.'}</p>
                     <div class="flex flex-wrap gap-2">
                         ${(dest.tags || []).slice(0,3).map(t => `<span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full">${t}</span>`).join('')}
                     </div>
                 </div>
-            </div>
+            </a>
         `).join('');
     } catch (err) {
         console.error(err);
