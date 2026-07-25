@@ -6,6 +6,8 @@ Fetch additional travel destinations from the free REST Countries API
 
 No API key required. Results are cached in memory for the lifetime of the
 process so we don't hit the external API on every request.
+
+Includes every country that has a capital city.
 """
 from __future__ import annotations
 
@@ -19,10 +21,9 @@ logger = logging.getLogger(__name__)
 # In-memory cache so we only call the external API once per process lifetime
 _cache: Optional[list] = None
 
-# Capitals / popular cities we prefer when a country has multiple options
 REGION_TO_CONTINENT = {
     "Africa": "Africa",
-    "Americas": "North America",  # refined below using subregion
+    "Americas": "North America",
     "Asia": "Asia",
     "Europe": "Europe",
     "Oceania": "Oceania",
@@ -36,7 +37,6 @@ SUBREGION_OVERRIDES = {
     "Northern America": "North America",
 }
 
-# Rough daily-budget estimates by region (USD) – used only for API-sourced entries
 REGION_COST = {
     "Africa": 55,
     "Asia": 60,
@@ -47,7 +47,6 @@ REGION_COST = {
     "Antarctica": 200,
 }
 
-# Default interest tags by region
 REGION_TAGS = {
     "Africa": ["nature", "adventure", "culture"],
     "Asia": ["culture", "food", "city"],
@@ -66,13 +65,13 @@ def _resolve_continent(region: str, subregion: str) -> str:
 
 
 def _fetch_from_restcountries() -> list:
-    """Call REST Countries and return a list of normalised destination dicts."""
+    """Call REST Countries and return destinations for ALL countries with a capital."""
     url = (
         "https://restcountries.com/v3.1/all"
         "?fields=name,capital,region,subregion,flags,cca2,population"
     )
     try:
-        resp = requests.get(url, timeout=12)
+        resp = requests.get(url, timeout=15)
         resp.raise_for_status()
         countries = resp.json()
     except Exception as exc:
@@ -80,11 +79,12 @@ def _fetch_from_restcountries() -> list:
         return []
 
     destinations = []
-    next_id = 1000  # start high so we don't collide with seed ids 1-12
+    next_id = 1000  # avoid collision with seed ids 1-12
 
     for country in countries:
         capitals = country.get("capital") or []
         if not capitals:
+            # Country has no capital – skip (very rare)
             continue
 
         capital = capitals[0]
@@ -93,16 +93,10 @@ def _fetch_from_restcountries() -> list:
         subregion = country.get("subregion", "")
         continent = _resolve_continent(region, subregion)
         flag = (country.get("flags") or {}).get("png") or ""
-        population = country.get("population") or 0
-
-        # Skip tiny / non-tourist entries
-        if population < 100_000 and continent != "Oceania":
-            continue
 
         cost = REGION_COST.get(continent, 80)
         tags = list(REGION_TAGS.get(continent, ["culture"]))
 
-        # Light tag enrichment from name/region keywords
         lower = f"{capital} {country_name} {subregion}".lower()
         if any(w in lower for w in ("island", "beach", "coast", "caribbean")):
             if "beach" not in tags:
@@ -118,17 +112,17 @@ def _fetch_from_restcountries() -> list:
             "continent": continent,
             "description": (
                 f"{capital} is the capital of {country_name}. "
-                f"Located in {subregion or region}, it offers a mix of local culture and travel experiences."
+                f"Located in {subregion or region or 'the world'}, "
+                f"it offers a mix of local culture and travel experiences."
             ),
             "tags": tags,
             "avg_cost_per_day": cost,
-            "image": flag,  # country flag as a reliable free image
+            "image": flag,
             "source": "restcountries",
         })
         next_id += 1
 
-    # Prefer larger / more interesting destinations first
-    destinations.sort(key=lambda d: d.get("country", ""))
+    destinations.sort(key=lambda d: (d.get("country", ""), d.get("name", "")))
     return destinations
 
 
