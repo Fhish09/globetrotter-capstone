@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "name": "Bali",
+    "country": "Indonesia",
+    "continent": "Asia",
+    "description": "Tropical paradise with stunning beaches, lush rice terraces, vibrant culture and spiritual temples.",
+    "tags": ["beach", "culture", "nature", "food"],
+    "avg_cost_per_day": 45
+  },
+  {
+    "id": 2,
+    "name": "Paris",
+    "country": "France",
+    "continent": "Europe",
+    "description": "The City of Light – romantic streets, world-class museums, iconic Eiffel Tower and exquisite cuisine.",
+    "tags": ["culture", "food", "romance", "history"],
+    "avg_cost_per_day": 120
+  },
+  {
+    "id": 3,
+    "name": "Tokyo",
+    "country": "Japan",
+    "continent": "Asia",
+    "description": "Futuristic metropolis blending ancient temples with neon skyscrapers, incredible food and unique experiences.",
+    "tags": ["culture", "food", "city", "technology"],
+    "avg_cost_per_day": 95
+  },
+  {
+    "id": 4,
+    "name": "Santorini",
+    "country": "Greece",
+    "continent": "Europe",
+    "description": "Famous for its white-washed buildings, blue domes, dramatic cliffs and breathtaking sunsets over the Aegean Sea.",
+    "tags": ["beach", "romance", "nature", "photography"],
+    "avg_cost_per_day": 110
+  },
+  {
+    "id": 5,
+    "name": "Cape Town",
+    "country": "South Africa",
+    "continent": "Africa",
+    "description": "Stunning coastal city with Table Mountain, vibrant culture, excellent wine and diverse outdoor adventures.",
+    "tags": ["nature", "adventure", "beach", "culture"],
+    "avg_cost_per_day": 70
+  },
+  {
+    "id": 6,
+    "name": "New York City",
+    "country": "USA",
+    "continent": "North America",
+    "description": "The city that never sleeps – iconic skyline, Broadway shows, world-class museums and endless energy.",
+    "tags": ["city", "culture", "food", "shopping"],
+    "avg_cost_per_day": 180
+  },
+  {
+    "id": 7,
+    "name": "Machu Picchu",
+    "country": "Peru",
+    "continent": "South America",
+    "description": "Ancient Incan citadel high in the Andes – one of the most spectacular archaeological sites in the world.",
+    "tags": ["history", "adventure", "nature", "culture"],
+    "avg_cost_per_day": 65
+  },
+  {
+    "id": 8,
+    "name": "Dubai",
+    "country": "UAE",
+    "continent": "Asia",
+    "description": "Ultra-modern desert city with luxury shopping, record-breaking architecture and desert adventures.",
+    "tags": ["city", "luxury", "shopping", "adventure"],
+    "avg_cost_per_day": 150
+  },
+  {
+    "id": 9,
+    "name": "Reykjavik",
+    "country": "Iceland",
+    "continent": "Europe",
+    "description": "Gateway to glaciers, volcanoes, northern lights and the famous Blue Lagoon geothermal spa.",
+    "tags": ["nature", "adventure", "photography", "unique"],
+    "avg_cost_per_day": 130
+  },
+  {
+    "id": 10,
+    "name": "Bangkok",
+    "country": "Thailand",
+    "continent": "Asia",
+    "description": "Vibrant capital with ornate temples, floating markets, street food paradise and lively nightlife.",
+    "tags": ["food", "culture", "city", "budget"],
+    "avg_cost_per_day": 40
+  },
+  {
+    "id": 11,
+    "name": "Barcelona",
+    "country": "Spain",
+    "continent": "Europe",
+    "description": "Gaudi masterpieces, sunny beaches, fantastic food and a perfect mix of culture and Mediterranean vibe.",
+    "tags": ["beach", "culture", "food", "architecture"],
+    "avg_cost_per_day": 90
+  },
+  {
+    "id": 12,
+    "name": "Queenstown",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "description": "Adventure capital of the world – bungee jumping, skiing, hiking and breathtaking alpine scenery.",
+    "tags": ["adventure", "nature", "outdoor", "scenery"],
+    "avg_cost_per_day": 100
+  }
+]
