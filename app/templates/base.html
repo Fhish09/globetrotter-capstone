@@ -23,13 +23,11 @@
     <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <!-- Logo -->
                 <a href="/" class="flex items-center gap-2">
                     <i class="fas fa-globe-americas text-indigo-600 text-2xl"></i>
                     <span class="heading text-xl font-bold text-gray-900">GlobeTrotter</span>
                 </a>
 
-                <!-- Desktop Links -->
                 <div class="hidden md:flex items-center gap-8">
                     <a href="/" class="text-gray-700 hover:text-indigo-600 font-medium transition">Home</a>
                     <a href="/destinations" class="text-gray-700 hover:text-indigo-600 font-medium transition">Destinations</a>
@@ -37,7 +35,6 @@
                     <a href="/itineraries" class="text-gray-700 hover:text-indigo-600 font-medium transition">My Trips</a>
                 </div>
 
-                <!-- Auth / User (Desktop) -->
                 <div class="hidden md:flex items-center gap-3">
                     <div id="authButtons" class="flex items-center gap-3">
                         <button onclick="openLogin()" class="text-gray-700 hover:text-indigo-600 font-medium transition">Login</button>
@@ -46,12 +43,15 @@
                         </button>
                     </div>
                     <div id="userMenu" class="hidden items-center gap-3">
+                        <button onclick="openPreferences()" class="text-gray-600 hover:text-indigo-600 text-sm font-medium flex items-center gap-1.5">
+                            <i class="fas fa-sliders-h"></i> Preferences
+                        </button>
+                        <span class="text-gray-300">|</span>
                         <span id="usernameDisplay" class="text-sm text-gray-600"></span>
                         <button onclick="logout()" class="text-red-500 hover:text-red-600 text-sm font-medium">Logout</button>
                     </div>
                 </div>
 
-                <!-- Mobile Hamburger -->
                 <button id="mobileMenuBtn" class="md:hidden p-2 text-gray-700 hover:text-indigo-600" onclick="toggleMobileMenu()">
                     <i id="menuIcon" class="fas fa-bars text-xl"></i>
                 </button>
@@ -72,35 +72,32 @@
                 </div>
                 <div id="mobileUser" class="hidden">
                     <p id="mobileUsername" class="text-sm text-gray-500 py-1"></p>
+                    <button onclick="openPreferences(); toggleMobileMenu();" class="block w-full text-left py-2 text-indigo-600 font-medium">
+                        <i class="fas fa-sliders-h mr-1"></i> Edit Preferences
+                    </button>
                     <button onclick="logout()" class="block w-full text-left py-2 text-red-500 font-medium">Logout</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-10 mt-auto">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <p class="text-sm">© 2026 GlobeTrotter Capstone Project • Built with Flask + Tailwind</p>
         </div>
     </footer>
 
-    <!-- ==================== LOGIN MODAL ==================== -->
+    <!-- LOGIN MODAL -->
     <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden">
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white relative">
-                <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                        <i class="fas fa-user text-xl"></i>
-                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center"><i class="fas fa-user text-xl"></i></div>
                     <div>
                         <h2 class="text-2xl font-bold">Welcome back</h2>
                         <p class="text-indigo-100 text-sm">Login to continue your journey</p>
@@ -114,42 +111,32 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
                         <div class="relative">
                             <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="loginUser" placeholder="Enter your username"
-                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                            <input type="text" id="loginUser" placeholder="Enter your username" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                         <div class="relative">
                             <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="password" id="loginPass" placeholder="Enter your password"
-                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                            <input type="password" id="loginPass" placeholder="Enter your password" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                 </div>
-                <button id="loginBtn" onclick="doLogin()"
-                        class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                <button id="loginBtn" onclick="doLogin()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
                     <span>Login</span>
                 </button>
-                <p class="text-center text-sm text-gray-500 mt-6">
-                    Don't have an account?
-                    <button onclick="switchToRegister()" class="text-indigo-600 font-medium hover:underline">Sign up</button>
-                </p>
+                <p class="text-center text-sm text-gray-500 mt-6">Don't have an account? <button onclick="switchToRegister()" class="text-indigo-600 font-medium hover:underline">Sign up</button></p>
             </div>
         </div>
     </div>
 
-    <!-- ==================== REGISTER MODAL ==================== -->
+    <!-- REGISTER MODAL -->
     <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden">
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white relative">
-                <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                        <i class="fas fa-user-plus text-xl"></i>
-                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center"><i class="fas fa-user-plus text-xl"></i></div>
                     <div>
                         <h2 class="text-2xl font-bold">Join GlobeTrotter</h2>
                         <p class="text-indigo-100 text-sm">Create your account to get started</p>
@@ -163,42 +150,71 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
                         <div class="relative">
                             <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="regUser" placeholder="Choose a username"
-                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                            <input type="text" id="regUser" placeholder="Choose a username" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                         <div class="relative">
                             <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="password" id="regPass" placeholder="Create a password"
-                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                            <input type="password" id="regPass" placeholder="Create a password" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Travel Preferences</label>
                         <div class="relative">
                             <i class="fas fa-heart absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="regPrefs" placeholder="e.g. beach, food, culture, adventure"
-                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                            <input type="text" id="regPrefs" placeholder="e.g. beach, food, culture, adventure" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                         <p class="text-xs text-gray-400 mt-1.5">Separate with commas — this powers your recommendations</p>
                     </div>
                 </div>
-                <button id="regBtn" onclick="doRegister()"
-                        class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                <button id="regBtn" onclick="doRegister()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
                     <span>Create Account</span>
                 </button>
-                <p class="text-center text-sm text-gray-500 mt-6">
-                    Already have an account?
-                    <button onclick="switchToLogin()" class="text-indigo-600 font-medium hover:underline">Login</button>
-                </p>
+                <p class="text-center text-sm text-gray-500 mt-6">Already have an account? <button onclick="switchToLogin()" class="text-indigo-600 font-medium hover:underline">Login</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREFERENCES MODAL -->
+    <div id="prefsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white relative">
+                <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center"><i class="fas fa-sliders-h text-xl"></i></div>
+                    <div>
+                        <h2 class="text-2xl font-bold">Your Preferences</h2>
+                        <p class="text-indigo-100 text-sm">Update what you love about travel</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-8">
+                <div id="prefsError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
+                <div id="prefsSuccess" class="hidden mb-4 bg-emerald-50 text-emerald-600 text-sm px-4 py-3 rounded-xl"></div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Travel Interests</label>
+                    <div class="relative">
+                        <i class="fas fa-heart absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="editPrefs" placeholder="e.g. beach, food, culture, adventure"
+                               class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1.5">Separate with commas. These power your recommendations.</p>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2" id="prefChips"></div>
+
+                <button id="prefsBtn" onclick="savePreferences()"
+                        class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                    <span>Save Preferences</span>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Mobile menu toggle
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const icon = document.getElementById('menuIcon');
@@ -207,7 +223,6 @@
             icon.classList.toggle('fa-times');
         }
 
-        // Check login state
         document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('token');
             if (token) {
@@ -236,22 +251,47 @@
             document.getElementById('registerModal').classList.add('flex');
         }
 
+        async function openPreferences() {
+            closeModals();
+            document.getElementById('prefsError').classList.add('hidden');
+            document.getElementById('prefsSuccess').classList.add('hidden');
+            document.getElementById('prefsModal').classList.remove('hidden');
+            document.getElementById('prefsModal').classList.add('flex');
+
+            // Load current preferences
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const res = await fetch('/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const prefs = data.preferences || [];
+                    document.getElementById('editPrefs').value = prefs.join(', ');
+                    renderPrefChips(prefs);
+                }
+            } catch (e) {}
+        }
+
+        function renderPrefChips(prefs) {
+            const container = document.getElementById('prefChips');
+            container.innerHTML = prefs.map(p =>
+                `<span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full">${p}</span>`
+            ).join('');
+        }
+
         function closeModals() {
-            document.getElementById('loginModal').classList.add('hidden');
-            document.getElementById('loginModal').classList.remove('flex');
-            document.getElementById('registerModal').classList.add('hidden');
-            document.getElementById('registerModal').classList.remove('flex');
+            ['loginModal', 'registerModal', 'prefsModal'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            });
         }
 
-        function switchToRegister() {
-            closeModals();
-            openRegister();
-        }
-
-        function switchToLogin() {
-            closeModals();
-            openLogin();
-        }
+        function switchToRegister() { closeModals(); openRegister(); }
+        function switchToLogin() { closeModals(); openLogin(); }
 
         function logout() {
             localStorage.removeItem('token');
@@ -281,7 +321,6 @@
                     body: JSON.stringify({username, password})
                 });
                 const data = await res.json();
-
                 if (data.token) {
                     localStorage.setItem('token', data.token);
                     closeModals();
@@ -302,8 +341,7 @@
         async function doRegister() {
             const username = document.getElementById('regUser').value.trim();
             const password = document.getElementById('regPass').value;
-            const prefsRaw = document.getElementById('regPrefs').value;
-            const prefs = prefsRaw.split(',').map(p => p.trim()).filter(Boolean);
+            const prefs = document.getElementById('regPrefs').value.split(',').map(p => p.trim()).filter(Boolean);
             const errorEl = document.getElementById('regError');
             const btn = document.getElementById('regBtn');
 
@@ -324,7 +362,6 @@
                     body: JSON.stringify({username, password, preferences: prefs})
                 });
                 const data = await res.json();
-
                 if (res.ok) {
                     closeModals();
                     document.getElementById('loginUser').value = username;
@@ -344,6 +381,48 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span>Create Account</span>';
+            }
+        }
+
+        async function savePreferences() {
+            const token = localStorage.getItem('token');
+            if (!token) { openLogin(); return; }
+
+            const prefs = document.getElementById('editPrefs').value.split(',').map(p => p.trim()).filter(Boolean);
+            const errorEl = document.getElementById('prefsError');
+            const successEl = document.getElementById('prefsSuccess');
+            const btn = document.getElementById('prefsBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+
+            try {
+                const res = await fetch('/preferences', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ preferences: prefs })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    successEl.textContent = 'Preferences saved successfully!';
+                    successEl.classList.remove('hidden');
+                    renderPrefChips(data.preferences || prefs);
+                } else {
+                    errorEl.textContent = data.error || 'Failed to save';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (e) {
+                errorEl.textContent = 'Network error. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Save Preferences</span>';
             }
         }
 
