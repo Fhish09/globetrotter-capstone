@@ -3,15 +3,15 @@
 {% block title %}Recommendations{% endblock %}
 
 {% block content %}
-<section class="max-w-7xl mx-auto px-6 py-12">
+<section class="max-w-7xl mx-auto px-6 py-12" aria-labelledby="recs-heading">
     <div class="mb-10">
-        <h1 class="heading text-4xl font-bold text-gray-900 mb-2">For You</h1>
+        <h1 id="recs-heading" class="heading text-4xl font-bold text-gray-900 mb-2">For You</h1>
         <p class="text-gray-500">Personalized recommendations based on your preferences</p>
     </div>
 
-    <div id="status" class="mb-8"></div>
+    <div id="status" class="mb-8" role="status" aria-live="polite"></div>
 
-    <div id="recs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div id="recs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
         <!-- Loaded by JS -->
     </div>
 </section>
@@ -19,6 +19,10 @@
 
 {% block scripts %}
 <script>
+function getDestImage(dest) {
+    return dest.image || `https://picsum.photos/seed/${encodeURIComponent(dest.name)}/600/400`;
+}
+
 async function loadRecommendations() {
     const token = localStorage.getItem('token');
     const status = document.getElementById('status');
@@ -26,19 +30,26 @@ async function loadRecommendations() {
 
     if (!token) {
         status.innerHTML = `
-            <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl p-6 flex items-center gap-4">
-                <i class="fas fa-lock text-2xl"></i>
-                <div>
-                    <p class="font-medium">Login required</p>
-                    <p class="text-sm">Please log in to see personalized recommendations.</p>
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-8 text-center" role="alert">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-2xl text-amber-600" aria-hidden="true"></i>
                 </div>
-                <button onclick="openLogin()" class="ml-auto bg-amber-600 text-white px-4 py-2 rounded-xl text-sm">Login</button>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Login to see your recommendations</h2>
+                <p class="text-gray-600 mb-6 max-w-md mx-auto">We personalize destinations based on your travel preferences. Sign in or create an account to get started.</p>
+                <div class="flex flex-wrap gap-3 justify-center">
+                    <button onclick="openLogin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition">
+                        Login
+                    </button>
+                    <button onclick="openRegister()" class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-medium transition">
+                        Create Account
+                    </button>
+                </div>
             </div>`;
         container.innerHTML = '';
         return;
     }
 
-    status.innerHTML = `<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-3xl"></i></div>`;
+    status.innerHTML = `<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-3xl" aria-hidden="true"></i><span class="sr-only">Loading recommendations</span></div>`;
 
     try {
         const res = await fetch('/recommendations', {
@@ -47,62 +58,66 @@ async function loadRecommendations() {
         const data = await res.json();
 
         if (!res.ok) {
-            status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6">${data.error || 'Failed to load recommendations'}</div>`;
+            status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6" role="alert">${data.error || 'Failed to load recommendations'}</div>`;
             return;
         }
 
         status.innerHTML = '';
         if (!data.length) {
             container.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400">
-                <i class="fas fa-compass text-5xl mb-4"></i>
-                <p>No recommendations yet. Try updating your preferences when you register!</p>
+                <i class="fas fa-compass text-5xl mb-4" aria-hidden="true"></i>
+                <p class="mb-4">No recommendations yet. Try updating your preferences!</p>
+                <button onclick="openPreferences()" class="text-indigo-600 font-medium hover:underline">Edit Preferences</button>
             </div>`;
             return;
         }
 
         container.innerHTML = data.map(dest => `
-            <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition group">
-                <div class="relative h-52 overflow-hidden">
-                    <img src="https://picsum.photos/seed/${dest.name}/600/400" 
-                         class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
-                         alt="${dest.name}">
-                    ${dest.match_score > 0 ? `
-                        <div class="absolute top-4 left-4 bg-indigo-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">
-                            Match ${dest.match_score}
-                        </div>` : ''}
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-gray-800 text-xs font-medium px-3 py-1.5 rounded-full">
-                        $${dest.avg_cost_per_day || '—'}/day
+            <article class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition group" role="listitem">
+                <a href="/destinations/${dest.id}" class="block">
+                    <div class="relative h-52 overflow-hidden">
+                        <img src="${getDestImage(dest)}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                             alt="${dest.name}"
+                             loading="lazy">
+                        ${dest.match_score > 0 ? `
+                            <div class="absolute top-4 left-4 bg-indigo-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">
+                                Match ${dest.match_score}
+                            </div>` : ''}
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-gray-800 text-xs font-medium px-3 py-1.5 rounded-full">
+                            $${dest.avg_cost_per_day || '—'}/day
+                        </div>
                     </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</span>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">${dest.name}</h3>
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">${dest.description || ''}</p>
-                    
-                    ${dest.match_reasons && dest.match_reasons.length ? `
-                        <div class="mb-4">
-                            <p class="text-xs font-medium text-gray-500 mb-1.5">Why recommended:</p>
-                            <div class="flex flex-wrap gap-1.5">
-                                ${dest.match_reasons.map(r => 
-                                    `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-full">${r}</span>`
-                                ).join('')}
-                            </div>
-                        </div>` : ''}
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            <span>${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition">${dest.name}</h2>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${dest.description || ''}</p>
+                        
+                        ${dest.match_reasons && dest.match_reasons.length ? `
+                            <div class="mb-4">
+                                <p class="text-xs font-medium text-gray-500 mb-1.5">Why recommended:</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${dest.match_reasons.map(r => 
+                                        `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-full">${r}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>` : ''}
 
-                    <div class="flex flex-wrap gap-2">
-                        ${(dest.tags || []).map(t => 
-                            `<span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full">${t}</span>`
-                        ).join('')}
+                        <div class="flex flex-wrap gap-2">
+                            ${(dest.tags || []).map(t => 
+                                `<span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full">${t}</span>`
+                            ).join('')}
+                        </div>
                     </div>
-                </div>
-            </div>
+                </a>
+            </article>
         `).join('');
     } catch (e) {
         console.error(e);
-        status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6">Network error. Please try again.</div>`;
+        status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6" role="alert">Network error. Please try again.</div>`;
     }
 }
 

@@ -6,7 +6,8 @@
     "continent": "Asia",
     "description": "Tropical paradise with stunning beaches, lush rice terraces, vibrant culture and spiritual temples.",
     "tags": ["beach", "culture", "nature", "food"],
-    "avg_cost_per_day": 45
+    "avg_cost_per_day": 45,
+    "image": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&h=600&fit=crop"
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "continent": "Europe",
     "description": "The City of Light – romantic streets, world-class museums, iconic Eiffel Tower and exquisite cuisine.",
     "tags": ["culture", "food", "romance", "history"],
-    "avg_cost_per_day": 120
+    "avg_cost_per_day": 120,
+    "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&h=600&fit=crop"
   },
   {
     "id": 3,
@@ -24,7 +26,8 @@
     "continent": "Asia",
     "description": "Futuristic metropolis blending ancient temples with neon skyscrapers, incredible food and unique experiences.",
     "tags": ["culture", "food", "city", "technology"],
-    "avg_cost_per_day": 95
+    "avg_cost_per_day": 95,
+    "image": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop"
   },
   {
     "id": 4,
@@ -33,7 +36,8 @@
     "continent": "Europe",
     "description": "Famous for its white-washed buildings, blue domes, dramatic cliffs and breathtaking sunsets over the Aegean Sea.",
     "tags": ["beach", "romance", "nature", "photography"],
-    "avg_cost_per_day": 110
+    "avg_cost_per_day": 110,
+    "image": "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&h=600&fit=crop"
   },
   {
     "id": 5,
@@ -42,7 +46,8 @@
     "continent": "Africa",
     "description": "Stunning coastal city with Table Mountain, vibrant culture, excellent wine and diverse outdoor adventures.",
     "tags": ["nature", "adventure", "beach", "culture"],
-    "avg_cost_per_day": 70
+    "avg_cost_per_day": 70,
+    "image": "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800&h=600&fit=crop"
   },
   {
     "id": 6,
@@ -51,7 +56,8 @@
     "continent": "North America",
     "description": "The city that never sleeps – iconic skyline, Broadway shows, world-class museums and endless energy.",
     "tags": ["city", "culture", "food", "shopping"],
-    "avg_cost_per_day": 180
+    "avg_cost_per_day": 180,
+    "image": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&h=600&fit=crop"
   },
   {
     "id": 7,
@@ -60,7 +66,8 @@
     "continent": "South America",
     "description": "Ancient Incan citadel high in the Andes – one of the most spectacular archaeological sites in the world.",
     "tags": ["history", "adventure", "nature", "culture"],
-    "avg_cost_per_day": 65
+    "avg_cost_per_day": 65,
+    "image": "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&h=600&fit=crop"
   },
   {
     "id": 8,
@@ -69,7 +76,8 @@
     "continent": "Asia",
     "description": "Ultra-modern desert city with luxury shopping, record-breaking architecture and desert adventures.",
     "tags": ["city", "luxury", "shopping", "adventure"],
-    "avg_cost_per_day": 150
+    "avg_cost_per_day": 150,
+    "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=600&fit=crop"
   },
   {
     "id": 9,
@@ -78,7 +86,8 @@
     "continent": "Europe",
     "description": "Gateway to glaciers, volcanoes, northern lights and the famous Blue Lagoon geothermal spa.",
     "tags": ["nature", "adventure", "photography", "unique"],
-    "avg_cost_per_day": 130
+    "avg_cost_per_day": 130,
+    "image": "https://images.unsplash.com/photo-1504829857797-ddff29da822f?w=800&h=600&fit=crop"
   },
   {
     "id": 10,
@@ -87,7 +96,8 @@
     "continent": "Asia",
     "description": "Vibrant capital with ornate temples, floating markets, street food paradise and lively nightlife.",
     "tags": ["food", "culture", "city", "budget"],
-    "avg_cost_per_day": 40
+    "avg_cost_per_day": 40,
+    "image": "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&h=600&fit=crop"
   },
   {
     "id": 11,
@@ -96,7 +106,8 @@
     "continent": "Europe",
     "description": "Gaudi masterpieces, sunny beaches, fantastic food and a perfect mix of culture and Mediterranean vibe.",
     "tags": ["beach", "culture", "food", "architecture"],
-    "avg_cost_per_day": 90
+    "avg_cost_per_day": 90,
+    "image": "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&h=600&fit=crop"
   },
   {
     "id": 12,
@@ -105,6 +116,7 @@
     "continent": "Oceania",
     "description": "Adventure capital of the world – bungee jumping, skiing, hiking and breathtaking alpine scenery.",
     "tags": ["adventure", "nature", "outdoor", "scenery"],
-    "avg_cost_per_day": 100
+    "avg_cost_per_day": 100,
+    "image": "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=800&h=600&fit=crop"
   }
 ]
