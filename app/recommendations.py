@@ -13,22 +13,25 @@ from flask import Blueprint, request, jsonify
 
 from app.auth import get_current_user
 from app.models import get_all_destinations, get_user_by_username
+from app.external_api import get_combined_destinations
 
 recommendations_bp = Blueprint("recommendations", __name__)
 
 
 def _score_destination(dest: dict, preferences: list[str]) -> tuple[float, list[str]]:
-    """Calculate a relevance score and list of matching reasons for a destination.
+    """Calculate a relevance score and list of matching reasons.
 
-    Scoring rules:
-    - +3 for each exact preference tag match
-    - +1 for partial / related keyword matches in description or name
-    - Small bonus for lower-cost destinations (budget-friendly bias)
+    Scoring:
+    - +3 per exact preference tag match
+    - +1 for keyword match in name/description
+    - Budget-friendly bonus
+    - Strong boost for curated tourist destinations (famous travel spots)
     """
     dest_tags = [t.lower() for t in dest.get("tags", [])]
     name = dest.get("name", "").lower()
     description = dest.get("description", "").lower()
     cost = dest.get("avg_cost_per_day") or 100
+    source = dest.get("source", "local")
 
     score = 0.0
     matched = []
@@ -42,11 +45,23 @@ def _score_destination(dest: dict, preferences: list[str]) -> tuple[float, list[
             if pref not in matched:
                 matched.append(f"{pref} (mentioned)")
 
-    # Mild preference for more affordable destinations
+    # Budget preference
     if cost <= 60:
         score += 0.8
     elif cost <= 100:
         score += 0.4
+
+    # Prefer famous tourist spots over generic capitals
+    if source in (None, "local") or source == "local":
+        # Seed data has no source field → treat as local
+        if not dest.get("source"):
+            score += 2.5
+            if "curated pick" not in matched:
+                matched.append("top destination")
+    if source == "tourist_curated":
+        score += 2.5
+        if "popular tourist spot" not in matched:
+            matched.append("popular tourist spot")
 
     return score, matched
 
@@ -55,12 +70,7 @@ def _score_destination(dest: dict, preferences: list[str]) -> tuple[float, list[
 def get_recommendations():
     """Return personalised destination recommendations for the logged-in user.
 
-    Improvements over the original version:
-    - Weighted scoring (exact tag matches are stronger)
-    - Diversity across continents
-    - Light budget preference
-    - Match reasons returned for transparency
-    - Graceful fallback when the user has no preferences
+    Prefers curated tourist destinations and seed data over plain country capitals.
 
     Query parameters:
         limit (int, default 6) – maximum number of results
@@ -79,19 +89,23 @@ def get_recommendations():
 
     try:
         limit = int(request.args.get("limit", 6))
-        limit = max(1, min(limit, 20))  # safety bounds
+        limit = max(1, min(limit, 20))
     except ValueError:
         return jsonify({"error": "limit must be an integer"}), 400
 
-    destinations = get_all_destinations()
+    # Use full catalogue: seed + tourist cities + country capitals
+    local = get_all_destinations()
+    destinations = get_combined_destinations(local)
 
-    # --- No preferences: return a diverse popular set ---
+    # --- No preferences: return diverse top tourist picks ---
     if not preferences:
-        # Prefer a mix of continents and lower-to-mid cost destinations
-        popular = sorted(
-            destinations,
-            key=lambda d: (d.get("avg_cost_per_day") or 999)
-        )
+        # Prefer tourist_curated and local first
+        def popularity_key(d):
+            source = d.get("source") or "local"
+            source_rank = 0 if source in ("local", "tourist_curated") or not d.get("source") else 1
+            return (source_rank, d.get("avg_cost_per_day") or 999)
+
+        popular = sorted(destinations, key=popularity_key)
         results = []
         seen_continents = set()
         for dest in popular:
@@ -99,7 +113,7 @@ def get_recommendations():
             if continent not in seen_continents or len(results) < 3:
                 entry = dict(dest)
                 entry["match_score"] = 0
-                entry["match_reasons"] = ["popular / diverse pick"]
+                entry["match_reasons"] = ["popular tourist pick"]
                 results.append(entry)
                 seen_continents.add(continent)
             if len(results) >= limit:
@@ -110,13 +124,12 @@ def get_recommendations():
     scored = []
     for dest in destinations:
         score, matched = _score_destination(dest, preferences)
-        if score > 0:  # only keep destinations with at least some relevance
+        if score > 0:
             scored.append((score, dest, matched))
 
-    # Sort by score descending, then by cost ascending as tie-breaker
     scored.sort(key=lambda x: (-x[0], x[1].get("avg_cost_per_day") or 999))
 
-    # --- Diversity: try not to return too many from the same continent ---
+    # Diversity across continents
     results = []
     continent_count = {}
 
@@ -124,7 +137,6 @@ def get_recommendations():
         continent = dest.get("continent", "Unknown")
         count = continent_count.get(continent, 0)
 
-        # Allow up to 2 from the same continent before skipping
         if count >= 2 and len(results) >= 3:
             continue
 
@@ -137,7 +149,6 @@ def get_recommendations():
         if len(results) >= limit:
             break
 
-    # If diversity filter left us short, fill with remaining high-scoring ones
     if len(results) < limit:
         already_ids = {r.get("id") for r in results}
         for score, dest, matched in scored:
