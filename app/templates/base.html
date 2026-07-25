@@ -10,6 +10,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .heading { font-family: 'Playfair Display', serif; }
+        .modal-enter { animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -30,11 +35,16 @@
                     <a href="/itineraries" class="text-gray-700 hover:text-indigo-600 font-medium transition">My Trips</a>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <button onclick="openLogin()" class="text-gray-700 hover:text-indigo-600 font-medium">Login</button>
-                    <button onclick="openRegister()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition text-sm font-medium">
+                <div id="authButtons" class="flex items-center gap-3">
+                    <button onclick="openLogin()" class="text-gray-700 hover:text-indigo-600 font-medium transition">Login</button>
+                    <button onclick="openRegister()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition text-sm font-medium shadow-sm">
                         Sign Up
                     </button>
+                </div>
+
+                <div id="userMenu" class="hidden items-center gap-3">
+                    <span id="usernameDisplay" class="text-sm text-gray-600"></span>
+                    <button onclick="logout()" class="text-red-500 hover:text-red-600 text-sm font-medium">Logout</button>
                 </div>
             </div>
         </div>
@@ -52,79 +62,270 @@
         </div>
     </footer>
 
-    <!-- Simple Login/Register Modals (placeholder) -->
-    <div id="loginModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4">
-            <h2 class="text-2xl font-bold mb-6">Login</h2>
-            <input type="text" id="loginUser" placeholder="Username" class="w-full border rounded-xl px-4 py-3 mb-4">
-            <input type="password" id="loginPass" placeholder="Password" class="w-full border rounded-xl px-4 py-3 mb-6">
-            <button onclick="doLogin()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium">Login</button>
-            <button onclick="closeModals()" class="mt-4 text-gray-500 w-full">Cancel</button>
+    <!-- ==================== LOGIN MODAL ==================== -->
+    <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white relative">
+                <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-user text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold">Welcome back</h2>
+                        <p class="text-indigo-100 text-sm">Login to continue your journey</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="p-8">
+                <div id="loginError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="loginUser" placeholder="Enter your username"
+                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="password" id="loginPass" placeholder="Enter your password"
+                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                        </div>
+                    </div>
+                </div>
+
+                <button id="loginBtn" onclick="doLogin()"
+                        class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                    <span>Login</span>
+                </button>
+
+                <p class="text-center text-sm text-gray-500 mt-6">
+                    Don't have an account?
+                    <button onclick="switchToRegister()" class="text-indigo-600 font-medium hover:underline">Sign up</button>
+                </p>
+            </div>
         </div>
     </div>
 
-    <div id="registerModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4">
-            <h2 class="text-2xl font-bold mb-6">Create Account</h2>
-            <input type="text" id="regUser" placeholder="Username" class="w-full border rounded-xl px-4 py-3 mb-4">
-            <input type="password" id="regPass" placeholder="Password" class="w-full border rounded-xl px-4 py-3 mb-4">
-            <input type="text" id="regPrefs" placeholder="Preferences (e.g. beach, food)" class="w-full border rounded-xl px-4 py-3 mb-6">
-            <button onclick="doRegister()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium">Sign Up</button>
-            <button onclick="closeModals()" class="mt-4 text-gray-500 w-full">Cancel</button>
+    <!-- ==================== REGISTER MODAL ==================== -->
+    <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white relative">
+                <button onclick="closeModals()" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-user-plus text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold">Join GlobeTrotter</h2>
+                        <p class="text-indigo-100 text-sm">Create your account to get started</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="p-8">
+                <div id="regError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="regUser" placeholder="Choose a username"
+                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="password" id="regPass" placeholder="Create a password"
+                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Travel Preferences</label>
+                        <div class="relative">
+                            <i class="fas fa-heart absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="regPrefs" placeholder="e.g. beach, food, culture, adventure"
+                                   class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1.5">Separate with commas — this powers your recommendations</p>
+                    </div>
+                </div>
+
+                <button id="regBtn" onclick="doRegister()"
+                        class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                    <span>Create Account</span>
+                </button>
+
+                <p class="text-center text-sm text-gray-500 mt-6">
+                    Already have an account?
+                    <button onclick="switchToLogin()" class="text-indigo-600 font-medium hover:underline">Login</button>
+                </p>
+            </div>
         </div>
     </div>
 
     <script>
+        // Check login state on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('authButtons').classList.add('hidden');
+                document.getElementById('userMenu').classList.remove('hidden');
+                document.getElementById('userMenu').classList.add('flex');
+                // Simple display (we don't store username separately yet)
+                document.getElementById('usernameDisplay').textContent = 'Logged in';
+            }
+        });
+
         function openLogin() {
+            closeModals();
+            document.getElementById('loginError').classList.add('hidden');
             document.getElementById('loginModal').classList.remove('hidden');
             document.getElementById('loginModal').classList.add('flex');
         }
+
         function openRegister() {
+            closeModals();
+            document.getElementById('regError').classList.add('hidden');
             document.getElementById('registerModal').classList.remove('hidden');
             document.getElementById('registerModal').classList.add('flex');
         }
+
         function closeModals() {
             document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('flex');
             document.getElementById('registerModal').classList.add('hidden');
+            document.getElementById('registerModal').classList.remove('flex');
+        }
+
+        function switchToRegister() {
+            closeModals();
+            openRegister();
+        }
+
+        function switchToLogin() {
+            closeModals();
+            openLogin();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            location.reload();
         }
 
         async function doLogin() {
-            const username = document.getElementById('loginUser').value;
+            const username = document.getElementById('loginUser').value.trim();
             const password = document.getElementById('loginPass').value;
-            const res = await fetch('/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username, password})
-            });
-            const data = await res.json();
-            if (data.token) {
-                localStorage.setItem('token', data.token);
-                alert('Logged in successfully!');
-                closeModals();
-                location.reload();
-            } else {
-                alert(data.error || 'Login failed');
+            const errorEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+
+            if (!username || !password) {
+                errorEl.textContent = 'Please fill in all fields';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            errorEl.classList.add('hidden');
+
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+                const data = await res.json();
+
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    closeModals();
+                    location.reload();
+                } else {
+                    errorEl.textContent = data.error || 'Invalid credentials';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (e) {
+                errorEl.textContent = 'Network error. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Login</span>';
             }
         }
 
         async function doRegister() {
-            const username = document.getElementById('regUser').value;
+            const username = document.getElementById('regUser').value.trim();
             const password = document.getElementById('regPass').value;
-            const prefs = document.getElementById('regPrefs').value.split(',').map(p => p.trim());
-            const res = await fetch('/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username, password, preferences: prefs})
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert('Account created! Please login.');
-                closeModals();
-                openLogin();
-            } else {
-                alert(data.error || 'Registration failed');
+            const prefsRaw = document.getElementById('regPrefs').value;
+            const prefs = prefsRaw.split(',').map(p => p.trim()).filter(Boolean);
+            const errorEl = document.getElementById('regError');
+            const btn = document.getElementById('regBtn');
+
+            if (!username || !password) {
+                errorEl.textContent = 'Username and password are required';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+            errorEl.classList.add('hidden');
+
+            try {
+                const res = await fetch('/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password, preferences: prefs})
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    closeModals();
+                    // Auto-fill login form and switch
+                    document.getElementById('loginUser').value = username;
+                    openLogin();
+                    document.getElementById('loginError').textContent = 'Account created! Please login.';
+                    document.getElementById('loginError').classList.remove('hidden');
+                    document.getElementById('loginError').classList.replace('bg-red-50', 'bg-emerald-50');
+                    document.getElementById('loginError').classList.replace('text-red-600', 'text-emerald-600');
+                } else {
+                    errorEl.textContent = data.error || 'Registration failed';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (e) {
+                errorEl.textContent = 'Network error. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Create Account</span>';
             }
         }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModals();
+        });
     </script>
 
     {% block scripts %}{% endblock %}
