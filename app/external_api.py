@@ -1,13 +1,12 @@
 """
 app/external_api.py
 
-Fetch additional travel destinations from the free REST Countries API
-(https://restcountries.com) and normalise them into our destination schema.
+Build the full destination catalogue from three sources:
+1. Curated seed data (data/destinations.json) – richest quality
+2. Top tourist cities (app/tourist_destinations.py) – famous travel spots
+3. REST Countries API – every country capital (no API key)
 
-No API key required. Results are cached in memory for the lifetime of the
-process so we don't hit the external API on every request.
-
-Includes every country that has a capital city.
+Results from the external API are cached in memory.
 """
 from __future__ import annotations
 
@@ -16,9 +15,10 @@ from typing import Optional
 
 import requests
 
+from app.tourist_destinations import get_tourist_destinations
+
 logger = logging.getLogger(__name__)
 
-# In-memory cache so we only call the external API once per process lifetime
 _cache: Optional[list] = None
 
 REGION_TO_CONTINENT = {
@@ -79,12 +79,11 @@ def _fetch_from_restcountries() -> list:
         return []
 
     destinations = []
-    next_id = 1000  # avoid collision with seed ids 1-12
+    next_id = 1000
 
     for country in countries:
         capitals = country.get("capital") or []
         if not capitals:
-            # Country has no capital – skip (very rare)
             continue
 
         capital = capitals[0]
@@ -127,7 +126,7 @@ def _fetch_from_restcountries() -> list:
 
 
 def get_external_destinations() -> list:
-    """Return cached external destinations (fetched once)."""
+    """Return cached REST Countries destinations."""
     global _cache
     if _cache is not None:
         return _cache
@@ -138,17 +137,28 @@ def get_external_destinations() -> list:
 
 
 def get_combined_destinations(local: list) -> list:
-    """Merge curated local destinations with external API results.
+    """Merge local seed + tourist curated + REST Countries.
 
-    Local (seed) entries always win on name conflict so our rich descriptions
-    and photos are preferred.
+    Priority on name conflicts:
+      1. Local seed (best photos/descriptions)
+      2. Tourist curated (famous cities)
+      3. REST Countries capitals
     """
-    local_names = {d.get("name", "").lower() for d in local}
-    external = get_external_destinations()
-
+    seen = {d.get("name", "").lower() for d in local}
     merged = list(local)
-    for dest in external:
-        if dest.get("name", "").lower() not in local_names:
+
+    # Add top tourist cities next
+    for dest in get_tourist_destinations():
+        key = dest.get("name", "").lower()
+        if key not in seen:
             merged.append(dest)
+            seen.add(key)
+
+    # Then all country capitals
+    for dest in get_external_destinations():
+        key = dest.get("name", "").lower()
+        if key not in seen:
+            merged.append(dest)
+            seen.add(key)
 
     return merged
