@@ -1,35 +1,113 @@
 """
 app/models.py
 
-Data models and file I/O helpers.
+Data models.
 
-All persistent data is stored in JSON files under the /data directory.
-  - data/users.json       – registered users
-  - data/itineraries.json – user itineraries
-  - data/destinations.json – static destination catalogue (seed data)
+- Users & itineraries → PostgreSQL (via SQLAlchemy)
+- Destinations → static JSON seed file (plus external API at runtime)
 """
+from __future__ import annotations
+
 import json
 import os
+import uuid
+from datetime import datetime, timezone
 
-# Resolve the /data directory relative to this file's location so the app
-# works regardless of the current working directory.
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import JSON
+
+db = SQLAlchemy()
+
 _BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(_BASE_DIR, "data")
-
-USERS_FILE = os.path.join(DATA_DIR, "users.json")
-ITINERARIES_FILE = os.path.join(DATA_DIR, "itineraries.json")
 DESTINATIONS_FILE = os.path.join(DATA_DIR, "destinations.json")
 
 
 # ---------------------------------------------------------------------------
-# Generic file I/O helpers
+# SQLAlchemy models (PostgreSQL)
+# ---------------------------------------------------------------------------
+
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    username = db.Column(db.String(80), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    preferences = db.Column(JSON, default=list, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "username": self.username,
+            "password_hash": self.password_hash,
+            "preferences": self.preferences or [],
+        }
+
+
+class Itinerary(db.Model):
+    __tablename__ = "itineraries"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    username = db.Column(db.String(80), nullable=False, index=True)
+    title = db.Column(db.String(200), nullable=False)
+    destinations = db.Column(JSON, default=list, nullable=False)
+    start_date = db.Column(db.String(20), default="")
+    end_date = db.Column(db.String(20), default="")
+    notes = db.Column(db.Text, default="")
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "username": self.username,
+            "title": self.title,
+            "destinations": self.destinations or [],
+            "start_date": self.start_date or "",
+            "end_date": self.end_date or "",
+            "notes": self.notes or "",
+            "created_at": self.created_at.isoformat() if self.created_at else "",
+        }
+
+
+# ---------------------------------------------------------------------------
+# User helpers (same interface as before)
+# ---------------------------------------------------------------------------
+
+def get_all_users() -> list:
+    return [u.to_dict() for u in User.query.all()]
+
+
+def get_user_by_username(username: str) -> dict | None:
+    user = User.query.filter_by(username=username).first()
+    return user.to_dict() if user else None
+
+
+def save_user(user: dict) -> None:
+    record = User(
+        id=user.get("id") or str(uuid.uuid4()),
+        username=user["username"],
+        password_hash=user["password_hash"],
+        preferences=user.get("preferences") or [],
+    )
+    db.session.add(record)
+    db.session.commit()
+
+
+def update_user_preferences(username: str, preferences: list) -> bool:
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return False
+    user.preferences = preferences
+    db.session.commit()
+    return True
+
+
+# ---------------------------------------------------------------------------
+# Destination helpers (still JSON seed file)
 # ---------------------------------------------------------------------------
 
 def _read_json(filepath: str) -> list:
-    """Read a JSON file and return its contents as a Python list.
-
-    Returns an empty list if the file does not exist or is empty.
-    """
     if not os.path.exists(filepath):
         return []
     with open(filepath, "r", encoding="utf-8") as fh:
@@ -39,58 +117,8 @@ def _read_json(filepath: str) -> list:
         return json.loads(content)
 
 
-def _write_json(filepath: str, data: list) -> None:
-    """Serialise *data* and write it to *filepath* (pretty-printed)."""
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    with open(filepath, "w", encoding="utf-8") as fh:
-        json.dump(data, fh, indent=2)
-
-
-# ---------------------------------------------------------------------------
-# User helpers
-# ---------------------------------------------------------------------------
-
-def get_all_users() -> list:
-    """Return all registered users."""
-    return _read_json(USERS_FILE)
-
-
-def get_user_by_username(username: str) -> dict | None:
-    """Return the user dict for *username*, or None if not found."""
-    users = get_all_users()
-    for user in users:
-        if user.get("username") == username:
-            return user
-    return None
-
-
-def save_user(user: dict) -> None:
-    """Append *user* to the users store."""
-    users = get_all_users()
-    users.append(user)
-    _write_json(USERS_FILE, users)
-
-
-def update_user_preferences(username: str, preferences: list) -> bool:
-    """Update the preferences list for an existing user.
-
-    Returns True if the user was found and updated, False otherwise.
-    """
-    users = get_all_users()
-    for user in users:
-        if user.get("username") == username:
-            user["preferences"] = preferences
-            _write_json(USERS_FILE, users)
-            return True
-    return False
-
-
-# ---------------------------------------------------------------------------
-# Destination helpers
-# ---------------------------------------------------------------------------
-
 def get_all_destinations() -> list:
-    """Return all destinations from the static catalogue."""
+    """Return destinations from the static catalogue (seed data)."""
     return _read_json(DESTINATIONS_FILE)
 
 
@@ -99,17 +127,23 @@ def get_all_destinations() -> list:
 # ---------------------------------------------------------------------------
 
 def get_all_itineraries() -> list:
-    """Return all itineraries across all users."""
-    return _read_json(ITINERARIES_FILE)
+    return [it.to_dict() for it in Itinerary.query.all()]
 
 
 def get_itineraries_for_user(username: str) -> list:
-    """Return itineraries that belong to *username*."""
-    return [it for it in get_all_itineraries() if it.get("username") == username]
+    rows = Itinerary.query.filter_by(username=username).order_by(Itinerary.created_at.desc()).all()
+    return [it.to_dict() for it in rows]
 
 
 def save_itinerary(itinerary: dict) -> None:
-    """Append *itinerary* to the itineraries store."""
-    itineraries = get_all_itineraries()
-    itineraries.append(itinerary)
-    _write_json(ITINERARIES_FILE, itineraries)
+    record = Itinerary(
+        id=itinerary.get("id") or str(uuid.uuid4()),
+        username=itinerary["username"],
+        title=itinerary["title"],
+        destinations=itinerary.get("destinations") or [],
+        start_date=itinerary.get("start_date") or "",
+        end_date=itinerary.get("end_date") or "",
+        notes=itinerary.get("notes") or "",
+    )
+    db.session.add(record)
+    db.session.commit()

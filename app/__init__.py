@@ -6,22 +6,40 @@ Flask application factory.
 import os
 from flask import Flask
 
-def create_app():
+from app.models import db
+
+
+def create_app(config_overrides: dict | None = None):
     """Create and configure the Flask application."""
     app = Flask(__name__)
 
-    # Secret key used for JWT signing.  Set the SECRET_KEY environment variable
-    # in production.  The fallback is intentionally weak and must never be used
-    # outside of local development.
     app.config["SECRET_KEY"] = os.environ.get(
         "SECRET_KEY", "globetrotter-secret-change-in-prod"
     )
 
-    # Register main frontend routes
+    # Database – PostgreSQL in Docker, SQLite fallback for local tests
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    else:
+        # Fallback for tests / local without Postgres
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    if config_overrides:
+        app.config.update(config_overrides)
+
+    db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
+    # Frontend routes
     from app.routes import main_bp
     app.register_blueprint(main_bp)
 
-    # Register all API blueprints
+    # API blueprints
     from app.auth import auth_bp
     from app.destinations import destinations_bp
     from app.recommendations import recommendations_bp
