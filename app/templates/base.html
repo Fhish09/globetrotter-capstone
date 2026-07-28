@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/container-queries.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/marquee.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/effects.css') }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -44,7 +45,7 @@
 </head>
 <body class="gt-theme bg-gt-bg text-gt-text min-h-screen flex flex-col">
 
-    <nav class="gt-nav sticky top-0 z-50 backdrop-blur-md">
+    <nav class="gt-nav gt-glass-nav sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex justify-between h-14 sm:h-16 items-center">
                 <a href="/" class="flex items-center gap-2 min-w-0">
@@ -80,7 +81,7 @@
             </div>
         </div>
 
-        <div id="mobileMenu" class="hidden md:hidden border-t border-gt-border bg-gt-surface safe-bottom">
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gt-border bg-gt-surface/95 backdrop-blur-lg safe-bottom">
             <div class="px-4 py-3 space-y-1">
                 <a href="/" class="block py-3 px-2 rounded-lg text-gt-muted hover:bg-gt-surface2 hover:text-gt-accent font-medium">Home</a>
                 <a href="/destinations" class="block py-3 px-2 rounded-lg text-gt-muted hover:bg-gt-surface2 hover:text-gt-accent font-medium">Destinations</a>
@@ -113,8 +114,8 @@
     </footer>
 
     <div id="loginModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="bg-gt-surface2 px-6 sm:px-8 py-5 sm:py-6 text-gt-text relative border-b border-gt-border">
+        <div class="gt-glass-strong rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
+            <div class="bg-gt-surface2/80 px-6 sm:px-8 py-5 sm:py-6 text-gt-text relative border-b border-gt-border">
                 <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-gt-muted hover:text-gt-text text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3 pr-8">
                     <div class="w-11 h-11 bg-gt-accent/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-user text-gt-accent"></i></div>
@@ -143,8 +144,8 @@
     </div>
 
     <div id="registerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="bg-gt-surface2 px-6 sm:px-8 py-5 sm:py-6 relative border-b border-gt-border">
+        <div class="gt-glass-strong rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
+            <div class="bg-gt-surface2/80 px-6 sm:px-8 py-5 sm:py-6 relative border-b border-gt-border">
                 <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-gt-muted hover:text-gt-text text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3 pr-8">
                     <div class="w-11 h-11 bg-gt-accent/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-user-plus text-gt-accent"></i></div>
@@ -178,8 +179,8 @@
     </div>
 
     <div id="prefsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="bg-gt-surface2 px-6 sm:px-8 py-5 sm:py-6 relative border-b border-gt-border">
+        <div class="gt-glass-strong rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
+            <div class="bg-gt-surface2/80 px-6 sm:px-8 py-5 sm:py-6 relative border-b border-gt-border">
                 <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-gt-muted hover:text-gt-text text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3 pr-8">
                     <div class="w-11 h-11 bg-gt-accent/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-sliders-h text-gt-accent"></i></div>
@@ -223,7 +224,34 @@
                 document.getElementById('mobileUser')?.classList.remove('hidden');
                 document.getElementById('mobileUsername').textContent = 'Logged in';
             }
+            initScrollReveal();
         });
+
+        function initScrollReveal() {
+            const nodes = document.querySelectorAll('.gt-reveal');
+            if (!nodes.length) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                nodes.forEach(n => n.classList.add('is-visible'));
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+            nodes.forEach(n => io.observe(n));
+        }
+        // Re-run when dynamic content is injected
+        window.refreshScrollReveal = function() {
+            document.querySelectorAll('.gt-reveal:not(.is-visible)').forEach((n, i) => {
+                n.style.setProperty('--reveal-delay', (i % 6) * 60 + 'ms');
+            });
+            initScrollReveal();
+        };
+
         function openLogin() { closeModals(); document.getElementById('loginError').classList.add('hidden'); document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('loginModal').classList.add('flex'); document.body.style.overflow = 'hidden'; }
         function openRegister() { closeModals(); document.getElementById('regError').classList.add('hidden'); document.getElementById('registerModal').classList.remove('hidden'); document.getElementById('registerModal').classList.add('flex'); document.body.style.overflow = 'hidden'; }
         async function openPreferences() {

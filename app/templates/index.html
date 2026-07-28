@@ -5,10 +5,10 @@
     <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1488085061387-422e58bd4a48?w=1600')] bg-cover bg-center opacity-25" aria-hidden="true"></div>
     <div class="absolute inset-0 bg-gradient-to-b from-gt-bg/80 via-gt-bg/60 to-gt-bg"></div>
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-28 text-center">
-        <h1 class="heading text-3xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-gt-text">Discover the World</h1>
+        <h1 class="heading text-3xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight gt-gradient-text">Discover the World</h1>
         <p class="text-base sm:text-xl md:text-2xl text-gt-muted mb-8 sm:mb-12 max-w-2xl mx-auto px-2">Your personal travel assistant for unforgettable adventures</p>
         <form onsubmit="event.preventDefault(); searchDestinations();" class="max-w-xl mx-auto" role="search">
-            <div class="bg-gt-surface/90 border border-gt-border rounded-2xl p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-2xl">
+            <div class="gt-glass rounded-2xl p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <div class="flex items-center flex-1 min-w-0">
                     <i class="fas fa-search text-gt-muted pl-3 sm:pl-5 shrink-0"></i>
                     <label for="heroSearch" class="sr-only">Search destinations</label>
@@ -22,14 +22,11 @@
     </div>
 </section>
 
-<!-- Trending marquee: responsive, pause on hover, reduced-motion safe -->
 <section class="gt-marquee" aria-label="Trending destinations">
     <div class="flex items-stretch">
         <span class="gt-marquee__label hidden sm:inline-flex items-center">Trending</span>
         <div class="flex-1 overflow-hidden min-w-0">
-            <div class="gt-marquee__track" id="marqueeTrack">
-                <!-- Filled by JS (duplicated for seamless loop) -->
-            </div>
+            <div class="gt-marquee__track" id="marqueeTrack"></div>
         </div>
     </div>
 </section>
@@ -53,7 +50,7 @@
 
 <section class="bg-gt-surface border-y border-gt-border py-12 sm:py-16" aria-label="Call to action">
     <div class="max-w-4xl mx-auto text-center px-4 sm:px-6">
-        <h2 class="heading text-2xl sm:text-3xl md:text-4xl font-bold mb-3 text-gt-text">Ready to plan your next trip?</h2>
+        <h2 class="heading text-2xl sm:text-3xl md:text-4xl font-bold mb-3 gt-gradient-text">Ready to plan your next trip?</h2>
         <p class="text-gt-muted mb-6 sm:mb-8 text-base sm:text-lg">Get personalized recommendations based on your preferences.</p>
         <a href="/recommendations" class="inline-block gt-btn-primary font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl min-h-[48px]">Get Recommendations</a>
     </div>
@@ -67,9 +64,7 @@ function getDestImage(dest) {
 
 function buildMarqueeItems(list) {
     return list.map(dest => {
-        const label = dest.country
-            ? `${dest.name} · ${dest.country}`
-            : dest.name;
+        const label = dest.country ? `${dest.name} · ${dest.country}` : dest.name;
         const href = dest.id ? `/destinations/${dest.id}` : `/destinations?q=${encodeURIComponent(dest.name)}`;
         return `<a class="gt-marquee__item" href="${href}"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${label}</span></a>`;
     }).join('');
@@ -78,31 +73,23 @@ function buildMarqueeItems(list) {
 async function loadMarquee() {
     const track = document.getElementById('marqueeTrack');
     if (!track) return;
-
     const fallback = [
         { name: 'Kribi', country: 'Cameroon' },
         { name: 'Limbe', country: 'Cameroon' },
         { name: 'Mount Cameroon', country: 'Cameroon' },
         { name: 'Douala', country: 'Cameroon' },
-        { name: 'Yaoundé', country: 'Cameroon' },
         { name: 'Bali', country: 'Indonesia' },
         { name: 'Tokyo', country: 'Japan' },
         { name: 'Paris', country: 'France' },
         { name: 'Cape Town', country: 'South Africa' },
-        { name: 'Marrakech', country: 'Morocco' },
     ];
-
     let items = fallback;
     try {
         const res = await fetch('/destinations?source=local');
         const data = await res.json();
-        if (Array.isArray(data) && data.length) {
-            items = data.slice(0, 14);
-        }
-    } catch (e) { /* use fallback */ }
-
+        if (Array.isArray(data) && data.length) items = data.slice(0, 14);
+    } catch (e) {}
     const html = buildMarqueeItems(items);
-    // Duplicate for seamless loop (animation moves -50%)
     track.innerHTML = html + html;
 }
 
@@ -115,11 +102,14 @@ async function loadDestinations() {
             container.innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-gt-muted"><p>No destinations found.</p></div>`;
             return;
         }
-        container.innerHTML = data.slice(0, 6).map(dest => `
-            <a href="/destinations/${dest.id}" class="cq-card bg-gt-surface border border-gt-border rounded-2xl overflow-hidden shadow-lg hover:border-gt-accent/40 transition group block" role="listitem">
+        container.innerHTML = data.slice(0, 6).map((dest, i) => `
+            <a href="/destinations/${dest.id}"
+               class="cq-card gt-reveal gt-card-glow bg-gt-surface border border-gt-border rounded-2xl overflow-hidden group block"
+               style="--reveal-delay: ${i * 70}ms"
+               role="listitem">
                 <div class="cq-card-media relative overflow-hidden">
                     <img src="${getDestImage(dest)}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${dest.name}" loading="lazy">
-                    <div class="absolute top-3 right-3 bg-gt-bg/90 border border-gt-border px-2.5 py-1 rounded-full text-xs font-medium text-gt-text">$${dest.avg_cost_per_day || '—'}/day</div>
+                    <div class="absolute top-3 right-3 gt-glass px-2.5 py-1 rounded-full text-xs font-medium text-gt-text">$${dest.avg_cost_per_day || '—'}/day</div>
                 </div>
                 <div class="cq-card-body">
                     <div class="flex items-center gap-2 text-xs text-gt-muted mb-2">
@@ -133,6 +123,7 @@ async function loadDestinations() {
                     </div>
                 </div>
             </a>`).join('');
+        if (window.refreshScrollReveal) window.refreshScrollReveal();
     } catch (err) {
         document.getElementById('destinations').innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-red-400"><p>Failed to load destinations.</p></div>`;
     }
