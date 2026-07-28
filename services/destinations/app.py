@@ -1,23 +1,36 @@
 """
 Destinations microservice – search catalogue (seed + tourist + REST Countries).
 Port: 5002
+
+Phase 4: Redis caching of search results and full catalogue.
 """
 import json
 import logging
 import os
+import sys
 from typing import Optional
 
 import requests
 from flask import Flask, request, jsonify
 
+sys.path.insert(0, os.path.dirname(__file__))
+try:
+    from cache import cache_get, cache_set
+except ImportError:
+    def cache_get(key): return None
+    def cache_set(key, value, ttl_seconds=300): pass
+
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
 DESTINATIONS_FILE = os.path.join(os.path.dirname(__file__), "data", "destinations.json")
-_cache: Optional[list] = None
+_memory_cache: Optional[list] = None
+CACHE_TTL = int(os.environ.get("CACHE_TTL", "300"))
 
-# --- Tourist curated (Cameroon + world) – subset imported inline for independence ---
-from tourist_data import TOP_TOURIST_DESTINATIONS  # noqa: E402
+try:
+    from tourist_data import TOP_TOURIST_DESTINATIONS
+except Exception:
+    TOP_TOURIST_DESTINATIONS = []
 
 
 def _load_seed() -> list:
@@ -66,8 +79,6 @@ def _fetch_restcountries() -> list:
         region = c.get("region", "")
         sub = c.get("subregion", "")
         continent = sub_map.get(sub) or region_map.get(region, region or "Unknown")
-        if region == "Americas" and continent == "North America" and sub == "South America":
-            continent = "South America"
         out.append({
             "id": nid,
             "name": caps[0],
@@ -84,32 +95,40 @@ def _fetch_restcountries() -> list:
 
 
 def get_all_destinations(source: str = "all") -> list:
-    global _cache
+    global _memory_cache
     seed = _load_seed()
     if source == "local":
         return seed
 
-    if _cache is None:
-        tourist = []
-        for i, d in enumerate(TOP_TOURIST_DESTINATIONS, start=2000):
-            entry = dict(d)
-            entry["id"] = i
-            entry["source"] = "tourist_curated"
-            tourist.append(entry)
+    cache_key = "destinations:all"
+    cached = cache_get(cache_key)
+    if cached is not None:
+        return cached
 
-        seen = {d["name"].lower() for d in seed}
-        merged = list(seed)
-        for d in tourist:
-            if d["name"].lower() not in seen:
-                merged.append(d)
-                seen.add(d["name"].lower())
-        for d in _fetch_restcountries():
-            if d["name"].lower() not in seen:
-                merged.append(d)
-                seen.add(d["name"].lower())
-        _cache = merged
+    if _memory_cache is not None:
+        return _memory_cache
 
-    return _cache
+    tourist = []
+    for i, d in enumerate(TOP_TOURIST_DESTINATIONS, start=2000):
+        entry = dict(d)
+        entry["id"] = i
+        entry["source"] = "tourist_curated"
+        tourist.append(entry)
+
+    seen = {d["name"].lower() for d in seed}
+    merged = list(seed)
+    for d in tourist:
+        if d["name"].lower() not in seen:
+            merged.append(d)
+            seen.add(d["name"].lower())
+    for d in _fetch_restcountries():
+        if d["name"].lower() not in seen:
+            merged.append(d)
+            seen.add(d["name"].lower())
+
+    _memory_cache = merged
+    cache_set(cache_key, merged, CACHE_TTL)
+    return merged
 
 
 @app.get("/health")
@@ -132,6 +151,12 @@ def search():
         except ValueError:
             return jsonify({"error": "max_cost must be an integer"}), 400
 
+    # Cache filtered search results
+    search_key = f"dest:q={q}:tag={tag}:cont={continent}:cost={max_cost}:src={source}"
+    cached = cache_get(search_key)
+    if cached is not None:
+        return jsonify(cached), 200
+
     results = []
     for dest in get_all_destinations(source):
         if q:
@@ -148,6 +173,7 @@ def search():
                 continue
         results.append(dest)
 
+    cache_set(search_key, results, CACHE_TTL)
     return jsonify(results), 200
 
 

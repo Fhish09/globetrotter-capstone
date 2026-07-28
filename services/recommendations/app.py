@@ -1,6 +1,6 @@
 """
 Recommendations microservice.
-Calls Auth (user preferences) and Destinations (catalogue) over HTTP.
+Calls Auth + Destinations with circuit breakers and optional Redis cache.
 Port: 5003
 """
 import os
@@ -9,12 +9,13 @@ import sys
 import jwt
 from flask import Flask, request, jsonify
 
-# Allow importing shared client when running in Docker (file copied) or from repo
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "shared"))
+sys.path.insert(0, os.path.dirname(__file__))
+
 try:
-    from http_client import call_service, ServiceError
+    from http_client import call_service, ServiceError, register_breaker
+    from circuit_breaker import CircuitBreaker
+    from cache import cache_get, cache_set
 except ImportError:
-    # Fallback if shared not on path – minimal inline client
     import requests
 
     class ServiceError(Exception):
@@ -24,20 +25,32 @@ except ImportError:
             self.status_code = status_code
 
     def call_service(service_name, method, url, **kwargs):
-        try:
-            r = requests.request(method, url, timeout=kwargs.get("timeout", 5),
-                                 headers=kwargs.get("headers"), params=kwargs.get("params"))
-            if r.status_code >= 400:
-                raise ServiceError(service_name, r.reason, r.status_code)
-            return r.json()
-        except requests.RequestException as e:
-            raise ServiceError(service_name, str(e), 503)
+        r = requests.request(method, url, timeout=kwargs.get("timeout", 5),
+                             headers=kwargs.get("headers"))
+        if r.status_code >= 400:
+            raise ServiceError(service_name, r.reason, r.status_code)
+        return r.json()
+
+    def register_breaker(name, breaker): pass
+    def cache_get(key): return None
+    def cache_set(key, value, ttl_seconds=300): pass
+    CircuitBreaker = None
 
 app = Flask(__name__)
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "globetrotter-secret-change-in-prod")
 AUTH_URL = os.environ.get("AUTH_SERVICE_URL", "http://auth:5001").rstrip("/")
 DEST_URL = os.environ.get("DESTINATIONS_SERVICE_URL", "http://destinations:5002").rstrip("/")
+CACHE_TTL = int(os.environ.get("CACHE_TTL", "60"))
+
+# Circuit breakers for upstreams
+if CircuitBreaker is not None:
+    _auth_breaker = CircuitBreaker("auth", failure_threshold=5, recovery_timeout=20)
+    _dest_breaker = CircuitBreaker("destinations", failure_threshold=5, recovery_timeout=20)
+    register_breaker("auth", _auth_breaker)
+    register_breaker("destinations", _dest_breaker)
+else:
+    _auth_breaker = _dest_breaker = None
 
 
 def get_username_from_token() -> str | None:
@@ -85,7 +98,6 @@ def _score(dest: dict, preferences: list[str]) -> tuple[float, list[str]]:
 
 @app.get("/health")
 def health():
-    """Liveness + shallow dependency check."""
     deps = {}
     for name, url in (("auth", AUTH_URL), ("destinations", DEST_URL)):
         try:
@@ -93,8 +105,20 @@ def health():
             deps[name] = "up"
         except ServiceError:
             deps[name] = "down"
+
+    breakers = {}
+    if _auth_breaker:
+        breakers["auth"] = _auth_breaker.status()
+    if _dest_breaker:
+        breakers["destinations"] = _dest_breaker.status()
+
     status = "ok" if all(v == "up" for v in deps.values()) else "degraded"
-    return jsonify({"status": status, "service": "recommendations", "dependencies": deps}), 200
+    return jsonify({
+        "status": status,
+        "service": "recommendations",
+        "dependencies": deps,
+        "circuit_breakers": breakers,
+    }), 200
 
 
 @app.get("/recommendations")
@@ -109,37 +133,22 @@ def recommendations():
     except ValueError:
         return jsonify({"error": "limit must be an integer"}), 400
 
-    # --- Call Auth service for user preferences ---
+    cache_key = f"rec:{username}:{limit}"
+    cached = cache_get(cache_key)
+    if cached is not None:
+        return jsonify(cached), 200
+
     try:
-        user = call_service(
-            "auth",
-            "GET",
-            f"{AUTH_URL}/internal/users/{username}",
-            timeout=5,
-            retries=2,
-        )
+        user = call_service("auth", "GET", f"{AUTH_URL}/internal/users/{username}", timeout=5, retries=2)
         preferences = [p.lower().strip() for p in (user or {}).get("preferences", []) if p]
     except ServiceError as exc:
         code = 404 if exc.status_code == 404 else 503
-        return jsonify({
-            "error": f"auth service: {exc.message}",
-            "service": "auth",
-        }), code
+        return jsonify({"error": f"auth service: {exc.message}", "service": "auth"}), code
 
-    # --- Call Destinations service for catalogue ---
     try:
-        destinations = call_service(
-            "destinations",
-            "GET",
-            f"{DEST_URL}/destinations",
-            timeout=10,
-            retries=2,
-        ) or []
+        destinations = call_service("destinations", "GET", f"{DEST_URL}/destinations", timeout=10, retries=2) or []
     except ServiceError as exc:
-        return jsonify({
-            "error": f"destinations service: {exc.message}",
-            "service": "destinations",
-        }), 503
+        return jsonify({"error": f"destinations service: {exc.message}", "service": "destinations"}), 503
 
     if not preferences:
         results = []
@@ -158,6 +167,7 @@ def recommendations():
             seen.add(cont)
             if len(results) >= limit:
                 break
+        cache_set(cache_key, results, CACHE_TTL)
         return jsonify(results), 200
 
     scored = []
@@ -181,6 +191,7 @@ def recommendations():
         if len(results) >= limit:
             break
 
+    cache_set(cache_key, results, CACHE_TTL)
     return jsonify(results), 200
 
 
