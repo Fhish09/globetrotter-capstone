@@ -39,6 +39,13 @@ spec:
                 configMapKeyRef:
                   name: globetrotter-config
                   key: DESTINATIONS_SERVICE_URL
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: globetrotter-config
+                  key: REDIS_URL
+            - name: CACHE_TTL
+              value: "60"
           readinessProbe:
             httpGet:
               path: /health

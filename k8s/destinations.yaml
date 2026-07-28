@@ -24,6 +24,16 @@ spec:
           env:
             - name: PORT
               value: "5002"
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: globetrotter-config
+                  key: REDIS_URL
+            - name: CACHE_TTL
+              valueFrom:
+                configMapKeyRef:
+                  name: globetrotter-config
+                  key: CACHE_TTL
           readinessProbe:
             httpGet:
               path: /health
