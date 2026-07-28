@@ -1,0 +1,140 @@
+/*
+ * GlobeTrotter – CSS Container Queries
+ * Layout responds to parent container width, not only the viewport.
+ */
+
+/* ---- Query containers ---- */
+.cq-grid-container {
+  container-type: inline-size;
+  container-name: dest-grid;
+  width: 100%;
+}
+
+.cq-filters-container {
+  container-type: inline-size;
+  container-name: filters;
+  width: 100%;
+}
+
+.cq-card {
+  container-type: inline-size;
+  container-name: card;
+}
+
+/* ---- Destination / card grids ---- */
+.cq-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+@container dest-grid (min-width: 420px) {
+  .cq-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@container dest-grid (min-width: 780px) {
+  .cq-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+@container dest-grid (min-width: 1100px) {
+  .cq-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ---- Filter bar (stacks when container is narrow) ---- */
+.cq-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.cq-filters > * {
+  width: 100%;
+}
+
+@container filters (min-width: 560px) {
+  .cq-filters {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+
+  .cq-filters .cq-filter-search {
+    flex: 1 1 200px;
+    min-width: 160px;
+    width: auto;
+  }
+
+  .cq-filters .cq-filter-field {
+    flex: 0 0 9rem;
+    width: auto;
+  }
+
+  .cq-filters .cq-filter-btn {
+    width: auto;
+    flex: 0 0 auto;
+  }
+}
+
+/* ---- Individual card internal layout ---- */
+.cq-card .cq-card-media {
+  height: 11rem;
+}
+
+.cq-card .cq-card-title {
+  font-size: 1.05rem;
+}
+
+.cq-card .cq-card-body {
+  padding: 1rem;
+}
+
+@container card (min-width: 280px) {
+  .cq-card .cq-card-media {
+    height: 13rem;
+  }
+
+  .cq-card .cq-card-title {
+    font-size: 1.2rem;
+  }
+
+  .cq-card .cq-card-body {
+    padding: 1.25rem;
+  }
+}
+
+@container card (min-width: 360px) {
+  .cq-card .cq-card-media {
+    height: 14rem;
+  }
+
+  .cq-card .cq-card-title {
+    font-size: 1.25rem;
+  }
+
+  .cq-card .cq-card-body {
+    padding: 1.5rem;
+  }
+}
+
+/* Horizontal card variant when very wide */
+@container card (min-width: 480px) {
+  .cq-card.cq-card-adaptive {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+  }
+
+  .cq-card.cq-card-adaptive .cq-card-media {
+    height: 100%;
+    min-height: 10rem;
+  }
+}
