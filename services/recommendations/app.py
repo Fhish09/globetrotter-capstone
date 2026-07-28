@@ -4,16 +4,40 @@ Calls Auth (user preferences) and Destinations (catalogue) over HTTP.
 Port: 5003
 """
 import os
+import sys
 
 import jwt
-import requests
 from flask import Flask, request, jsonify
+
+# Allow importing shared client when running in Docker (file copied) or from repo
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "shared"))
+try:
+    from http_client import call_service, ServiceError
+except ImportError:
+    # Fallback if shared not on path – minimal inline client
+    import requests
+
+    class ServiceError(Exception):
+        def __init__(self, service, message, status_code=503):
+            self.service = service
+            self.message = message
+            self.status_code = status_code
+
+    def call_service(service_name, method, url, **kwargs):
+        try:
+            r = requests.request(method, url, timeout=kwargs.get("timeout", 5),
+                                 headers=kwargs.get("headers"), params=kwargs.get("params"))
+            if r.status_code >= 400:
+                raise ServiceError(service_name, r.reason, r.status_code)
+            return r.json()
+        except requests.RequestException as e:
+            raise ServiceError(service_name, str(e), 503)
 
 app = Flask(__name__)
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "globetrotter-secret-change-in-prod")
-AUTH_URL = os.environ.get("AUTH_SERVICE_URL", "http://auth:5001")
-DEST_URL = os.environ.get("DESTINATIONS_SERVICE_URL", "http://destinations:5002")
+AUTH_URL = os.environ.get("AUTH_SERVICE_URL", "http://auth:5001").rstrip("/")
+DEST_URL = os.environ.get("DESTINATIONS_SERVICE_URL", "http://destinations:5002").rstrip("/")
 
 
 def get_username_from_token() -> str | None:
@@ -61,7 +85,16 @@ def _score(dest: dict, preferences: list[str]) -> tuple[float, list[str]]:
 
 @app.get("/health")
 def health():
-    return jsonify({"status": "ok", "service": "recommendations"}), 200
+    """Liveness + shallow dependency check."""
+    deps = {}
+    for name, url in (("auth", AUTH_URL), ("destinations", DEST_URL)):
+        try:
+            call_service(name, "GET", f"{url}/health", timeout=2, retries=0)
+            deps[name] = "up"
+        except ServiceError:
+            deps[name] = "down"
+    status = "ok" if all(v == "up" for v in deps.values()) else "degraded"
+    return jsonify({"status": status, "service": "recommendations", "dependencies": deps}), 200
 
 
 @app.get("/recommendations")
@@ -76,22 +109,37 @@ def recommendations():
     except ValueError:
         return jsonify({"error": "limit must be an integer"}), 400
 
-    # Inter-service call: Auth
+    # --- Call Auth service for user preferences ---
     try:
-        r = requests.get(f"{AUTH_URL}/internal/users/{username}", timeout=5)
-        if r.status_code != 200:
-            return jsonify({"error": "user not found"}), 404
-        preferences = [p.lower().strip() for p in r.json().get("preferences", []) if p]
-    except requests.RequestException:
-        return jsonify({"error": "auth service unavailable"}), 503
+        user = call_service(
+            "auth",
+            "GET",
+            f"{AUTH_URL}/internal/users/{username}",
+            timeout=5,
+            retries=2,
+        )
+        preferences = [p.lower().strip() for p in (user or {}).get("preferences", []) if p]
+    except ServiceError as exc:
+        code = 404 if exc.status_code == 404 else 503
+        return jsonify({
+            "error": f"auth service: {exc.message}",
+            "service": "auth",
+        }), code
 
-    # Inter-service call: Destinations
+    # --- Call Destinations service for catalogue ---
     try:
-        r = requests.get(f"{DEST_URL}/destinations", timeout=10)
-        r.raise_for_status()
-        destinations = r.json()
-    except requests.RequestException:
-        return jsonify({"error": "destinations service unavailable"}), 503
+        destinations = call_service(
+            "destinations",
+            "GET",
+            f"{DEST_URL}/destinations",
+            timeout=10,
+            retries=2,
+        ) or []
+    except ServiceError as exc:
+        return jsonify({
+            "error": f"destinations service: {exc.message}",
+            "service": "destinations",
+        }), 503
 
     if not preferences:
         results = []

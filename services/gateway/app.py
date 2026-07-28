@@ -1,23 +1,31 @@
 """
 API Gateway – proxies API calls to microservices and serves the frontend.
 Port: 5000 (public entry point)
+
+Uses shared HTTP client patterns: timeouts, retries, clear upstream errors.
 """
 import os
+import sys
+import time
 
 import requests
 from flask import Flask, request, jsonify, Response, render_template
 
 app = Flask(__name__, template_folder="templates")
 
-AUTH_URL = os.environ.get("AUTH_SERVICE_URL", "http://auth:5001")
-DEST_URL = os.environ.get("DESTINATIONS_SERVICE_URL", "http://destinations:5002")
-REC_URL = os.environ.get("RECOMMENDATIONS_SERVICE_URL", "http://recommendations:5003")
-ITIN_URL = os.environ.get("ITINERARIES_SERVICE_URL", "http://itineraries:5004")
+AUTH_URL = os.environ.get("AUTH_SERVICE_URL", "http://auth:5001").rstrip("/")
+DEST_URL = os.environ.get("DESTINATIONS_SERVICE_URL", "http://destinations:5002").rstrip("/")
+REC_URL = os.environ.get("RECOMMENDATIONS_SERVICE_URL", "http://recommendations:5003").rstrip("/")
+ITIN_URL = os.environ.get("ITINERARIES_SERVICE_URL", "http://itineraries:5004").rstrip("/")
+
+PROXY_TIMEOUT = float(os.environ.get("PROXY_TIMEOUT", "12"))
+PROXY_RETRIES = int(os.environ.get("PROXY_RETRIES", "1"))
 
 
 def _wants_html() -> bool:
     accept = request.headers.get("Accept", "")
-    return "text/html" in accept and not request.args
+    # Browser navigation sends text/html; fetch/XHR usually prefers application/json
+    return "text/html" in accept and "application/json" not in accept.split(",")[0]
 
 
 def _proxy(base_url: str, path: str = ""):
@@ -31,26 +39,41 @@ def _proxy(base_url: str, path: str = ""):
     if request.content_type:
         headers["Content-Type"] = request.content_type
 
-    try:
-        resp = requests.request(
-            method=request.method,
-            url=url,
-            headers=headers,
-            data=request.get_data(),
-            timeout=15,
-        )
-        excluded = {"content-encoding", "content-length", "transfer-encoding", "connection"}
-        response_headers = [
-            (k, v) for k, v in resp.headers.items() if k.lower() not in excluded
-        ]
-        return Response(resp.content, status=resp.status_code, headers=response_headers)
-    except requests.RequestException as exc:
-        return jsonify({"error": f"upstream unavailable: {exc}"}), 503
+    last_err = None
+    for attempt in range(PROXY_RETRIES + 1):
+        try:
+            resp = requests.request(
+                method=request.method,
+                url=url,
+                headers=headers,
+                data=request.get_data(),
+                timeout=PROXY_TIMEOUT,
+            )
+            excluded = {"content-encoding", "content-length", "transfer-encoding", "connection"}
+            response_headers = [
+                (k, v) for k, v in resp.headers.items() if k.lower() not in excluded
+            ]
+            return Response(resp.content, status=resp.status_code, headers=response_headers)
+        except requests.Timeout:
+            last_err = "upstream timeout"
+        except requests.ConnectionError:
+            last_err = "upstream connection refused"
+        except requests.RequestException as exc:
+            last_err = str(exc)
+
+        if attempt < PROXY_RETRIES:
+            time.sleep(0.3 * (attempt + 1))
+
+    return jsonify({
+        "error": last_err or "upstream unavailable",
+        "upstream": base_url,
+    }), 503
 
 
 @app.get("/health")
 def health():
     services = {}
+    overall = "ok"
     for name, url in [
         ("auth", AUTH_URL),
         ("destinations", DEST_URL),
@@ -58,11 +81,16 @@ def health():
         ("itineraries", ITIN_URL),
     ]:
         try:
-            r = requests.get(f"{url}/health", timeout=3)
-            services[name] = r.json() if r.ok else {"status": "error"}
+            r = requests.get(f"{url}/health", timeout=2)
+            if r.ok:
+                services[name] = r.json()
+            else:
+                services[name] = {"status": "error", "code": r.status_code}
+                overall = "degraded"
         except requests.RequestException:
             services[name] = {"status": "down"}
-    return jsonify({"status": "ok", "service": "gateway", "upstream": services}), 200
+            overall = "degraded"
+    return jsonify({"status": overall, "service": "gateway", "upstream": services}), 200
 
 
 @app.route("/register", methods=["POST"])
