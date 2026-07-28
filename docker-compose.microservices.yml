@@ -1,8 +1,5 @@
 version: "3.9"
 
-# Phase 2–4 – Microservices + resilience (Redis cache)
-# Usage: docker-compose -f docker-compose.microservices.yml up --build
-
 services:
   redis:
     image: redis:7-alpine
@@ -86,11 +83,13 @@ services:
       - SECRET_KEY=dev-secret-key-please-change-in-prod
       - AUTH_SERVICE_URL=http://auth:5001
       - DESTINATIONS_SERVICE_URL=http://destinations:5002
+      - ITINERARIES_SERVICE_URL=http://itineraries:5004
       - REDIS_URL=redis://redis:6379/0
       - CACHE_TTL=60
     depends_on:
       - auth
       - destinations
+      - itineraries
       - redis
     restart: unless-stopped
 

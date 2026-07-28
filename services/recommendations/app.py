@@ -1,6 +1,6 @@
 """
 Recommendations microservice.
-Calls Auth + Destinations with circuit breakers, Redis cache, observability.
+Uses: preferences + past trips + global popularity.
 Port: 5003
 """
 import os
@@ -52,15 +52,18 @@ logger = init_observability(app, "recommendations")
 SECRET_KEY = os.environ.get("SECRET_KEY", "globetrotter-secret-change-in-prod")
 AUTH_URL = os.environ.get("AUTH_SERVICE_URL", "http://auth:5001").rstrip("/")
 DEST_URL = os.environ.get("DESTINATIONS_SERVICE_URL", "http://destinations:5002").rstrip("/")
+ITIN_URL = os.environ.get("ITINERARIES_SERVICE_URL", "http://itineraries:5004").rstrip("/")
 CACHE_TTL = int(os.environ.get("CACHE_TTL", "60"))
 
 if CircuitBreaker is not None:
     _auth_breaker = CircuitBreaker("auth", failure_threshold=5, recovery_timeout=20)
     _dest_breaker = CircuitBreaker("destinations", failure_threshold=5, recovery_timeout=20)
+    _itin_breaker = CircuitBreaker("itineraries", failure_threshold=5, recovery_timeout=20)
     register_breaker("auth", _auth_breaker)
     register_breaker("destinations", _dest_breaker)
+    register_breaker("itineraries", _itin_breaker)
 else:
-    _auth_breaker = _dest_breaker = None
+    _auth_breaker = _dest_breaker = _itin_breaker = None
 
 
 def get_username_from_token() -> str | None:
@@ -75,23 +78,45 @@ def get_username_from_token() -> str | None:
         return None
 
 
-def _score(dest: dict, preferences: list[str]) -> tuple[float, list[str]]:
+def _score(
+    dest: dict,
+    preferences: list[str],
+    past_names: set[str],
+    popular: dict[str, int],
+) -> tuple[float, list[str]]:
     dest_tags = [t.lower() for t in dest.get("tags", [])]
-    name = dest.get("name", "").lower()
+    name = dest.get("name", "")
+    name_l = name.lower()
     description = dest.get("description", "").lower()
     cost = dest.get("avg_cost_per_day") or 100
     source = dest.get("source") or "local"
 
     score = 0.0
     matched = []
+
     for pref in preferences:
         if pref in dest_tags:
             score += 3.0
             matched.append(pref)
-        elif pref in name or pref in description:
+        elif pref in name_l or pref in description:
             score += 1.0
             if pref not in matched:
                 matched.append(f"{pref} (mentioned)")
+
+    # Past trips: boost similar tags / same region; light boost if related
+    if name in past_names or name_l in {p.lower() for p in past_names}:
+        # Already visited – small score so we prefer new places, but still show as option
+        score += 0.5
+        matched.append("from your past trips")
+    else:
+        # Popular among all users
+        pop = popular.get(name, 0) or popular.get(name_l, 0)
+        if pop >= 3:
+            score += 2.0
+            matched.append("popular destination")
+        elif pop >= 1:
+            score += 1.0
+            matched.append("trending")
 
     if cost <= 60:
         score += 0.8
@@ -99,9 +124,7 @@ def _score(dest: dict, preferences: list[str]) -> tuple[float, list[str]]:
         score += 0.4
 
     if source in ("local", "tourist_curated") or not dest.get("source"):
-        score += 2.5
-        if "popular tourist spot" not in matched:
-            matched.append("popular tourist spot")
+        score += 1.5
 
     return score, matched
 
@@ -109,7 +132,7 @@ def _score(dest: dict, preferences: list[str]) -> tuple[float, list[str]]:
 @app.get("/health")
 def health():
     deps = {}
-    for name, url in (("auth", AUTH_URL), ("destinations", DEST_URL)):
+    for name, url in (("auth", AUTH_URL), ("destinations", DEST_URL), ("itineraries", ITIN_URL)):
         try:
             call_service(name, "GET", f"{url}/health", timeout=2, retries=0, headers=trace_headers())
             deps[name] = "up"
@@ -117,10 +140,9 @@ def health():
             deps[name] = "down"
 
     breakers = {}
-    if _auth_breaker:
-        breakers["auth"] = _auth_breaker.status()
-    if _dest_breaker:
-        breakers["destinations"] = _dest_breaker.status()
+    for b in (_auth_breaker, _dest_breaker, _itin_breaker):
+        if b:
+            breakers[b.name] = b.status()
 
     status = "ok" if all(v == "up" for v in deps.values()) else "degraded"
     return jsonify({
@@ -143,12 +165,12 @@ def recommendations():
     except ValueError:
         return jsonify({"error": "limit must be an integer"}), 400
 
-    cache_key = f"rec:{username}:{limit}"
+    cache_key = f"rec:v2:{username}:{limit}"
     cached = cache_get(cache_key)
     if cached is not None:
-        logger.info("event=recommendations_cache_hit username=%s", username)
         return jsonify(cached), 200
 
+    # Preferences
     try:
         user = call_service(
             "auth", "GET", f"{AUTH_URL}/internal/users/{username}",
@@ -159,6 +181,7 @@ def recommendations():
         code = 404 if exc.status_code == 404 else 503
         return jsonify({"error": f"auth service: {exc.message}", "service": "auth"}), code
 
+    # Catalogue
     try:
         destinations = call_service(
             "destinations", "GET", f"{DEST_URL}/destinations",
@@ -167,29 +190,30 @@ def recommendations():
     except ServiceError as exc:
         return jsonify({"error": f"destinations service: {exc.message}", "service": "destinations"}), 503
 
-    if not preferences:
-        results = []
-        seen = set()
-        for dest in destinations:
-            cont = dest.get("continent", "Unknown")
-            src = dest.get("source") or "local"
-            if src not in ("local", "tourist_curated") and dest.get("source"):
-                continue
-            if cont in seen and len(results) >= 3:
-                continue
-            entry = dict(dest)
-            entry["match_score"] = 0
-            entry["match_reasons"] = ["popular tourist pick"]
-            results.append(entry)
-            seen.add(cont)
-            if len(results) >= limit:
-                break
-        cache_set(cache_key, results, CACHE_TTL)
-        return jsonify(results), 200
+    # Past trips + popularity (best-effort; don't fail if itineraries down)
+    past_names: set[str] = set()
+    popular: dict[str, int] = {}
+    try:
+        past = call_service(
+            "itineraries", "GET", f"{ITIN_URL}/internal/past-destinations/{username}",
+            timeout=5, retries=1, headers=trace_headers(),
+        ) or {}
+        past_names = {d["name"] for d in past.get("destinations", []) if d.get("name")}
+    except ServiceError:
+        logger.warning("past destinations unavailable")
+
+    try:
+        pop_list = call_service(
+            "itineraries", "GET", f"{ITIN_URL}/internal/popular-destinations",
+            timeout=5, retries=1, headers=trace_headers(),
+        ) or []
+        popular = {item["name"]: item["count"] for item in pop_list if item.get("name")}
+    except ServiceError:
+        logger.warning("popular destinations unavailable")
 
     scored = []
     for dest in destinations:
-        score, matched = _score(dest, preferences)
+        score, matched = _score(dest, preferences, past_names, popular)
         if score > 0:
             scored.append((score, dest, matched))
     scored.sort(key=lambda x: (-x[0], x[1].get("avg_cost_per_day") or 999))
@@ -209,7 +233,10 @@ def recommendations():
             break
 
     cache_set(cache_key, results, CACHE_TTL)
-    logger.info("event=recommendations username=%s count=%s", username, len(results))
+    logger.info(
+        "event=recommendations username=%s count=%s past=%s popular_keys=%s",
+        username, len(results), len(past_names), len(popular),
+    )
     return jsonify(results), 200
 
 

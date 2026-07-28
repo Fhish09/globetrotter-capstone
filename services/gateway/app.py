@@ -1,8 +1,6 @@
 """
 API Gateway – proxies API calls to microservices and serves the frontend.
 Port: 5000
-
-Observability: structured logs, /metrics, X-Request-ID tracing across services.
 """
 import os
 import sys
@@ -65,7 +63,6 @@ def _proxy(base_url: str, path: str = ""):
             response_headers = [
                 (k, v) for k, v in resp.headers.items() if k.lower() not in excluded
             ]
-            # Ensure request id is always present on response
             if not any(k.lower() == "x-request-id" for k, _ in response_headers):
                 response_headers.append(("X-Request-ID", getattr(g, "request_id", "-")))
             return Response(resp.content, status=resp.status_code, headers=response_headers)
@@ -137,6 +134,16 @@ def itineraries():
     if request.method == "GET" and _wants_html():
         return render_template("itineraries.html")
     return _proxy(ITIN_URL, "/itineraries")
+
+
+@app.route("/itineraries/<itinerary_id>/share", methods=["POST"])
+def share_itinerary(itinerary_id):
+    return _proxy(ITIN_URL, f"/itineraries/{itinerary_id}/share")
+
+
+@app.route("/itineraries/shared/<token>", methods=["GET"])
+def shared_itinerary(token):
+    return _proxy(ITIN_URL, f"/itineraries/shared/{token}")
 
 
 @app.get("/")
