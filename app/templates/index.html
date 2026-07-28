@@ -22,6 +22,18 @@
     </div>
 </section>
 
+<!-- Trending marquee: responsive, pause on hover, reduced-motion safe -->
+<section class="gt-marquee" aria-label="Trending destinations">
+    <div class="flex items-stretch">
+        <span class="gt-marquee__label hidden sm:inline-flex items-center">Trending</span>
+        <div class="flex-1 overflow-hidden min-w-0">
+            <div class="gt-marquee__track" id="marqueeTrack">
+                <!-- Filled by JS (duplicated for seamless loop) -->
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20" aria-labelledby="popular-heading">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-8 sm:mb-10">
         <div>
@@ -52,6 +64,48 @@
 function getDestImage(dest) {
     return dest.image || `https://picsum.photos/seed/${encodeURIComponent(dest.name)}/600/400`;
 }
+
+function buildMarqueeItems(list) {
+    return list.map(dest => {
+        const label = dest.country
+            ? `${dest.name} · ${dest.country}`
+            : dest.name;
+        const href = dest.id ? `/destinations/${dest.id}` : `/destinations?q=${encodeURIComponent(dest.name)}`;
+        return `<a class="gt-marquee__item" href="${href}"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${label}</span></a>`;
+    }).join('');
+}
+
+async function loadMarquee() {
+    const track = document.getElementById('marqueeTrack');
+    if (!track) return;
+
+    const fallback = [
+        { name: 'Kribi', country: 'Cameroon' },
+        { name: 'Limbe', country: 'Cameroon' },
+        { name: 'Mount Cameroon', country: 'Cameroon' },
+        { name: 'Douala', country: 'Cameroon' },
+        { name: 'Yaoundé', country: 'Cameroon' },
+        { name: 'Bali', country: 'Indonesia' },
+        { name: 'Tokyo', country: 'Japan' },
+        { name: 'Paris', country: 'France' },
+        { name: 'Cape Town', country: 'South Africa' },
+        { name: 'Marrakech', country: 'Morocco' },
+    ];
+
+    let items = fallback;
+    try {
+        const res = await fetch('/destinations?source=local');
+        const data = await res.json();
+        if (Array.isArray(data) && data.length) {
+            items = data.slice(0, 14);
+        }
+    } catch (e) { /* use fallback */ }
+
+    const html = buildMarqueeItems(items);
+    // Duplicate for seamless loop (animation moves -50%)
+    track.innerHTML = html + html;
+}
+
 async function loadDestinations() {
     try {
         const res = await fetch('/destinations?source=local');
@@ -83,10 +137,13 @@ async function loadDestinations() {
         document.getElementById('destinations').innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-red-400"><p>Failed to load destinations.</p></div>`;
     }
 }
+
 function searchDestinations() {
     const q = document.getElementById('heroSearch').value.trim();
     window.location.href = q ? `/destinations?q=${encodeURIComponent(q)}` : '/destinations';
 }
+
+loadMarquee();
 loadDestinations();
 </script>
 {% endblock %}
