@@ -1,211 +1,134 @@
 {% extends "base.html" %}
-
 {% block title %}My Trips{% endblock %}
-
 {% block content %}
-<section class="max-w-7xl mx-auto px-6 py-12" aria-labelledby="trips-heading">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-            <h1 id="trips-heading" class="heading text-4xl font-bold text-gray-900 mb-2">My Itineraries</h1>
-            <p class="text-gray-500">Plan and manage your trips</p>
+            <h1 class="heading text-2xl sm:text-3xl md:text-4xl font-bold text-gt-text mb-1">My Itineraries</h1>
+            <p class="text-gt-muted text-sm sm:text-base">Plan and manage your trips</p>
         </div>
-        <button onclick="openCreateModal()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition font-medium flex items-center gap-2"
-                aria-label="Create new trip">
-            <i class="fas fa-plus" aria-hidden="true"></i> New Trip
+        <button onclick="openCreateModal()" class="gt-btn-primary px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 min-h-[44px]">
+            <i class="fas fa-plus"></i> New Trip
         </button>
     </div>
-
-    <div id="status" class="mb-8" role="status" aria-live="polite"></div>
+    <div id="status" class="mb-8" role="status"></div>
     <div id="trips" class="grid grid-cols-1 md:grid-cols-2 gap-6" role="list"></div>
 </section>
 
-<!-- Create Modal -->
-<div id="createModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="createModalTitle">
-    <div class="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl">
+<div id="createModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4" role="dialog">
+    <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl max-h-[95vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h2 id="createModalTitle" class="text-2xl font-bold text-gray-900">Create New Itinerary</h2>
-            <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600 text-xl" aria-label="Close">
-                <i class="fas fa-times" aria-hidden="true"></i>
-            </button>
+            <h2 class="text-xl sm:text-2xl font-bold text-gt-text">Create New Itinerary</h2>
+            <button onclick="closeCreateModal()" class="text-gt-muted hover:text-gt-text text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
         </div>
-
-        <div id="createError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl" role="alert"></div>
-
+        <div id="createError" class="hidden mb-4 bg-red-950/40 text-red-300 text-sm px-4 py-3 rounded-xl border border-red-900"></div>
         <form onsubmit="event.preventDefault(); createTrip();" class="space-y-4">
             <div>
-                <label for="tripTitle" class="block text-sm font-medium text-gray-700 mb-1.5">Trip Title <span class="text-red-500">*</span></label>
-                <input type="text" id="tripTitle" required minlength="2" maxlength="80"
-                       placeholder="e.g. Summer Escape"
-                       class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
-                       aria-required="true">
+                <label for="tripTitle" class="block text-sm font-medium text-gt-muted mb-1.5">Trip Title *</label>
+                <input type="text" id="tripTitle" required minlength="2" maxlength="80" placeholder="e.g. Summer Escape" class="w-full rounded-xl px-4 py-3 border border-gt-border bg-gt-surface2">
             </div>
             <div>
-                <label for="tripDests" class="block text-sm font-medium text-gray-700 mb-1.5">Destinations</label>
-                <input type="text" id="tripDests" placeholder="e.g. Bali, Tokyo, Paris"
-                       class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <p class="text-xs text-gray-400 mt-1">Separate with commas</p>
+                <label for="tripDests" class="block text-sm font-medium text-gt-muted mb-1.5">Destinations</label>
+                <input type="text" id="tripDests" placeholder="e.g. Bali, Tokyo, Paris" class="w-full rounded-xl px-4 py-3 border border-gt-border bg-gt-surface2">
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1.5">Start Date</label>
-                    <input type="date" id="startDate" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <label for="startDate" class="block text-sm font-medium text-gt-muted mb-1.5">Start Date</label>
+                    <input type="date" id="startDate" class="w-full rounded-xl px-4 py-3 border border-gt-border bg-gt-surface2">
                 </div>
                 <div>
-                    <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1.5">End Date</label>
-                    <input type="date" id="endDate" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <label for="endDate" class="block text-sm font-medium text-gt-muted mb-1.5">End Date</label>
+                    <input type="date" id="endDate" class="w-full rounded-xl px-4 py-3 border border-gt-border bg-gt-surface2">
                 </div>
             </div>
-
-            <button id="createBtn" type="submit"
-                    class="w-full mt-2 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
-                <span>Create Trip</span>
-            </button>
+            <button id="createBtn" type="submit" class="w-full mt-2 gt-btn-primary py-3.5 rounded-xl font-semibold min-h-[48px]"><span>Create Trip</span></button>
         </form>
-        <button onclick="closeCreateModal()" class="mt-3 text-gray-500 w-full text-sm hover:text-gray-700">Cancel</button>
+        <button onclick="closeCreateModal()" class="mt-3 text-gt-muted w-full text-sm hover:text-gt-text">Cancel</button>
     </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
 function openCreateModal() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        openLogin();
-        return;
-    }
+    if (!localStorage.getItem('token')) { openLogin(); return; }
     document.getElementById('createError').classList.add('hidden');
     document.getElementById('createModal').classList.remove('hidden');
     document.getElementById('createModal').classList.add('flex');
-    document.getElementById('tripTitle').focus();
 }
 function closeCreateModal() {
     document.getElementById('createModal').classList.add('hidden');
     document.getElementById('createModal').classList.remove('flex');
 }
-
 async function loadTrips() {
     const token = localStorage.getItem('token');
     const status = document.getElementById('status');
     const container = document.getElementById('trips');
-
     if (!token) {
         status.innerHTML = `
-            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-8 text-center" role="alert">
-                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-lock text-2xl text-amber-600" aria-hidden="true"></i>
-                </div>
-                <h2 class="text-xl font-bold text-gray-900 mb-2">Login to manage your trips</h2>
-                <p class="text-gray-600 mb-6 max-w-md mx-auto">Create and view personal itineraries once you're signed in.</p>
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <button onclick="openLogin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition">Login</button>
-                    <button onclick="openRegister()" class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-medium transition">Create Account</button>
+            <div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-gt-accent/15 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-lock text-2xl text-gt-accent"></i></div>
+                <h2 class="text-xl font-bold text-gt-text mb-2">Login to manage your trips</h2>
+                <div class="flex flex-wrap gap-3 justify-center mt-6">
+                    <button onclick="openLogin()" class="gt-btn-primary px-6 py-3 rounded-xl font-medium">Login</button>
+                    <button onclick="openRegister()" class="border border-gt-border px-6 py-3 rounded-xl font-medium">Create Account</button>
                 </div>
             </div>`;
         return;
     }
-
     try {
-        const res = await fetch('/itineraries', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await fetch('/itineraries', { headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
-
-        if (!res.ok) {
-            status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6" role="alert">${data.error || 'Error loading trips'}</div>`;
-            return;
-        }
-
+        if (!res.ok) { status.innerHTML = `<div class="bg-red-950/40 text-red-300 border border-red-900 rounded-2xl p-6">${data.error || 'Error'}</div>`; return; }
         status.innerHTML = '';
         if (!data.length) {
-            container.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400">
-                <i class="fas fa-suitcase text-5xl mb-4" aria-hidden="true"></i>
-                <p>No trips yet. Create your first itinerary!</p>
-            </div>`;
+            container.innerHTML = `<div class="col-span-full text-center py-16 text-gt-muted"><i class="fas fa-suitcase text-5xl mb-4"></i><p>No trips yet. Create your first itinerary!</p></div>`;
             return;
         }
-
         container.innerHTML = data.map(trip => `
-            <article class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition" role="listitem">
-                <h2 class="text-xl font-bold text-gray-900 mb-2">${trip.title}</h2>
-                <p class="text-sm text-gray-500 mb-3">
-                    <i class="far fa-calendar mr-1" aria-hidden="true"></i>
-                    <time>${trip.start_date || '—'}</time> → <time>${trip.end_date || '—'}</time>
-                </p>
+            <article class="bg-gt-surface border border-gt-border rounded-2xl p-6 hover:border-gt-accent/40 transition" role="listitem">
+                <h2 class="text-xl font-bold text-gt-text mb-2">${trip.title}</h2>
+                <p class="text-sm text-gt-muted mb-3"><i class="far fa-calendar mr-1"></i> ${trip.start_date || '—'} → ${trip.end_date || '—'}</p>
                 <div class="flex flex-wrap gap-2">
-                    ${(trip.destinations || []).map(d => `<span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full">${d}</span>`).join('')}
+                    ${(trip.destinations || []).map(d => `<span class="gt-chip text-xs px-3 py-1 rounded-full">${d}</span>`).join('')}
                 </div>
-            </article>
-        `).join('');
+                ${trip.share_url ? `<p class="text-xs text-gt-muted mt-3">Share: <code class="text-gt-accent">${trip.share_url}</code></p>` : ''}
+            </article>`).join('');
     } catch (e) {
-        status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6" role="alert">Network error</div>`;
+        status.innerHTML = `<div class="bg-red-950/40 text-red-300 border border-red-900 rounded-2xl p-6">Network error</div>`;
     }
 }
-
 async function createTrip() {
     const token = localStorage.getItem('token');
     if (!token) { openLogin(); return; }
-
     const title = document.getElementById('tripTitle').value.trim();
     const dests = document.getElementById('tripDests').value.split(',').map(d => d.trim()).filter(Boolean);
     const start = document.getElementById('startDate').value;
     const end = document.getElementById('endDate').value;
     const errorEl = document.getElementById('createError');
     const btn = document.getElementById('createBtn');
-
-    // Validation
-    if (!title || title.length < 2) {
-        errorEl.textContent = 'Please enter a trip title (at least 2 characters)';
-        errorEl.classList.remove('hidden');
-        document.getElementById('tripTitle').focus();
-        return;
-    }
-    if (start && end && start > end) {
-        errorEl.textContent = 'End date must be after start date';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Creating...';
-    errorEl.classList.add('hidden');
-
+    if (!title || title.length < 2) { errorEl.textContent = 'Please enter a trip title'; errorEl.classList.remove('hidden'); return; }
+    if (start && end && start > end) { errorEl.textContent = 'End date must be after start date'; errorEl.classList.remove('hidden'); return; }
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...'; errorEl.classList.add('hidden');
     try {
         const res = await fetch('/itineraries', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                title,
-                destinations: dests,
-                start_date: start,
-                end_date: end
-            })
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ title, destinations: dests, start_date: start, end_date: end })
         });
-
         if (res.ok) {
             closeCreateModal();
-            document.getElementById('tripTitle').value = '';
-            document.getElementById('tripDests').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
+            ['tripTitle','tripDests','startDate','endDate'].forEach(id => document.getElementById(id).value = '');
             loadTrips();
         } else {
             const data = await res.json();
-            errorEl.textContent = data.error || 'Failed to create trip';
-            errorEl.classList.remove('hidden');
+            errorEl.textContent = data.error || 'Failed'; errorEl.classList.remove('hidden');
         }
     } catch (e) {
-        errorEl.textContent = 'Network error. Please try again.';
-        errorEl.classList.remove('hidden');
+        errorEl.textContent = 'Network error'; errorEl.classList.remove('hidden');
     } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>Create Trip</span>';
+        btn.disabled = false; btn.innerHTML = '<span>Create Trip</span>';
     }
 }
-
 loadTrips();
 </script>
 {% endblock %}

@@ -1,126 +1,77 @@
 {% extends "base.html" %}
-
 {% block title %}Recommendations{% endblock %}
-
 {% block content %}
-<section class="max-w-7xl mx-auto px-6 py-12" aria-labelledby="recs-heading">
-    <div class="mb-10">
-        <h1 id="recs-heading" class="heading text-4xl font-bold text-gray-900 mb-2">For You</h1>
-        <p class="text-gray-500">Personalized recommendations based on your preferences</p>
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div class="mb-8">
+        <h1 class="heading text-2xl sm:text-3xl md:text-4xl font-bold text-gt-text mb-1">For You</h1>
+        <p class="text-gt-muted text-sm sm:text-base">Personalized recommendations based on preferences, past trips & popularity</p>
     </div>
-
     <div id="status" class="mb-8" role="status" aria-live="polite"></div>
-
-    <div id="recs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
-        <!-- Loaded by JS -->
+    <div class="cq-grid-container">
+        <div id="recs" class="cq-grid" role="list"></div>
     </div>
 </section>
 {% endblock %}
-
 {% block scripts %}
 <script>
 function getDestImage(dest) {
     return dest.image || `https://picsum.photos/seed/${encodeURIComponent(dest.name)}/600/400`;
 }
-
 async function loadRecommendations() {
     const token = localStorage.getItem('token');
     const status = document.getElementById('status');
     const container = document.getElementById('recs');
-
     if (!token) {
         status.innerHTML = `
-            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-8 text-center" role="alert">
-                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-lock text-2xl text-amber-600" aria-hidden="true"></i>
+            <div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-gt-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-2xl text-gt-accent"></i>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 mb-2">Login to see your recommendations</h2>
-                <p class="text-gray-600 mb-6 max-w-md mx-auto">We personalize destinations based on your travel preferences. Sign in or create an account to get started.</p>
+                <h2 class="text-xl font-bold text-gt-text mb-2">Login to see your recommendations</h2>
+                <p class="text-gt-muted mb-6 max-w-md mx-auto">We personalize destinations based on your travel preferences.</p>
                 <div class="flex flex-wrap gap-3 justify-center">
-                    <button onclick="openLogin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition">
-                        Login
-                    </button>
-                    <button onclick="openRegister()" class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-medium transition">
-                        Create Account
-                    </button>
+                    <button onclick="openLogin()" class="gt-btn-primary px-6 py-3 rounded-xl font-medium">Login</button>
+                    <button onclick="openRegister()" class="border border-gt-border text-gt-text px-6 py-3 rounded-xl font-medium hover:border-gt-accent">Create Account</button>
                 </div>
             </div>`;
-        container.innerHTML = '';
         return;
     }
-
-    status.innerHTML = `<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-3xl" aria-hidden="true"></i><span class="sr-only">Loading recommendations</span></div>`;
-
+    status.innerHTML = `<div class="text-center py-8 text-gt-muted"><i class="fas fa-spinner fa-spin text-3xl"></i></div>`;
     try {
-        const res = await fetch('/recommendations', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await fetch('/recommendations', { headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
-
         if (!res.ok) {
-            status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6" role="alert">${data.error || 'Failed to load recommendations'}</div>`;
+            status.innerHTML = `<div class="bg-red-950/40 text-red-300 border border-red-900 rounded-2xl p-6">${data.error || 'Failed'}</div>`;
             return;
         }
-
         status.innerHTML = '';
         if (!data.length) {
-            container.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400">
-                <i class="fas fa-compass text-5xl mb-4" aria-hidden="true"></i>
-                <p class="mb-4">No recommendations yet. Try updating your preferences!</p>
-                <button onclick="openPreferences()" class="text-indigo-600 font-medium hover:underline">Edit Preferences</button>
-            </div>`;
+            container.innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-gt-muted"><p class="mb-4">No recommendations yet.</p><button onclick="openPreferences()" class="text-gt-accent font-medium hover:underline">Edit Preferences</button></div>`;
             return;
         }
-
         container.innerHTML = data.map(dest => `
-            <article class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition group" role="listitem">
+            <article class="cq-card bg-gt-surface border border-gt-border rounded-2xl overflow-hidden hover:border-gt-accent/40 transition group" role="listitem">
                 <a href="/destinations/${dest.id}" class="block">
-                    <div class="relative h-52 overflow-hidden">
-                        <img src="${getDestImage(dest)}" 
-                             class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
-                             alt="${dest.name}"
-                             loading="lazy">
-                        ${dest.match_score > 0 ? `
-                            <div class="absolute top-4 left-4 bg-indigo-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">
-                                Match ${dest.match_score}
-                            </div>` : ''}
-                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-gray-800 text-xs font-medium px-3 py-1.5 rounded-full">
-                            $${dest.avg_cost_per_day || '—'}/day
-                        </div>
+                    <div class="cq-card-media relative overflow-hidden">
+                        <img src="${getDestImage(dest)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${dest.name}" loading="lazy">
+                        ${dest.match_score > 0 ? `<div class="absolute top-4 left-4 bg-gt-accent text-gt-bg text-xs font-semibold px-3 py-1.5 rounded-full">Match ${dest.match_score}</div>` : ''}
+                        <div class="absolute top-4 right-4 bg-gt-bg/90 border border-gt-border text-xs px-3 py-1.5 rounded-full">$${dest.avg_cost_per_day || '—'}/day</div>
                     </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                            <span>${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</span>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition">${dest.name}</h2>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${dest.description || ''}</p>
-                        
+                    <div class="cq-card-body">
+                        <p class="text-sm text-gt-muted mb-1"><i class="fas fa-map-marker-alt text-gt-accent mr-1"></i>${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</p>
+                        <h2 class="cq-card-title font-bold text-gt-text mb-2 group-hover:text-gt-accent transition">${dest.name}</h2>
+                        <p class="text-gt-muted text-sm mb-3 line-clamp-2">${dest.description || ''}</p>
                         ${dest.match_reasons && dest.match_reasons.length ? `
-                            <div class="mb-4">
-                                <p class="text-xs font-medium text-gray-500 mb-1.5">Why recommended:</p>
-                                <div class="flex flex-wrap gap-1.5">
-                                    ${dest.match_reasons.map(r => 
-                                        `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-full">${r}</span>`
-                                    ).join('')}
-                                </div>
-                            </div>` : ''}
-
-                        <div class="flex flex-wrap gap-2">
-                            ${(dest.tags || []).map(t => 
-                                `<span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full">${t}</span>`
-                            ).join('')}
-                        </div>
+                            <div class="mb-3"><p class="text-xs text-gt-muted mb-1">Why recommended:</p>
+                            <div class="flex flex-wrap gap-1.5">${dest.match_reasons.map(r => `<span class="bg-emerald-950/40 text-emerald-300 text-xs px-2.5 py-1 rounded-full border border-emerald-900/50">${r}</span>`).join('')}</div></div>` : ''}
+                        <div class="flex flex-wrap gap-1.5">${(dest.tags || []).map(t => `<span class="gt-chip text-xs px-2.5 py-1 rounded-full">${t}</span>`).join('')}</div>
                     </div>
                 </a>
-            </article>
-        `).join('');
+            </article>`).join('');
     } catch (e) {
-        console.error(e);
-        status.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-6" role="alert">Network error. Please try again.</div>`;
+        status.innerHTML = `<div class="bg-red-950/40 text-red-300 border border-red-900 rounded-2xl p-6">Network error</div>`;
     }
 }
-
 loadRecommendations();
 </script>
 {% endblock %}
