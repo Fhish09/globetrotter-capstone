@@ -1,0 +1,64 @@
+/* GlobeTrotter – design-image palette
+   Dark charcoal + muted blue-slate accents
+*/
+:root {
+  --gt-bg: #121214;
+  --gt-surface: #1c1c1f;
+  --gt-surface-2: #252529;
+  --gt-border: #2e2e34;
+  --gt-text: #e8e8ea;
+  --gt-muted: #9a9aa3;
+  --gt-accent: #8fa8c0;
+  --gt-accent-hover: #a8c0d0;
+  --gt-accent-soft: rgba(143, 168, 192, 0.15);
+  --gt-accent-text: #c5d4e0;
+}
+
+body.gt-theme {
+  background-color: var(--gt-bg);
+  color: var(--gt-text);
+}
+
+.gt-theme .gt-surface {
+  background-color: var(--gt-surface);
+  border: 1px solid var(--gt-border);
+}
+
+.gt-theme .gt-nav {
+  background-color: rgba(18, 18, 20, 0.92);
+  border-bottom: 1px solid var(--gt-border);
+}
+
+.gt-theme .gt-accent {
+  color: var(--gt-accent);
+}
+
+.gt-theme .gt-btn-primary {
+  background-color: var(--gt-accent);
+  color: #121214;
+}
+.gt-theme .gt-btn-primary:hover {
+  background-color: var(--gt-accent-hover);
+}
+
+.gt-theme .gt-chip {
+  background: var(--gt-accent-soft);
+  color: var(--gt-accent-text);
+}
+
+.gt-theme input,
+.gt-theme select,
+.gt-theme textarea {
+  background-color: var(--gt-surface-2);
+  border-color: var(--gt-border);
+  color: var(--gt-text);
+}
+.gt-theme input::placeholder {
+  color: #6b6b75;
+}
+.gt-theme input:focus,
+.gt-theme select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(143, 168, 192, 0.45);
+  border-color: var(--gt-accent);
+}

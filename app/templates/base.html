@@ -5,8 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}GlobeTrotter{% endblock %} - Travel Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              gt: {
+                bg: '#121214',
+                surface: '#1c1c1f',
+                surface2: '#252529',
+                border: '#2e2e34',
+                text: '#e8e8ea',
+                muted: '#9a9aa3',
+                accent: '#8fa8c0',
+                accentHover: '#a8c0d0',
+              }
+            }
+          }
+        }
+      }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/container-queries.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -17,67 +38,64 @@
             to { opacity: 1; transform: scale(1); }
         }
         html, body { overflow-x: hidden; max-width: 100vw; }
-        @media (max-width: 768px) {
-            button, a.btn-touch { min-height: 44px; }
-        }
         .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="gt-theme bg-gt-bg text-gt-text min-h-screen flex flex-col">
 
-    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
+    <nav class="gt-nav sticky top-0 z-50 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex justify-between h-14 sm:h-16 items-center">
                 <a href="/" class="flex items-center gap-2 min-w-0">
-                    <i class="fas fa-globe-americas text-indigo-600 text-xl sm:text-2xl shrink-0"></i>
-                    <span class="heading text-lg sm:text-xl font-bold text-gray-900 truncate">GlobeTrotter</span>
+                    <i class="fas fa-globe-americas text-gt-accent text-xl sm:text-2xl shrink-0"></i>
+                    <span class="heading text-lg sm:text-xl font-bold text-gt-text truncate">GlobeTrotter</span>
                 </a>
 
                 <div class="hidden md:flex items-center gap-6 lg:gap-8">
-                    <a href="/" class="text-gray-700 hover:text-indigo-600 font-medium transition">Home</a>
-                    <a href="/destinations" class="text-gray-700 hover:text-indigo-600 font-medium transition">Destinations</a>
-                    <a href="/recommendations" class="text-gray-700 hover:text-indigo-600 font-medium transition">Recommendations</a>
-                    <a href="/itineraries" class="text-gray-700 hover:text-indigo-600 font-medium transition">My Trips</a>
+                    <a href="/" class="text-gt-muted hover:text-gt-accent font-medium transition">Home</a>
+                    <a href="/destinations" class="text-gt-muted hover:text-gt-accent font-medium transition">Destinations</a>
+                    <a href="/recommendations" class="text-gt-muted hover:text-gt-accent font-medium transition">Recommendations</a>
+                    <a href="/itineraries" class="text-gt-muted hover:text-gt-accent font-medium transition">My Trips</a>
                 </div>
 
                 <div class="hidden md:flex items-center gap-3">
                     <div id="authButtons" class="flex items-center gap-3">
-                        <button onclick="openLogin()" class="text-gray-700 hover:text-indigo-600 font-medium transition px-2 py-2">Login</button>
-                        <button onclick="openRegister()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition text-sm font-medium shadow-sm">Sign Up</button>
+                        <button onclick="openLogin()" class="text-gt-muted hover:text-gt-accent font-medium transition px-2 py-2">Login</button>
+                        <button onclick="openRegister()" class="gt-btn-primary px-4 py-2 rounded-xl text-sm font-medium transition">Sign Up</button>
                     </div>
                     <div id="userMenu" class="hidden items-center gap-3">
-                        <button onclick="openPreferences()" class="text-gray-600 hover:text-indigo-600 text-sm font-medium flex items-center gap-1.5 py-2">
+                        <button onclick="openPreferences()" class="text-gt-muted hover:text-gt-accent text-sm font-medium flex items-center gap-1.5 py-2">
                             <i class="fas fa-sliders-h"></i> Preferences
                         </button>
-                        <span class="text-gray-300">|</span>
-                        <span id="usernameDisplay" class="text-sm text-gray-600"></span>
-                        <button onclick="logout()" class="text-red-500 hover:text-red-600 text-sm font-medium py-2">Logout</button>
+                        <span class="text-gt-border">|</span>
+                        <span id="usernameDisplay" class="text-sm text-gt-muted"></span>
+                        <button onclick="logout()" class="text-red-400 hover:text-red-300 text-sm font-medium py-2">Logout</button>
                     </div>
                 </div>
 
-                <button id="mobileMenuBtn" type="button" class="md:hidden p-3 -mr-2 text-gray-700 hover:text-indigo-600 rounded-lg" onclick="toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false">
+                <button id="mobileMenuBtn" type="button" class="md:hidden p-3 -mr-2 text-gt-muted hover:text-gt-accent rounded-lg" onclick="toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false">
                     <i id="menuIcon" class="fas fa-bars text-xl"></i>
                 </button>
             </div>
         </div>
 
-        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-100 bg-white safe-bottom">
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gt-border bg-gt-surface safe-bottom">
             <div class="px-4 py-3 space-y-1">
-                <a href="/" class="block py-3 px-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium">Home</a>
-                <a href="/destinations" class="block py-3 px-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium">Destinations</a>
-                <a href="/recommendations" class="block py-3 px-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium">Recommendations</a>
-                <a href="/itineraries" class="block py-3 px-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium">My Trips</a>
-                <hr class="my-2">
+                <a href="/" class="block py-3 px-2 rounded-lg text-gt-muted hover:bg-gt-surface2 hover:text-gt-accent font-medium">Home</a>
+                <a href="/destinations" class="block py-3 px-2 rounded-lg text-gt-muted hover:bg-gt-surface2 hover:text-gt-accent font-medium">Destinations</a>
+                <a href="/recommendations" class="block py-3 px-2 rounded-lg text-gt-muted hover:bg-gt-surface2 hover:text-gt-accent font-medium">Recommendations</a>
+                <a href="/itineraries" class="block py-3 px-2 rounded-lg text-gt-muted hover:bg-gt-surface2 hover:text-gt-accent font-medium">My Trips</a>
+                <hr class="my-2 border-gt-border">
                 <div id="mobileAuth" class="space-y-1">
-                    <button onclick="openLogin(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 rounded-lg text-gray-700 font-medium hover:bg-gray-50">Login</button>
-                    <button onclick="openRegister(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 rounded-lg text-indigo-600 font-medium hover:bg-indigo-50">Sign Up</button>
+                    <button onclick="openLogin(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 rounded-lg text-gt-muted font-medium">Login</button>
+                    <button onclick="openRegister(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 rounded-lg text-gt-accent font-medium">Sign Up</button>
                 </div>
                 <div id="mobileUser" class="hidden space-y-1">
-                    <p id="mobileUsername" class="text-sm text-gray-500 px-2 py-1"></p>
-                    <button onclick="openPreferences(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 rounded-lg text-indigo-600 font-medium hover:bg-indigo-50">
+                    <p id="mobileUsername" class="text-sm text-gt-muted px-2 py-1"></p>
+                    <button onclick="openPreferences(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 rounded-lg text-gt-accent font-medium">
                         <i class="fas fa-sliders-h mr-1"></i> Edit Preferences
                     </button>
-                    <button onclick="logout()" class="block w-full text-left py-3 px-2 rounded-lg text-red-500 font-medium hover:bg-red-50">Logout</button>
+                    <button onclick="logout()" class="block w-full text-left py-3 px-2 rounded-lg text-red-400 font-medium">Logout</button>
                 </div>
             </div>
         </div>
@@ -87,117 +105,102 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-gray-900 text-gray-400 py-8 sm:py-10 mt-auto safe-bottom">
+    <footer class="bg-gt-surface border-t border-gt-border text-gt-muted py-8 sm:py-10 mt-auto safe-bottom">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
             <p class="text-xs sm:text-sm">© 2026 GlobeTrotter Capstone Project • Built with Flask + Tailwind</p>
         </div>
     </footer>
 
-    <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-white relative">
-                <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-white/80 hover:text-white text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
+    <!-- LOGIN -->
+    <div id="loginModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
+            <div class="bg-gt-surface2 px-6 sm:px-8 py-5 sm:py-6 text-gt-text relative border-b border-gt-border">
+                <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-gt-muted hover:text-gt-text text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3 pr-8">
-                    <div class="w-11 h-11 sm:w-12 sm:h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-user text-lg sm:text-xl"></i></div>
-                    <div class="min-w-0">
+                    <div class="w-11 h-11 bg-gt-accent/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-user text-gt-accent"></i></div>
+                    <div>
                         <h2 class="text-xl sm:text-2xl font-bold">Welcome back</h2>
-                        <p class="text-indigo-100 text-sm">Login to continue your journey</p>
+                        <p class="text-gt-muted text-sm">Login to continue your journey</p>
                     </div>
                 </div>
             </div>
             <div class="p-6 sm:p-8">
-                <div id="loginError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
+                <div id="loginError" class="hidden mb-4 bg-red-950/50 text-red-300 text-sm px-4 py-3 rounded-xl border border-red-900"></div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5" for="loginUser">Username</label>
-                        <div class="relative">
-                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="loginUser" autocomplete="username" placeholder="Enter your username" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
+                        <label class="block text-sm font-medium text-gt-muted mb-1.5" for="loginUser">Username</label>
+                        <input type="text" id="loginUser" autocomplete="username" placeholder="Enter your username" class="w-full rounded-xl pl-4 pr-4 py-3 text-base border border-gt-border bg-gt-surface2">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5" for="loginPass">Password</label>
-                        <div class="relative">
-                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="password" id="loginPass" autocomplete="current-password" placeholder="Enter your password" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
+                        <label class="block text-sm font-medium text-gt-muted mb-1.5" for="loginPass">Password</label>
+                        <input type="password" id="loginPass" autocomplete="current-password" placeholder="Enter your password" class="w-full rounded-xl pl-4 pr-4 py-3 text-base border border-gt-border bg-gt-surface2">
                     </div>
                 </div>
-                <button id="loginBtn" type="button" onclick="doLogin()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 min-h-[48px]"><span>Login</span></button>
-                <p class="text-center text-sm text-gray-500 mt-6">Don't have an account? <button type="button" onclick="switchToRegister()" class="text-indigo-600 font-medium hover:underline">Sign up</button></p>
+                <button id="loginBtn" type="button" onclick="doLogin()" class="w-full mt-6 gt-btn-primary py-3.5 rounded-xl font-semibold min-h-[48px]"><span>Login</span></button>
+                <p class="text-center text-sm text-gt-muted mt-6">Don't have an account? <button type="button" onclick="switchToRegister()" class="text-gt-accent font-medium hover:underline">Sign up</button></p>
             </div>
         </div>
     </div>
 
-    <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-white relative">
-                <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-white/80 hover:text-white text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
+    <!-- REGISTER -->
+    <div id="registerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
+            <div class="bg-gt-surface2 px-6 sm:px-8 py-5 sm:py-6 relative border-b border-gt-border">
+                <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-gt-muted hover:text-gt-text text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3 pr-8">
-                    <div class="w-11 h-11 sm:w-12 sm:h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-user-plus text-lg sm:text-xl"></i></div>
-                    <div class="min-w-0">
+                    <div class="w-11 h-11 bg-gt-accent/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-user-plus text-gt-accent"></i></div>
+                    <div>
                         <h2 class="text-xl sm:text-2xl font-bold">Join GlobeTrotter</h2>
-                        <p class="text-indigo-100 text-sm">Create your account to get started</p>
+                        <p class="text-gt-muted text-sm">Create your account to get started</p>
                     </div>
                 </div>
             </div>
             <div class="p-6 sm:p-8">
-                <div id="regError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
+                <div id="regError" class="hidden mb-4 bg-red-950/50 text-red-300 text-sm px-4 py-3 rounded-xl border border-red-900"></div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5" for="regUser">Username</label>
-                        <div class="relative">
-                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="regUser" autocomplete="username" placeholder="Choose a username" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
+                        <label class="block text-sm font-medium text-gt-muted mb-1.5" for="regUser">Username</label>
+                        <input type="text" id="regUser" autocomplete="username" placeholder="Choose a username" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5" for="regPass">Password</label>
-                        <div class="relative">
-                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="password" id="regPass" autocomplete="new-password" placeholder="Create a password" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
+                        <label class="block text-sm font-medium text-gt-muted mb-1.5" for="regPass">Password</label>
+                        <input type="password" id="regPass" autocomplete="new-password" placeholder="Create a password" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5" for="regPrefs">Travel Preferences</label>
-                        <div class="relative">
-                            <i class="fas fa-heart absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="regPrefs" placeholder="e.g. beach, food, culture" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <p class="text-xs text-gray-400 mt-1.5">Separate with commas</p>
+                        <label class="block text-sm font-medium text-gt-muted mb-1.5" for="regPrefs">Travel Preferences</label>
+                        <input type="text" id="regPrefs" placeholder="e.g. beach, food, culture" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2">
+                        <p class="text-xs text-gt-muted mt-1.5">Separate with commas</p>
                     </div>
                 </div>
-                <button id="regBtn" type="button" onclick="doRegister()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 min-h-[48px]"><span>Create Account</span></button>
-                <p class="text-center text-sm text-gray-500 mt-6">Already have an account? <button type="button" onclick="switchToLogin()" class="text-indigo-600 font-medium hover:underline">Login</button></p>
+                <button id="regBtn" type="button" onclick="doRegister()" class="w-full mt-6 gt-btn-primary py-3.5 rounded-xl font-semibold min-h-[48px]"><span>Create Account</span></button>
+                <p class="text-center text-sm text-gt-muted mt-6">Already have an account? <button type="button" onclick="switchToLogin()" class="text-gt-accent font-medium hover:underline">Login</button></p>
             </div>
         </div>
     </div>
 
-    <div id="prefsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-white relative">
-                <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-white/80 hover:text-white text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
+    <!-- PREFS -->
+    <div id="prefsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
+            <div class="bg-gt-surface2 px-6 sm:px-8 py-5 sm:py-6 relative border-b border-gt-border">
+                <button type="button" onclick="closeModals()" class="absolute top-3 right-3 p-2 text-gt-muted hover:text-gt-text text-xl" aria-label="Close"><i class="fas fa-times"></i></button>
                 <div class="flex items-center gap-3 pr-8">
-                    <div class="w-11 h-11 sm:w-12 sm:h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-sliders-h text-lg sm:text-xl"></i></div>
-                    <div class="min-w-0">
+                    <div class="w-11 h-11 bg-gt-accent/20 rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-sliders-h text-gt-accent"></i></div>
+                    <div>
                         <h2 class="text-xl sm:text-2xl font-bold">Your Preferences</h2>
-                        <p class="text-indigo-100 text-sm">Update what you love about travel</p>
+                        <p class="text-gt-muted text-sm">Update what you love about travel</p>
                     </div>
                 </div>
             </div>
             <div class="p-6 sm:p-8">
-                <div id="prefsError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
-                <div id="prefsSuccess" class="hidden mb-4 bg-emerald-50 text-emerald-600 text-sm px-4 py-3 rounded-xl"></div>
+                <div id="prefsError" class="hidden mb-4 bg-red-950/50 text-red-300 text-sm px-4 py-3 rounded-xl border border-red-900"></div>
+                <div id="prefsSuccess" class="hidden mb-4 bg-emerald-950/40 text-emerald-300 text-sm px-4 py-3 rounded-xl border border-emerald-900"></div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5" for="editPrefs">Travel Interests</label>
-                    <div class="relative">
-                        <i class="fas fa-heart absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="editPrefs" placeholder="e.g. beach, food, culture, adventure" class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1.5">Separate with commas</p>
+                    <label class="block text-sm font-medium text-gt-muted mb-1.5" for="editPrefs">Travel Interests</label>
+                    <input type="text" id="editPrefs" placeholder="e.g. beach, food, culture, adventure" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2">
+                    <p class="text-xs text-gt-muted mt-1.5">Separate with commas</p>
                 </div>
                 <div class="mt-4 flex flex-wrap gap-2" id="prefChips"></div>
-                <button id="prefsBtn" type="button" onclick="savePreferences()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 min-h-[48px]"><span>Save Preferences</span></button>
+                <button id="prefsBtn" type="button" onclick="savePreferences()" class="w-full mt-6 gt-btn-primary py-3.5 rounded-xl font-semibold min-h-[48px]"><span>Save Preferences</span></button>
             </div>
         </div>
     </div>
@@ -213,8 +216,7 @@
             btn.setAttribute('aria-expanded', open ? 'false' : 'true');
         }
         document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('token');
-            if (token) {
+            if (localStorage.getItem('token')) {
                 document.getElementById('authButtons')?.classList.add('hidden');
                 document.getElementById('userMenu')?.classList.remove('hidden');
                 document.getElementById('userMenu')?.classList.add('flex');
@@ -246,13 +248,12 @@
             } catch (e) {}
         }
         function renderPrefChips(prefs) {
-            document.getElementById('prefChips').innerHTML = prefs.map(p => `<span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full">${p}</span>`).join('');
+            document.getElementById('prefChips').innerHTML = prefs.map(p => `<span class="gt-chip text-xs px-3 py-1 rounded-full">${p}</span>`).join('');
         }
         function closeModals() {
             ['loginModal', 'registerModal', 'prefsModal'].forEach(id => {
                 const el = document.getElementById(id);
-                el.classList.add('hidden');
-                el.classList.remove('flex');
+                el.classList.add('hidden'); el.classList.remove('flex');
             });
             document.body.style.overflow = '';
         }
@@ -289,7 +290,6 @@
                     closeModals(); document.getElementById('loginUser').value = username; openLogin();
                     const loginErr = document.getElementById('loginError');
                     loginErr.textContent = 'Account created! Please login.'; loginErr.classList.remove('hidden');
-                    loginErr.classList.replace('bg-red-50', 'bg-emerald-50'); loginErr.classList.replace('text-red-600', 'text-emerald-600');
                 } else { errorEl.textContent = data.error || 'Registration failed'; errorEl.classList.remove('hidden'); }
             } catch (e) { errorEl.textContent = 'Network error. Please try again.'; errorEl.classList.remove('hidden'); }
             finally { btn.disabled = false; btn.innerHTML = '<span>Create Account</span>'; }
