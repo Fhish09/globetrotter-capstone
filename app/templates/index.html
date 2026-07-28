@@ -5,18 +5,20 @@
 {% block content %}
 <section class="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 text-white overflow-hidden" aria-label="Hero">
     <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1488085061387-422e58bd4a48?w=1600')] bg-cover bg-center opacity-20" aria-hidden="true"></div>
-    <div class="relative max-w-7xl mx-auto px-6 py-28 text-center">
-        <h1 class="heading text-5xl md:text-7xl font-bold mb-6 leading-tight">Discover the World</h1>
-        <p class="text-xl md:text-2xl text-indigo-100 mb-12 max-w-2xl mx-auto">Your personal travel assistant for unforgettable adventures</p>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-28 text-center">
+        <h1 class="heading text-3xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight">Discover the World</h1>
+        <p class="text-base sm:text-xl md:text-2xl text-indigo-100 mb-8 sm:mb-12 max-w-2xl mx-auto px-2">Your personal travel assistant for unforgettable adventures</p>
 
         <form onsubmit="event.preventDefault(); searchDestinations();" class="max-w-xl mx-auto" role="search">
-            <div class="bg-white/15 backdrop-blur-md rounded-2xl p-2 flex items-center shadow-2xl">
-                <i class="fas fa-search text-white/70 pl-5" aria-hidden="true"></i>
-                <label for="heroSearch" class="sr-only">Search destinations</label>
-                <input type="search" id="heroSearch" placeholder="Where do you want to go?" 
-                       class="w-full bg-transparent border-0 focus:outline-none text-white placeholder-white/60 px-4 py-4 text-lg"
-                       autocomplete="off">
-                <button type="submit" class="bg-white text-indigo-700 font-semibold px-6 py-3 rounded-xl hover:bg-indigo-50 transition">
+            <div class="bg-white/15 backdrop-blur-md rounded-2xl p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-2xl">
+                <div class="flex items-center flex-1 min-w-0">
+                    <i class="fas fa-search text-white/70 pl-3 sm:pl-5 shrink-0" aria-hidden="true"></i>
+                    <label for="heroSearch" class="sr-only">Search destinations</label>
+                    <input type="search" id="heroSearch" placeholder="Where do you want to go?"
+                           class="w-full min-w-0 bg-transparent border-0 focus:outline-none text-white placeholder-white/60 px-3 py-3 sm:py-4 text-base sm:text-lg"
+                           autocomplete="off">
+                </div>
+                <button type="submit" class="bg-white text-indigo-700 font-semibold px-6 py-3 rounded-xl hover:bg-indigo-50 transition w-full sm:w-auto shrink-0 min-h-[48px]">
                     Search
                 </button>
             </div>
@@ -24,28 +26,28 @@
     </div>
 </section>
 
-<section class="max-w-7xl mx-auto px-6 py-20" aria-labelledby="popular-heading">
-    <div class="flex justify-between items-end mb-10">
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20" aria-labelledby="popular-heading">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-8 sm:mb-10">
         <div>
-            <h2 id="popular-heading" class="heading text-4xl font-bold text-gray-900">Popular Destinations</h2>
-            <p class="text-gray-500 mt-2">Hand-picked places travelers love</p>
+            <h2 id="popular-heading" class="heading text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Popular Destinations</h2>
+            <p class="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">Hand-picked places travelers love</p>
         </div>
-        <a href="/destinations" class="text-indigo-600 font-medium hover:underline">View all →</a>
+        <a href="/destinations" class="text-indigo-600 font-medium hover:underline text-sm sm:text-base self-start sm:self-auto">View all →</a>
     </div>
 
-    <div id="destinations" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
-        <div class="col-span-full text-center py-20 text-gray-400">
-            <i class="fas fa-spinner fa-spin text-4xl mb-4" aria-hidden="true"></i>
+    <div id="destinations" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8" role="list">
+        <div class="col-span-full text-center py-16 sm:py-20 text-gray-400">
+            <i class="fas fa-spinner fa-spin text-3xl sm:text-4xl mb-4" aria-hidden="true"></i>
             <p>Loading destinations...</p>
         </div>
     </div>
 </section>
 
-<section class="bg-indigo-600 text-white py-16" aria-label="Call to action">
-    <div class="max-w-4xl mx-auto text-center px-6">
-        <h2 class="heading text-3xl md:text-4xl font-bold mb-4">Ready to plan your next trip?</h2>
-        <p class="text-indigo-100 mb-8 text-lg">Get personalized recommendations based on your preferences.</p>
-        <a href="/recommendations" class="inline-block bg-white text-indigo-700 font-semibold px-8 py-4 rounded-2xl hover:bg-indigo-50 transition">
+<section class="bg-indigo-600 text-white py-12 sm:py-16" aria-label="Call to action">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6">
+        <h2 class="heading text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Ready to plan your next trip?</h2>
+        <p class="text-indigo-100 mb-6 sm:mb-8 text-base sm:text-lg">Get personalized recommendations based on your preferences.</p>
+        <a href="/recommendations" class="inline-block bg-white text-indigo-700 font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl hover:bg-indigo-50 transition min-h-[48px]">
             Get Recommendations
         </a>
     </div>
@@ -60,46 +62,41 @@ function getDestImage(dest) {
 
 async function loadDestinations() {
     try {
-        const res = await fetch('/destinations');
+        const res = await fetch('/destinations?source=local');
         const data = await res.json();
         const container = document.getElementById('destinations');
 
         if (!data.length) {
-            container.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400">
-                <p>No destinations found.</p>
-            </div>`;
+            container.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400"><p>No destinations found.</p></div>`;
             return;
         }
 
         container.innerHTML = data.slice(0, 6).map(dest => `
-            <a href="/destinations/${dest.id}" class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition group block" role="listitem">
-                <div class="relative h-56 overflow-hidden">
-                    <img src="${getDestImage(dest)}" 
-                         class="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
-                         alt="${dest.name}"
-                         loading="lazy">
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">
+            <a href="/destinations/${dest.id}" class="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition group block" role="listitem">
+                <div class="relative h-44 sm:h-52 md:h-56 overflow-hidden">
+                    <img src="${getDestImage(dest)}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                         alt="${dest.name}" loading="lazy">
+                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium">
                         $${dest.avg_cost_per_day || '—'}/day
                     </div>
                 </div>
-                <div class="p-6">
-                    <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                <div class="p-4 sm:p-6">
+                    <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-2">
                         <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                        <span>${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</span>
+                        <span class="truncate">${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition">${dest.name}</h3>
-                    <p class="text-gray-600 text-sm line-clamp-2 mb-4">${dest.description || 'Beautiful destination waiting for you.'}</p>
-                    <div class="flex flex-wrap gap-2">
-                        ${(dest.tags || []).slice(0,3).map(t => `<span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full">${t}</span>`).join('')}
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition">${dest.name}</h3>
+                    <p class="text-gray-600 text-sm line-clamp-2 mb-3 sm:mb-4">${dest.description || 'Beautiful destination waiting for you.'}</p>
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                        ${(dest.tags || []).slice(0,3).map(t => `<span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full">${t}</span>`).join('')}
                     </div>
                 </div>
             </a>
         `).join('');
     } catch (err) {
         document.getElementById('destinations').innerHTML = `
-            <div class="col-span-full text-center py-16 text-red-400">
-                <p>Failed to load destinations. Is the API running?</p>
-            </div>`;
+            <div class="col-span-full text-center py-16 text-red-400"><p>Failed to load destinations. Is the API running?</p></div>`;
     }
 }
 
