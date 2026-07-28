@@ -1,20 +1,36 @@
 version: "3.9"
 
-# Phase 2 – Microservices stack
+# Phase 2 – Microservices stack (separate databases per service)
 # Usage: docker-compose -f docker-compose.microservices.yml up --build
 
 services:
-  db:
+  auth-db:
     image: postgres:15-alpine
-    container_name: gt_db
+    container_name: gt_auth_db
     environment:
-      POSTGRES_USER: globetrotter
-      POSTGRES_PASSWORD: globetrotter
-      POSTGRES_DB: globetrotter
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: auth
+      POSTGRES_DB: auth_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - auth_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U globetrotter -d globetrotter"]
+      test: ["CMD-SHELL", "pg_isready -U auth -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  itineraries-db:
+    image: postgres:15-alpine
+    container_name: gt_itineraries_db
+    environment:
+      POSTGRES_USER: itineraries
+      POSTGRES_PASSWORD: itineraries
+      POSTGRES_DB: itineraries_db
+    volumes:
+      - itineraries_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U itineraries -d itineraries_db"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,9 +44,9 @@ services:
     environment:
       - PORT=5001
       - SECRET_KEY=dev-secret-key-please-change-in-prod
-      - DATABASE_URL=postgresql://globetrotter:globetrotter@db:5432/globetrotter
+      - DATABASE_URL=postgresql://auth:auth@auth-db:5432/auth_db
     depends_on:
-      db:
+      auth-db:
         condition: service_healthy
     restart: unless-stopped
 
@@ -66,9 +82,9 @@ services:
     environment:
       - PORT=5004
       - SECRET_KEY=dev-secret-key-please-change-in-prod
-      - DATABASE_URL=postgresql://globetrotter:globetrotter@db:5432/globetrotter
+      - DATABASE_URL=postgresql://itineraries:itineraries@itineraries-db:5432/itineraries_db
     depends_on:
-      db:
+      itineraries-db:
         condition: service_healthy
     restart: unless-stopped
 
@@ -93,4 +109,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  auth_data:
+  itineraries_data:

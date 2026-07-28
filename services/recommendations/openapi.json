@@ -1,0 +1,39 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "GlobeTrotter Recommendations Service",
+    "version": "1.0.0",
+    "description": "Personalized recommendations. Calls Auth and Destinations services."
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health + dependency status",
+        "responses": { "200": { "description": "OK or degraded" } }
+      }
+    },
+    "/recommendations": {
+      "get": {
+        "summary": "Get personalized recommendations",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 6 } }
+        ],
+        "responses": {
+          "200": { "description": "List of scored destinations" },
+          "401": { "description": "Unauthorized" },
+          "503": { "description": "Upstream service unavailable" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
