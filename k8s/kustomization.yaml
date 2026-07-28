@@ -6,6 +6,7 @@ namespace: globetrotter
 resources:
   - namespace.yaml
   - configmap.yaml
+  - redis.yaml
   - auth-db.yaml
   - itineraries-db.yaml
   - auth.yaml

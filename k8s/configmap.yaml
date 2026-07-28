@@ -9,5 +9,7 @@ data:
   DESTINATIONS_SERVICE_URL: "http://destinations:5002"
   RECOMMENDATIONS_SERVICE_URL: "http://recommendations:5003"
   ITINERARIES_SERVICE_URL: "http://itineraries:5004"
+  REDIS_URL: "redis://redis:6379/0"
+  CACHE_TTL: "300"
   PROXY_TIMEOUT: "12"
   PROXY_RETRIES: "1"
