@@ -3,6 +3,7 @@ Auth microservice – registration, login, JWT, profile, preferences.
 Port: 5001
 """
 import os
+import sys
 import uuid
 import datetime
 
@@ -12,6 +13,14 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
 from werkzeug.security import generate_password_hash, check_password_hash
 
+sys.path.insert(0, os.path.dirname(__file__))
+try:
+    from observability import init_observability
+except ImportError:
+    def init_observability(app, service_name):
+        import logging
+        return logging.getLogger(service_name)
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "globetrotter-secret-change-in-prod")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
@@ -19,6 +28,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+logger = init_observability(app, "auth")
 db = SQLAlchemy(app)
 
 
@@ -80,6 +90,7 @@ def register():
     )
     db.session.add(user)
     db.session.commit()
+    logger.info("event=user_registered username=%s", username)
     return jsonify({"message": "user registered successfully", "username": username}), 201
 
 
@@ -94,8 +105,10 @@ def login():
 
     user = User.query.filter_by(username=username).first()
     if not user or not check_password_hash(user.password_hash, password):
+        logger.info("event=login_failed username=%s", username)
         return jsonify({"error": "invalid credentials"}), 401
 
+    logger.info("event=login_success username=%s", username)
     return jsonify({"token": create_token(username), "username": username}), 200
 
 
@@ -130,12 +143,12 @@ def update_preferences():
 
     user.preferences = cleaned
     db.session.commit()
+    logger.info("event=preferences_updated username=%s count=%s", username, len(cleaned))
     return jsonify({"message": "preferences updated successfully", "preferences": cleaned}), 200
 
 
 @app.get("/internal/users/<username>")
 def internal_user(username):
-    """Internal endpoint for other services (recommendations)."""
     user = User.query.filter_by(username=username).first()
     if not user:
         return jsonify({"error": "user not found"}), 404
