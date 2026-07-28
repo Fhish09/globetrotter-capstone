@@ -3,6 +3,7 @@ Itineraries microservice – create and list trips for authenticated users.
 Port: 5004
 """
 import os
+import sys
 import uuid
 import datetime
 
@@ -11,6 +12,14 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
 
+sys.path.insert(0, os.path.dirname(__file__))
+try:
+    from observability import init_observability
+except ImportError:
+    def init_observability(app, service_name):
+        import logging
+        return logging.getLogger(service_name)
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "globetrotter-secret-change-in-prod")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
@@ -18,6 +27,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+logger = init_observability(app, "itineraries")
 db = SQLAlchemy(app)
 
 
@@ -91,6 +101,7 @@ def create_itinerary():
     )
     db.session.add(row)
     db.session.commit()
+    logger.info("event=itinerary_created username=%s title=%s", username, title)
     return jsonify(row.to_dict()), 201
 
 

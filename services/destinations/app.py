@@ -2,10 +2,10 @@
 Destinations microservice – search catalogue (seed + tourist + REST Countries).
 Port: 5002
 
-Phase 4: Redis caching of search results and full catalogue.
+Observability: structured logs, /metrics, X-Request-ID.
+Phase 4: Redis caching.
 """
 import json
-import logging
 import os
 import sys
 from typing import Optional
@@ -20,8 +20,15 @@ except ImportError:
     def cache_get(key): return None
     def cache_set(key, value, ttl_seconds=300): pass
 
+try:
+    from observability import init_observability
+except ImportError:
+    def init_observability(app, service_name):
+        import logging
+        return logging.getLogger(service_name)
+
 app = Flask(__name__)
-logger = logging.getLogger(__name__)
+logger = init_observability(app, "destinations")
 
 DESTINATIONS_FILE = os.path.join(os.path.dirname(__file__), "data", "destinations.json")
 _memory_cache: Optional[list] = None
@@ -151,7 +158,6 @@ def search():
         except ValueError:
             return jsonify({"error": "max_cost must be an integer"}), 400
 
-    # Cache filtered search results
     search_key = f"dest:q={q}:tag={tag}:cont={continent}:cost={max_cost}:src={source}"
     cached = cache_get(search_key)
     if cached is not None:
@@ -174,6 +180,7 @@ def search():
         results.append(dest)
 
     cache_set(search_key, results, CACHE_TTL)
+    logger.info("event=search q=%s tag=%s results=%s", q, tag, len(results))
     return jsonify(results), 200
 
 
