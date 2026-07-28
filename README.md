@@ -4,185 +4,22 @@ GlobeTrotter is a distributed travel recommendation application built as a semes
 
 Students start with a **monolith** (Phase 1), refactor into **microservices** (Phase 2), deploy to the **cloud** (Phase 3), and add **resilience** patterns (Phase 4).
 
-**Current status: Phase 2 – Microservices ✅ Complete**
+**Current status: Phase 3 – Cloud Deployment ✅**
 
 ---
 
 ## Features
 
-- Search travel destinations (seed data + world capitals + curated tourist cities)
+- Search travel destinations (seed + tourist curated + REST Countries)
 - Personalized recommendations based on user preferences
 - Create and manage travel itineraries
-- JWT authentication (register / login / preferences)
-- Modern Tailwind CSS frontend
-- Strong coverage of **Cameroon** and African tourist sites
-- **Microservices** with API gateway and inter-service HTTP calls
-- **Separate databases** per stateful service (auth-db, itineraries-db)
-- Retries, timeouts, and health checks between services
-- Service-level tests + OpenAPI specs per service
-- Monolith API tests with pytest
-
----
-
-## Architecture
-
-### Phase 1 – Monolith
-
-Single Flask app + PostgreSQL (`docker-compose.yml`).
-
-### Phase 2 – Microservices
-
-```
-                    ┌─────────────┐
-                    │   Gateway   │  :5000  (public entry + frontend)
-                    └──────┬──────┘
-           ┌───────────────┼───────────────────┐
-           │               │                   │
-    ┌──────▼─────┐  ┌──────▼──────┐  ┌─────────▼────────┐  ┌──────▼───────┐
-    │    Auth    │  │ Destinations│  │ Recommendations  │  │ Itineraries  │
-    │   :5001    │  │   :5002     │  │     :5003        │  │   :5004      │
-    └──────┬─────┘  └─────────────┘  └────────┬─────────┘  └──────┬───────┘
-           │                                  │                    │
-      ┌────▼────┐              calls auth + destinations      ┌────▼────┐
-      │ auth-db │                                             │ itin-db │
-      └─────────┘                                             └─────────┘
-```
-
-| Service | Port | Database | Responsibility |
-|---------|------|----------|----------------|
-| **gateway** | 5000 | — | Frontend + API proxy |
-| **auth** | 5001 | **auth-db** | Register, login, JWT, preferences |
-| **destinations** | 5002 | — (JSON + API) | Search catalogue |
-| **recommendations** | 5003 | — | Personalized picks (calls auth + destinations) |
-| **itineraries** | 5004 | **itineraries-db** | Create / list trips |
-
-Inter-service calls use a shared HTTP client with **timeouts**, **retries**, and **clear error responses**.
-
----
-
-## Project Structure
-
-```
-.
-├── app/                              # Phase 1 monolith
-├── services/                         # Phase 2 microservices
-│   ├── shared/
-│   │   ├── requirements.txt
-│   │   └── http_client.py
-│   ├── auth/
-│   │   ├── app.py
-│   │   ├── openapi.json
-│   │   └── tests/
-│   ├── destinations/
-│   │   ├── app.py
-│   │   ├── openapi.json
-│   │   └── tests/
-│   ├── recommendations/
-│   │   ├── app.py
-│   │   └── openapi.json
-│   ├── itineraries/
-│   │   ├── app.py
-│   │   ├── openapi.json
-│   │   └── tests/
-│   └── gateway/
-├── data/destinations.json
-├── tests/                            # Monolith tests
-├── docker-compose.yml                # Phase 1
-├── docker-compose.microservices.yml  # Phase 2
-└── README.md
-```
-
----
-
-## REST API
-
-Same public API in both phases (Phase 2 via gateway):
-
-| Method | Endpoint           | Auth | Description |
-|--------|--------------------|------|-------------|
-| POST   | `/register`        | No   | Register |
-| POST   | `/login`           | No   | JWT login |
-| GET    | `/me`              | Yes  | Profile + preferences |
-| PUT    | `/preferences`     | Yes  | Update preferences |
-| GET    | `/destinations`    | No   | Search destinations |
-| GET    | `/recommendations` | Yes  | Personalized recommendations |
-| POST   | `/itineraries`     | Yes  | Create itinerary |
-| GET    | `/itineraries`     | Yes  | List itineraries |
-| GET    | `/health`          | No   | Gateway + upstream health |
-
-OpenAPI specs live under each service folder, e.g. `services/auth/openapi.json`.
-
-Protected routes: `Authorization: Bearer <token>`
-
-### Example requests
-
-```bash
-curl -X POST http://localhost:5000/register \
-  -H "Content-Type: application/json" \
-  -d '{"username": "alice", "password": "s3cr3t", "preferences": ["beach", "food"]}'
-
-curl -X POST http://localhost:5000/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "alice", "password": "s3cr3t"}'
-
-curl "http://localhost:5000/destinations?q=cameroon"
-
-curl http://localhost:5000/recommendations -H "Authorization: Bearer $TOKEN"
-
-curl http://localhost:5000/health
-```
-
----
-
-## Running Phase 1 (Monolith)
-
-```bash
-docker-compose up --build
-# → http://localhost:5000
-```
-
----
-
-## Running Phase 2 (Microservices)
-
-```bash
-docker-compose -f docker-compose.microservices.yml up --build
-# → http://localhost:5000  (gateway)
-```
-
-```bash
-docker-compose -f docker-compose.microservices.yml down
-```
-
----
-
-## Running tests
-
-**Monolith:**
-
-```bash
-pip install -r requirements.txt
-pytest tests/ -v
-```
-
-**Microservices (examples):**
-
-```bash
-pip install -r services/shared/requirements.txt pytest PyJWT
-pytest services/auth/tests/ -v
-pytest services/destinations/tests/ -v
-pytest services/itineraries/tests/ -v
-```
-
----
-
-## Data storage (Phase 2)
-
-| Data | Storage |
-|------|---------|
-| Users | **auth-db** (PostgreSQL) |
-| Itineraries | **itineraries-db** (PostgreSQL) |
-| Destinations | JSON seed + REST Countries + curated list |
+- JWT authentication
+- Tailwind CSS frontend
+- Strong **Cameroon** / Africa coverage
+- Microservices + API gateway
+- Separate databases per stateful service
+- **Kubernetes**: Deployments, Services, Ingress, HPA (auto-scaling)
+- Health probes, ConfigMaps, Secrets, PVCs
 
 ---
 
@@ -191,9 +28,128 @@ pytest services/itineraries/tests/ -v
 | Phase | Goal | Status |
 |-------|------|--------|
 | **1. Monolith** | REST API, Docker, PostgreSQL, frontend, tests | ✅ Done |
-| **2. Microservices** | Decomposition, gateway, inter-service calls, separate DBs, OpenAPI | ✅ Done |
-| **3. Cloud Deployment** | Kubernetes, load balancing, auto-scaling | ⏳ Next |
-| **4. Resilience** | Caching, queues, circuit breakers, fault tolerance | ⏳ Planned |
+| **2. Microservices** | Decomposition, gateway, inter-service calls, separate DBs | ✅ Done |
+| **3. Cloud Deployment** | Kubernetes, load balancing, auto-scaling | ✅ Done |
+| **4. Resilience** | Caching, queues, circuit breakers, fault tolerance | ⏳ Next |
+
+---
+
+## Architecture (Phase 2 + 3)
+
+```
+                 ┌──────────── Ingress ────────────┐
+                 │     (load balancing / TLS)      │
+                 └───────────────┬─────────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │   Gateway (HPA 2–6)     │
+                    └────────────┬────────────┘
+           ┌─────────────────────┼─────────────────────┐
+           │                     │                     │
+    ┌──────▼─────┐      ┌────────▼────────┐    ┌───────▼──────┐
+    │ Auth (HPA) │      │ Destinations    │    │ Itineraries  │
+    │ + auth-db  │      │ Recommendations │    │ + itin-db    │
+    └────────────┘      └─────────────────┘    └──────────────┘
+```
+
+---
+
+## Project structure
+
+```
+.
+├── app/                              # Phase 1 monolith
+├── services/                         # Phase 2 microservices
+├── k8s/                              # Phase 3 Kubernetes
+│   ├── namespace.yaml
+│   ├── configmap.yaml
+│   ├── auth-db.yaml / itineraries-db.yaml
+│   ├── auth.yaml / destinations.yaml / ...
+│   ├── gateway.yaml
+│   ├── ingress.yaml
+│   ├── kustomization.yaml
+│   └── README.md                     # Detailed K8s guide
+├── docker-compose.yml                # Phase 1
+├── docker-compose.microservices.yml  # Phase 2
+└── README.md
+```
+
+---
+
+## Running locally
+
+### Phase 1 – Monolith
+
+```bash
+docker-compose up --build
+# http://localhost:5000
+```
+
+### Phase 2 – Microservices
+
+```bash
+docker-compose -f docker-compose.microservices.yml up --build
+# http://localhost:5000
+```
+
+### Phase 3 – Kubernetes
+
+Full instructions: **[k8s/README.md](k8s/README.md)**
+
+```bash
+# 1. Build images (use minikube docker-env if on Minikube)
+docker build -f services/auth/Dockerfile -t globetrotter/auth:latest .
+docker build -f services/destinations/Dockerfile -t globetrotter/destinations:latest .
+docker build -f services/recommendations/Dockerfile -t globetrotter/recommendations:latest .
+docker build -f services/itineraries/Dockerfile -t globetrotter/itineraries:latest .
+docker build -f services/gateway/Dockerfile -t globetrotter/gateway:latest .
+
+# 2. Deploy
+kubectl apply -k k8s/
+
+# 3. Access
+kubectl port-forward -n globetrotter svc/gateway 5000:80
+# → http://localhost:5000
+```
+
+**Phase 3 capabilities:**
+
+| Capability | Implementation |
+|------------|----------------|
+| Load balancing | Service + Ingress |
+| Auto-scaling | HPA (CPU 70%, min 2 replicas) |
+| Health checks | readiness + liveness probes |
+| Config | ConfigMap + Secrets |
+| Persistence | PVC for databases |
+
+---
+
+## REST API
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/register` | No | Register |
+| POST | `/login` | No | JWT login |
+| GET | `/me` | Yes | Profile |
+| PUT | `/preferences` | Yes | Update preferences |
+| GET | `/destinations` | No | Search |
+| GET | `/recommendations` | Yes | Personalized |
+| POST/GET | `/itineraries` | Yes | Trips |
+| GET | `/health` | No | Health |
+
+---
+
+## Tests
+
+```bash
+# Monolith
+pytest tests/ -v
+
+# Services
+pytest services/auth/tests/ -v
+pytest services/destinations/tests/ -v
+pytest services/itineraries/tests/ -v
+```
 
 ---
 
