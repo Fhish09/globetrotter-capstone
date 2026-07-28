@@ -15,6 +15,11 @@ REC_URL = os.environ.get("RECOMMENDATIONS_SERVICE_URL", "http://recommendations:
 ITIN_URL = os.environ.get("ITINERARIES_SERVICE_URL", "http://itineraries:5004")
 
 
+def _wants_html() -> bool:
+    accept = request.headers.get("Accept", "")
+    return "text/html" in accept and not request.args
+
+
 def _proxy(base_url: str, path: str = ""):
     url = f"{base_url}{path}"
     if request.query_string:
@@ -34,7 +39,7 @@ def _proxy(base_url: str, path: str = ""):
             data=request.get_data(),
             timeout=15,
         )
-        excluded = ["content-encoding", "content-length", "transfer-encoding", "connection"]
+        excluded = {"content-encoding", "content-length", "transfer-encoding", "connection"}
         response_headers = [
             (k, v) for k, v in resp.headers.items() if k.lower() not in excluded
         ]
@@ -60,7 +65,6 @@ def health():
     return jsonify({"status": "ok", "service": "gateway", "upstream": services}), 200
 
 
-# --- API proxies ---
 @app.route("/register", methods=["POST"])
 @app.route("/login", methods=["POST"])
 @app.route("/me", methods=["GET"])
@@ -70,55 +74,34 @@ def auth_proxy():
 
 
 @app.route("/destinations", methods=["GET"])
-def dest_proxy():
+def destinations():
+    if _wants_html():
+        return render_template("destinations.html")
     return _proxy(DEST_URL, "/destinations")
 
 
 @app.route("/recommendations", methods=["GET"])
-def rec_proxy():
+def recommendations():
+    if _wants_html():
+        return render_template("recommendations.html")
     return _proxy(REC_URL, "/recommendations")
 
 
 @app.route("/itineraries", methods=["GET", "POST"])
-def itin_proxy():
+def itineraries():
+    if request.method == "GET" and _wants_html():
+        return render_template("itineraries.html")
     return _proxy(ITIN_URL, "/itineraries")
 
 
-# --- Frontend pages (same templates as monolith) ---
 @app.get("/")
 def home():
     return render_template("index.html")
 
 
-@app.get("/destinations")
-def destinations_page():
-    # Path conflict: API also uses /destinations.
-    # Browser page requests typically Accept: text/html
-    accept = request.headers.get("Accept", "")
-    if "text/html" in accept and "application/json" not in accept.split(",")[0]:
-        return render_template("destinations.html")
-    return _proxy(DEST_URL, "/destinations")
-
-
 @app.get("/destinations/<int:dest_id>")
 def destination_detail(dest_id):
     return render_template("destination_detail.html", dest_id=dest_id)
-
-
-@app.get("/recommendations")
-def recommendations_page():
-    accept = request.headers.get("Accept", "")
-    if "text/html" in accept:
-        return render_template("recommendations.html")
-    return _proxy(REC_URL, "/recommendations")
-
-
-@app.get("/itineraries")
-def itineraries_page():
-    accept = request.headers.get("Accept", "")
-    if "text/html" in accept:
-        return render_template("itineraries.html")
-    return _proxy(ITIN_URL, "/itineraries")
 
 
 if __name__ == "__main__":
