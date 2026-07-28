@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: globetrotter-config
+  namespace: globetrotter
+data:
+  SECRET_KEY: "dev-secret-key-please-change-in-prod"
+  AUTH_SERVICE_URL: "http://auth:5001"
+  DESTINATIONS_SERVICE_URL: "http://destinations:5002"
+  RECOMMENDATIONS_SERVICE_URL: "http://recommendations:5003"
+  ITINERARIES_SERVICE_URL: "http://itineraries:5004"
+  PROXY_TIMEOUT: "12"
+  PROXY_RETRIES: "1"

@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: itineraries-db-secret
+  namespace: globetrotter
+type: Opaque
+stringData:
+  POSTGRES_USER: itineraries
+  POSTGRES_PASSWORD: itineraries
+  POSTGRES_DB: itineraries_db
+  DATABASE_URL: postgresql://itineraries:itineraries@itineraries-db:5432/itineraries_db
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: itineraries-db-pvc
+  namespace: globetrotter
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: itineraries-db
+  namespace: globetrotter
+  labels:
+    app: itineraries-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: itineraries-db
+  template:
+    metadata:
+      labels:
+        app: itineraries-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: itineraries-db-secret
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "itineraries", "-d", "itineraries_db"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: itineraries-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: itineraries-db
+  namespace: globetrotter
+spec:
+  selector:
+    app: itineraries-db
+  ports:
+    - port: 5432
+      targetPort: 5432

@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: globetrotter
+  labels:
+    app: gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: globetrotter/gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: "5000"
+            - name: AUTH_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: globetrotter-config
+                  key: AUTH_SERVICE_URL
+            - name: DESTINATIONS_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: globetrotter-config
+                  key: DESTINATIONS_SERVICE_URL
+            - name: RECOMMENDATIONS_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: globetrotter-config
+                  key: RECOMMENDATIONS_SERVICE_URL
+            - name: ITINERARIES_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: globetrotter-config
+                  key: ITINERARIES_SERVICE_URL
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: globetrotter
+spec:
+  type: ClusterIP
+  selector:
+    app: gateway
+  ports:
+    - port: 80
+      targetPort: 5000
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: gateway-hpa
+  namespace: globetrotter
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gateway
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
