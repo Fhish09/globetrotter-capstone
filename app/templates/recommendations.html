@@ -3,13 +3,23 @@
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
   <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-2">For you</h1>
-  <p class="text-gt-muted mb-6 text-sm sm:text-base">Countries to explore, then places matched to your preferences and last search</p>
+  <p class="text-gt-muted mb-6 text-sm sm:text-base">Type a place or country — suggestions appear as you type. Click one to update recommendations.</p>
 
-  <div class="mb-6 flex flex-wrap gap-2 items-center">
-    <label class="text-sm text-gt-muted">Last search:</label>
-    <input id="lastSearchInput" type="text" placeholder="e.g. Kribi, Cameroon, beach"
-           class="rounded-xl px-4 py-2 border border-gt-border text-sm min-w-[200px]">
-    <button onclick="loadRecs()" class="gt-btn-primary px-4 py-2 rounded-full text-sm">Update</button>
+  <div class="mb-6 relative max-w-md">
+    <label class="block text-sm text-gt-muted mb-1.5" for="lastSearchInput">Search area</label>
+    <div class="flex gap-2">
+      <div class="relative flex-1">
+        <input id="lastSearchInput" type="text" autocomplete="off"
+               placeholder="e.g. Kribi, Cameroon, beach"
+               class="w-full rounded-xl px-4 py-3 border border-gt-border text-sm"
+               oninput="onSearchInput()"
+               onkeydown="onSearchKey(event)"
+               onfocus="onSearchInput()">
+        <div id="suggestBox"
+             class="hidden absolute left-0 right-0 top-full mt-1 z-40 bg-gt-surface border border-gt-border rounded-xl shadow-xl max-h-64 overflow-y-auto"></div>
+      </div>
+      <button type="button" onclick="loadRecs()" class="gt-btn-primary px-5 py-3 rounded-full text-sm shrink-0">Update</button>
+    </div>
   </div>
 
   <div id="countries" class="flex flex-wrap gap-2 mb-10"></div>
@@ -19,9 +29,113 @@
 {% endblock %}
 {% block scripts %}
 <script>
+let allPlaces = [];   // {label, name, country}
+let suggestTimer = null;
+let activeIndex = -1;
+
 function getDestImage(d) {
   return d.image || `https://picsum.photos/seed/${encodeURIComponent(d.name)}/600/400`;
 }
+
+async function loadPlaceIndex() {
+  try {
+    const res = await fetch('/destinations?source=local', { headers: { 'Accept': 'application/json' } });
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+    const seen = new Set();
+    allPlaces = [];
+    data.forEach(d => {
+      const name = d.name || '';
+      const country = d.country || '';
+      if (name && !seen.has(name.toLowerCase())) {
+        seen.add(name.toLowerCase());
+        allPlaces.push({ label: country ? `${name}, ${country}` : name, name, country });
+      }
+      if (country && !seen.has('c:' + country.toLowerCase())) {
+        seen.add('c:' + country.toLowerCase());
+        allPlaces.push({ label: country, name: country, country });
+      }
+    });
+    // Extra Cameroon-focused hints
+    ['Kribi', 'Limbe', 'Douala', 'Yaoundé', 'Mount Cameroon', 'Buea'].forEach(n => {
+      if (!seen.has(n.toLowerCase())) {
+        allPlaces.unshift({ label: `${n}, Cameroon`, name: n, country: 'Cameroon' });
+      }
+    });
+  } catch (e) {}
+}
+
+function onSearchInput() {
+  clearTimeout(suggestTimer);
+  suggestTimer = setTimeout(showSuggestions, 120);
+}
+
+function showSuggestions() {
+  const box = document.getElementById('suggestBox');
+  const q = document.getElementById('lastSearchInput').value.trim().toLowerCase();
+  activeIndex = -1;
+  if (!q || q.length < 1) {
+    box.classList.add('hidden');
+    box.innerHTML = '';
+    return;
+  }
+  const matches = allPlaces.filter(p =>
+    p.label.toLowerCase().includes(q) ||
+    p.name.toLowerCase().includes(q) ||
+    (p.country && p.country.toLowerCase().includes(q))
+  ).slice(0, 8);
+
+  if (!matches.length) {
+    box.classList.add('hidden');
+    box.innerHTML = '';
+    return;
+  }
+  box.innerHTML = matches.map((p, i) => `
+    <button type="button" data-i="${i}" data-value="${p.name.replace(/"/g, '"')}"
+      class="suggest-item w-full text-left px-4 py-2.5 text-sm text-gt-text hover:bg-gt-surface2 flex justify-between gap-2 border-b border-gt-border last:border-0"
+      onmousedown="event.preventDefault(); pickSuggestion('${p.name.replace(/'/g, "\\'")}')">
+      <span><i class="fas fa-map-marker-alt text-gt-accent mr-2 text-xs"></i>${p.label}</span>
+    </button>
+  `).join('');
+  box.classList.remove('hidden');
+}
+
+function pickSuggestion(value) {
+  document.getElementById('lastSearchInput').value = value;
+  document.getElementById('suggestBox').classList.add('hidden');
+  localStorage.setItem('lastSearch', value);
+  loadRecs();
+}
+
+function onSearchKey(e) {
+  const box = document.getElementById('suggestBox');
+  const items = box.querySelectorAll('.suggest-item');
+  if (e.key === 'ArrowDown' && items.length) {
+    e.preventDefault();
+    activeIndex = Math.min(activeIndex + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('bg-gt-surface2', i === activeIndex));
+  } else if (e.key === 'ArrowUp' && items.length) {
+    e.preventDefault();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('bg-gt-surface2', i === activeIndex));
+  } else if (e.key === 'Enter') {
+    if (activeIndex >= 0 && items[activeIndex]) {
+      e.preventDefault();
+      items[activeIndex].dispatchEvent(new MouseEvent('mousedown'));
+    } else {
+      loadRecs();
+      box.classList.add('hidden');
+    }
+  } else if (e.key === 'Escape') {
+    box.classList.add('hidden');
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#lastSearchInput') && !e.target.closest('#suggestBox')) {
+    document.getElementById('suggestBox').classList.add('hidden');
+  }
+});
 
 async function loadRecs() {
   const token = localStorage.getItem('token');
@@ -30,6 +144,7 @@ async function loadRecs() {
   const countriesEl = document.getElementById('countries');
   const q = document.getElementById('lastSearchInput').value.trim();
   if (q) localStorage.setItem('lastSearch', q);
+  document.getElementById('suggestBox').classList.add('hidden');
 
   if (!token) {
     status.innerHTML = `<div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">
@@ -52,12 +167,13 @@ async function loadRecs() {
       status.innerHTML = `<p class="text-red-400">${data.error || 'Failed'}</p>`;
       return;
     }
-    // Support both old array format and new {destinations, countries}
     const list = Array.isArray(data) ? data : (data.destinations || []);
     const countries = data.countries || [];
-    status.innerHTML = '';
+    status.innerHTML = q
+      ? `<p class="text-sm text-gt-muted">Showing matches related to <span class="text-gt-accent font-medium">${q}</span></p>`
+      : '';
     countriesEl.innerHTML = countries.slice(0, 24).map(c =>
-      `<button type="button" onclick="document.getElementById('lastSearchInput').value='${c.replace(/'/g,"\\'")}';loadRecs()"
+      `<button type="button" onclick="pickSuggestion('${c.replace(/'/g, "\\'")}')"
         class="text-xs px-3 py-1.5 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent transition">${c}</button>`
     ).join('');
 
@@ -80,7 +196,9 @@ async function loadRecs() {
   }
 }
 
-document.getElementById('lastSearchInput').value = localStorage.getItem('lastSearch') || '';
-loadRecs();
+loadPlaceIndex().then(() => {
+  document.getElementById('lastSearchInput').value = localStorage.getItem('lastSearch') || '';
+  loadRecs();
+});
 </script>
 {% endblock %}
