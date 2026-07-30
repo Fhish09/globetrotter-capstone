@@ -1,144 +1,147 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-<section class="relative bg-white text-gt-text overflow-hidden border-b border-gt-border" aria-label="Hero">
-    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1488085061387-422e58bd4a48?w=1600')] bg-cover bg-center opacity-15" aria-hidden="true"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-white/90 via-white/80 to-gt-bg"></div>
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-28 text-center">
-        <p class="text-sm font-semibold text-gt-accent tracking-wide uppercase mb-3">Travel planner</p>
-        <h1 class="heading text-3xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-gt-text">Plan trips you’ll actually love</h1>
-        <p class="text-base sm:text-xl text-gt-muted mb-8 sm:mb-12 max-w-2xl mx-auto px-2">Discover destinations, get personal recommendations, and build itineraries in one place.</p>
-        <form onsubmit="event.preventDefault(); searchDestinations();" class="max-w-xl mx-auto" role="search">
-            <div class="gt-glass rounded-full p-1.5 sm:p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-lg">
-                <div class="flex items-center flex-1 min-w-0 px-2">
-                    <i class="fas fa-search text-gt-muted pl-2 sm:pl-3 shrink-0"></i>
-                    <label for="heroSearch" class="sr-only">Search destinations</label>
-                    <input type="search" id="heroSearch" placeholder="Where do you want to go?"
-                           class="w-full min-w-0 bg-transparent border-0 focus:outline-none text-gt-text placeholder-gt-muted px-3 py-3 text-base"
-                           autocomplete="off">
-                </div>
-                <button type="submit" class="gt-btn-primary font-semibold px-6 py-3 rounded-full w-full sm:w-auto shrink-0 min-h-[48px]">Search</button>
-            </div>
-        </form>
-        <div class="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="/itineraries" class="text-sm font-medium text-gt-accent hover:underline">Start a trip →</a>
-            <span class="text-gt-border">·</span>
-            <a href="/recommendations" class="text-sm font-medium text-gt-muted hover:text-gt-accent">See recommendations</a>
-        </div>
+
+<!-- 1. HERO with looped video -->
+<section class="relative min-h-[70vh] flex items-center justify-center overflow-hidden" aria-label="Hero">
+  <video class="gt-hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1488085061387-422e58bd4a48?w=1600">
+    <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-a-beach-1584/1080p.mp4" type="video/mp4">
+  </video>
+  <div class="absolute inset-0 bg-gradient-to-b from-gt-bg/70 via-gt-bg/55 to-gt-bg"></div>
+  <div class="relative z-10 max-w-4xl mx-auto px-4 text-center py-20">
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="w-16 h-16 mx-auto mb-6 rounded-2xl shadow-lg">
+    <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 gt-gradient-text">GlobeTrotter</h1>
+    <p class="text-gt-muted text-base sm:text-lg max-w-xl mx-auto mb-8">Your travel companion for discovering places, planning trips, and sharing experiences — built for explorers from Cameroon to the world.</p>
+    <div class="flex flex-wrap gap-3 justify-center">
+      <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore destinations</a>
+      <a href="/itineraries" class="border border-gt-border text-gt-text px-6 py-3 rounded-full hover:border-gt-accent transition">Plan a trip</a>
     </div>
+  </div>
 </section>
 
-<section class="gt-marquee" aria-label="Trending destinations">
-    <div class="flex items-stretch">
-        <span class="gt-marquee__label hidden sm:inline-flex items-center">Trending</span>
-        <div class="flex-1 overflow-hidden min-w-0">
-            <div class="gt-marquee__track" id="marqueeTrack"></div>
-        </div>
-    </div>
+<!-- 2. Popular places (4 Africa + rest world) -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="popular-h">
+  <h2 id="popular-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular places</h2>
+  <p class="text-gt-muted mb-8 text-sm sm:text-base">Start with Africa, then explore the world</p>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="popularGrid">
+    <!-- filled by JS -->
+  </div>
 </section>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20" aria-labelledby="popular-heading">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-8 sm:mb-10">
-        <div>
-            <h2 id="popular-heading" class="heading text-2xl sm:text-3xl md:text-4xl font-bold text-gt-text">Popular destinations</h2>
-            <p class="text-gt-muted mt-1 sm:mt-2 text-sm sm:text-base">Ideas to add to your next itinerary</p>
-        </div>
-        <a href="/destinations" class="text-gt-accent font-medium hover:underline text-sm sm:text-base">View all →</a>
-    </div>
-    <div class="cq-grid-container">
-        <div id="destinations" class="cq-grid" role="list">
-            <div style="grid-column:1/-1" class="text-center py-16 text-gt-muted">
-                <i class="fas fa-spinner fa-spin text-3xl mb-4"></i><p>Loading destinations...</p>
-            </div>
-        </div>
-    </div>
+<!-- 3. Reasons to visit -->
+<section class="bg-gt-surface border-y border-gt-border py-14" aria-labelledby="reasons-h">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <h2 id="reasons-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Why visit</h2>
+    <p class="text-gt-muted mb-8">Highlights that make these destinations worth the journey</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="reasonsGrid"></div>
+  </div>
 </section>
 
-<section class="bg-white border-y border-gt-border py-12 sm:py-16" aria-label="Call to action">
-    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6">
-        <h2 class="heading text-2xl sm:text-3xl md:text-4xl font-bold mb-3 text-gt-text">Ready to plan your next trip?</h2>
-        <p class="text-gt-muted mb-6 sm:mb-8 text-base sm:text-lg">Get personalized recommendations based on your preferences.</p>
-        <a href="/recommendations" class="inline-block gt-btn-primary font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full min-h-[48px]">Get recommendations</a>
+<!-- 4. Testimonials -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="stories-h">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+    <div>
+      <h2 id="stories-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text">Traveler stories</h2>
+      <p class="text-gt-muted text-sm sm:text-base mt-1">Experiences from the community (demo stories)</p>
     </div>
+    <a href="/testimonials" class="text-gt-accent font-medium hover:underline text-sm">Read more →</a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="testimonialGrid"></div>
+</section>
+
+<!-- 5. World map -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-label="World map">
+  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Explore the map</h2>
+  <p class="text-gt-muted mb-6 text-sm">A view of the world — plan your next route</p>
+  <div class="gt-map-wrap">
+    <iframe title="World map" loading="lazy"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=-180%2C-60%2C180%2C80&amp;layer=mapnik"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+
+<section class="bg-gt-surface border-t border-gt-border py-12 text-center px-4">
+  <h2 class="heading text-2xl font-bold text-gt-text mb-3">Ready when you are</h2>
+  <p class="text-gt-muted mb-6">Get recommendations or start an itinerary</p>
+  <a href="/recommendations" class="gt-btn-primary inline-block px-8 py-3.5 rounded-full">Get recommendations</a>
 </section>
 {% endblock %}
+
 {% block scripts %}
 <script>
-function getDestImage(dest) {
-    return dest.image || `https://picsum.photos/seed/${encodeURIComponent(dest.name)}/600/400`;
-}
+const POPULAR = [
+  { name: "Kribi", country: "Cameroon", continent: "Africa", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop" },
+  { name: "Limbe", country: "Cameroon", continent: "Africa", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop" },
+  { name: "Cape Town", country: "South Africa", continent: "Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=600&h=400&fit=crop" },
+  { name: "Marrakech", country: "Morocco", continent: "Africa", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=600&h=400&fit=crop" },
+  { name: "Bali", country: "Indonesia", continent: "Asia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop" },
+  { name: "Paris", country: "France", continent: "Europe", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop" },
+  { name: "Tokyo", country: "Japan", continent: "Asia", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop" },
+  { name: "New York", country: "USA", continent: "North America", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&h=400&fit=crop" },
+  { name: "Dubai", country: "UAE", continent: "Asia", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&h=400&fit=crop" },
+  { name: "Santorini", country: "Greece", continent: "Europe", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=600&h=400&fit=crop" },
+];
 
-function buildMarqueeItems(list) {
-    return list.map(dest => {
-        const label = dest.country ? `${dest.name} · ${dest.country}` : dest.name;
-        const href = dest.id ? `/destinations/${dest.id}` : `/destinations?q=${encodeURIComponent(dest.name)}`;
-        return `<a class="gt-marquee__item" href="${href}"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${label}</span></a>`;
-    }).join('');
-}
+const REASONS = [
+  { name: "Cameroon", img: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=600&h=400&fit=crop", reasons: ["Atlantic beaches at Kribi", "Mount Cameroon hiking", "Rich cultural diversity", "Wildlife & national parks"] },
+  { name: "South Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=600&h=400&fit=crop", reasons: ["Table Mountain views", "Safari experiences", "Cape wine routes", "Vibrant cities"] },
+  { name: "Morocco", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=600&h=400&fit=crop", reasons: ["Historic medinas", "Sahara desert trips", "Souks & crafts", "Distinct cuisine"] },
+  { name: "France", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop", reasons: ["World-class museums", "Regional food culture", "Iconic cities", "Countryside escapes"] },
+  { name: "Japan", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop", reasons: ["Tradition meets tech", "Seasonal festivals", "Rail travel ease", "Unique cuisine"] },
+  { name: "Indonesia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop", reasons: ["Island landscapes", "Temples & culture", "Diving & beaches", "Warm hospitality"] },
+];
 
-async function loadMarquee() {
-    const track = document.getElementById('marqueeTrack');
-    if (!track) return;
-    const fallback = [
-        { name: 'Kribi', country: 'Cameroon' },
-        { name: 'Limbe', country: 'Cameroon' },
-        { name: 'Bali', country: 'Indonesia' },
-        { name: 'Tokyo', country: 'Japan' },
-        { name: 'Paris', country: 'France' },
-        { name: 'Cape Town', country: 'South Africa' },
-    ];
-    let items = fallback;
-    try {
-        const res = await fetch('/destinations?source=local');
-        const data = await res.json();
-        if (Array.isArray(data) && data.length) items = data.slice(0, 14);
-    } catch (e) {}
-    const html = buildMarqueeItems(items);
-    track.innerHTML = html + html;
-}
+const STORIES = [
+  { name: "Amina N.", place: "Kribi", text: "Kribi’s coastline was calm and the seafood was incredible. Ideal short trip from Douala.", img: "https://i.pravatar.cc/100?u=amina" },
+  { name: "Jean-Paul T.", place: "Limbe", text: "Black sand beaches and the botanical garden made Limbe a highlight for our family.", img: "https://i.pravatar.cc/100?u=jean" },
+  { name: "Marie K.", place: "Mount Cameroon", text: "Hard climb, unforgettable sunrise. Local guides in Buea were excellent.", img: "https://i.pravatar.cc/100?u=marie" },
+  { name: "Ibrahim B.", place: "Douala → Kribi", text: "Planned a coastal weekend here — simple and practical itinerary.", img: "https://i.pravatar.cc/100?u=ibrahim" },
+  { name: "Fatima S.", place: "Cape Town", text: "Table Mountain and the waterfront. Already saving for a return.", img: "https://i.pravatar.cc/100?u=fatima" },
+  { name: "Grace E.", place: "Bali", text: "Rice terraces at dawn beat the crowded beach clubs.", img: "https://i.pravatar.cc/100?u=grace" },
+];
 
-async function loadDestinations() {
-    try {
-        const res = await fetch('/destinations?source=local');
-        const data = await res.json();
-        const container = document.getElementById('destinations');
-        if (!data.length) {
-            container.innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-gt-muted"><p>No destinations found.</p></div>`;
-            return;
-        }
-        container.innerHTML = data.slice(0, 6).map((dest, i) => `
-            <a href="/destinations/${dest.id}"
-               class="cq-card gt-reveal gt-card-glow bg-white border border-gt-border rounded-2xl overflow-hidden group block shadow-sm"
-               style="--reveal-delay: ${i * 70}ms"
-               role="listitem">
-                <div class="cq-card-media relative overflow-hidden">
-                    <img src="${getDestImage(dest)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${dest.name}" loading="lazy">
-                    <div class="absolute top-3 right-3 bg-white/95 border border-gt-border px-2.5 py-1 rounded-full text-xs font-medium text-gt-text shadow-sm">$${dest.avg_cost_per_day || '—'}/day</div>
-                </div>
-                <div class="cq-card-body">
-                    <div class="flex items-center gap-2 text-xs text-gt-muted mb-2">
-                        <i class="fas fa-map-marker-alt text-gt-accent"></i>
-                        <span class="truncate">${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</span>
-                    </div>
-                    <h3 class="cq-card-title font-bold text-gt-text mb-2 group-hover:text-gt-accent transition">${dest.name}</h3>
-                    <p class="text-gt-muted text-sm line-clamp-2 mb-3">${dest.description || ''}</p>
-                    <div class="flex flex-wrap gap-1.5">
-                        ${(dest.tags || []).slice(0,3).map(t => `<span class="gt-chip text-xs px-2.5 py-1 rounded-full">${t}</span>`).join('')}
-                    </div>
-                </div>
-            </a>`).join('');
-        if (window.refreshScrollReveal) window.refreshScrollReveal();
-    } catch (err) {
-        document.getElementById('destinations').innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-red-500"><p>Failed to load destinations.</p></div>`;
-    }
-}
+document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
+  <a href="/destinations?q=${encodeURIComponent(p.name)}" class="gt-reveal gt-card-glow group block rounded-2xl overflow-hidden border border-gt-border bg-gt-surface" style="--reveal-delay:${i*50}ms">
+    <div class="aspect-[4/3] overflow-hidden">
+      <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+    </div>
+    <div class="p-3">
+      <p class="font-semibold text-gt-text text-sm">${p.name}</p>
+      <p class="text-xs text-gt-muted">${p.country}</p>
+    </div>
+  </a>
+`).join('');
 
-function searchDestinations() {
-    const q = document.getElementById('heroSearch').value.trim();
-    window.location.href = q ? `/destinations?q=${encodeURIComponent(q)}` : '/destinations';
-}
+document.getElementById('reasonsGrid').innerHTML = REASONS.map((r, i) => `
+  <article class="gt-reveal gt-card-glow rounded-2xl overflow-hidden border border-gt-border bg-gt-bg" style="--reveal-delay:${i*60}ms">
+    <div class="h-40 overflow-hidden">
+      <img src="${r.img}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy">
+    </div>
+    <div class="p-5">
+      <h3 class="font-bold text-lg text-gt-text mb-3">${r.name}</h3>
+      <ul class="space-y-1.5">
+        ${r.reasons.map(x => `<li class="text-sm text-gt-muted flex gap-2"><i class="fas fa-check text-gt-accent mt-0.5 text-xs"></i><span>${x}</span></li>`).join('')}
+      </ul>
+    </div>
+  </article>
+`).join('');
 
-loadMarquee();
-loadDestinations();
+document.getElementById('testimonialGrid').innerHTML = STORIES.map((s, i) => `
+  <article class="gt-reveal bg-gt-surface border border-gt-border rounded-2xl p-5 flex gap-4" style="--reveal-delay:${i*50}ms">
+    <img src="${s.img}" alt="" class="w-12 h-12 rounded-full object-cover shrink-0 border border-gt-border">
+    <div class="min-w-0">
+      <p class="font-semibold text-gt-text text-sm">${s.name}</p>
+      <p class="text-xs text-gt-accent mb-2">${s.place}</p>
+      <p class="text-sm text-gt-muted line-clamp-3">${s.text}</p>
+    </div>
+  </article>
+`).join('');
+
+if (window.refreshScrollReveal) window.refreshScrollReveal();
+else document.querySelectorAll('.gt-reveal').forEach(n => n.classList.add('is-visible'));
+
+// Remember last search for recommendations
+const params = new URLSearchParams(location.search);
+if (params.get('q')) localStorage.setItem('lastSearch', params.get('q'));
 </script>
 {% endblock %}
