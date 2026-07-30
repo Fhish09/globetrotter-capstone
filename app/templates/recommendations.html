@@ -3,14 +3,15 @@
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
   <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-2">For you</h1>
-  <p class="text-gt-muted mb-6 text-sm sm:text-base">Type a place or country — suggestions appear as you type. Click one to update recommendations.</p>
+  <p class="text-gt-muted mb-8 text-sm sm:text-base">Search a place or country, then browse matched destinations below.</p>
 
-  <div class="mb-6 relative max-w-md">
-    <label class="block text-sm text-gt-muted mb-1.5" for="lastSearchInput">Search area</label>
-    <div class="flex gap-2">
+  <!-- Search block -->
+  <div class="bg-gt-surface border border-gt-border rounded-2xl p-4 sm:p-5 mb-8 max-w-2xl">
+    <label class="block text-sm text-gt-muted mb-2" for="lastSearchInput">Search area</label>
+    <div class="flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
         <input id="lastSearchInput" type="text" autocomplete="off"
-               placeholder="e.g. Kribi, Cameroon, beach"
+               placeholder="Type Kribi, Cameroon, beach…"
                class="w-full rounded-xl px-4 py-3 border border-gt-border text-sm"
                oninput="onSearchInput()"
                onkeydown="onSearchKey(event)"
@@ -18,23 +19,30 @@
         <div id="suggestBox"
              class="hidden absolute left-0 right-0 top-full mt-1 z-40 bg-gt-surface border border-gt-border rounded-xl shadow-xl max-h-64 overflow-y-auto"></div>
       </div>
-      <button type="button" onclick="loadRecs()" class="gt-btn-primary px-5 py-3 rounded-full text-sm shrink-0">Update</button>
+      <button type="button" onclick="loadRecs()" class="gt-btn-primary px-6 py-3 rounded-full text-sm shrink-0">Update</button>
     </div>
   </div>
 
-  <div id="countries" class="flex flex-wrap gap-2 mb-10"></div>
+  <!-- Country chips -->
+  <div class="mb-4">
+    <p class="text-xs uppercase tracking-wide text-gt-muted mb-2">Countries</p>
+    <div id="countries" class="flex flex-wrap gap-2 min-h-[2rem]"></div>
+  </div>
+
   <div id="status" class="mb-6"></div>
+
+  <!-- Results grid -->
   <div id="recs" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </section>
 {% endblock %}
 {% block scripts %}
 <script>
-let allPlaces = [];   // {label, name, country}
+let allPlaces = [];
 let suggestTimer = null;
 let activeIndex = -1;
 
 function getDestImage(d) {
-  return d.image || `https://picsum.photos/seed/${encodeURIComponent(d.name)}/600/400`;
+  return d.image || `https://picsum.photos/seed/${encodeURIComponent(d.name || 'place')}/600/400`;
 }
 
 async function loadPlaceIndex() {
@@ -49,17 +57,16 @@ async function loadPlaceIndex() {
       const country = d.country || '';
       if (name && !seen.has(name.toLowerCase())) {
         seen.add(name.toLowerCase());
-        allPlaces.push({ label: country ? `${name}, ${country}` : name, name, country });
+        allPlaces.push({ label: country ? name + ', ' + country : name, name, country });
       }
       if (country && !seen.has('c:' + country.toLowerCase())) {
         seen.add('c:' + country.toLowerCase());
         allPlaces.push({ label: country, name: country, country });
       }
     });
-    // Extra Cameroon-focused hints
     ['Kribi', 'Limbe', 'Douala', 'Yaoundé', 'Mount Cameroon', 'Buea'].forEach(n => {
       if (!seen.has(n.toLowerCase())) {
-        allPlaces.unshift({ label: `${n}, Cameroon`, name: n, country: 'Cameroon' });
+        allPlaces.unshift({ label: n + ', Cameroon', name: n, country: 'Cameroon' });
       }
     });
   } catch (e) {}
@@ -74,29 +81,16 @@ function showSuggestions() {
   const box = document.getElementById('suggestBox');
   const q = document.getElementById('lastSearchInput').value.trim().toLowerCase();
   activeIndex = -1;
-  if (!q || q.length < 1) {
-    box.classList.add('hidden');
-    box.innerHTML = '';
-    return;
-  }
+  if (!q) { box.classList.add('hidden'); box.innerHTML = ''; return; }
   const matches = allPlaces.filter(p =>
-    p.label.toLowerCase().includes(q) ||
-    p.name.toLowerCase().includes(q) ||
-    (p.country && p.country.toLowerCase().includes(q))
+    p.label.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)
   ).slice(0, 8);
-
-  if (!matches.length) {
-    box.classList.add('hidden');
-    box.innerHTML = '';
-    return;
-  }
-  box.innerHTML = matches.map((p, i) => `
-    <button type="button" data-i="${i}" data-value="${p.name.replace(/"/g, '"')}"
-      class="suggest-item w-full text-left px-4 py-2.5 text-sm text-gt-text hover:bg-gt-surface2 flex justify-between gap-2 border-b border-gt-border last:border-0"
-      onmousedown="event.preventDefault(); pickSuggestion('${p.name.replace(/'/g, "\\'")}')">
-      <span><i class="fas fa-map-marker-alt text-gt-accent mr-2 text-xs"></i>${p.label}</span>
-    </button>
-  `).join('');
+  if (!matches.length) { box.classList.add('hidden'); return; }
+  box.innerHTML = matches.map(p =>
+    '<button type="button" class="suggest-item w-full text-left px-4 py-2.5 text-sm text-gt-text hover:bg-gt-surface2 border-b border-gt-border last:border-0" ' +
+    'onmousedown="event.preventDefault(); pickSuggestion(\'' + p.name.replace(/'/g, "\\'") + '\')">' +
+    '<i class="fas fa-map-marker-alt text-gt-accent mr-2 text-xs"></i>' + p.label + '</button>'
+  ).join('');
   box.classList.remove('hidden');
 }
 
@@ -110,25 +104,11 @@ function pickSuggestion(value) {
 function onSearchKey(e) {
   const box = document.getElementById('suggestBox');
   const items = box.querySelectorAll('.suggest-item');
-  if (e.key === 'ArrowDown' && items.length) {
+  if (e.key === 'Enter') {
     e.preventDefault();
-    activeIndex = Math.min(activeIndex + 1, items.length - 1);
-    items.forEach((el, i) => el.classList.toggle('bg-gt-surface2', i === activeIndex));
-  } else if (e.key === 'ArrowUp' && items.length) {
-    e.preventDefault();
-    activeIndex = Math.max(activeIndex - 1, 0);
-    items.forEach((el, i) => el.classList.toggle('bg-gt-surface2', i === activeIndex));
-  } else if (e.key === 'Enter') {
-    if (activeIndex >= 0 && items[activeIndex]) {
-      e.preventDefault();
-      items[activeIndex].dispatchEvent(new MouseEvent('mousedown'));
-    } else {
-      loadRecs();
-      box.classList.add('hidden');
-    }
-  } else if (e.key === 'Escape') {
-    box.classList.add('hidden');
-  }
+    if (activeIndex >= 0 && items[activeIndex]) items[activeIndex].dispatchEvent(new MouseEvent('mousedown'));
+    else { loadRecs(); box.classList.add('hidden'); }
+  } else if (e.key === 'Escape') box.classList.add('hidden');
 }
 
 document.addEventListener('click', (e) => {
@@ -147,56 +127,61 @@ async function loadRecs() {
   document.getElementById('suggestBox').classList.add('hidden');
 
   if (!token) {
-    status.innerHTML = `<div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">
-      <p class="text-gt-text font-semibold mb-2">Login required</p>
-      <p class="text-gt-muted mb-4 text-sm">Sign in to see personalized recommendations.</p>
-      <button onclick="openLogin()" class="gt-btn-primary px-5 py-2.5 rounded-full">Login</button>
-    </div>`;
+    status.innerHTML = '<div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">' +
+      '<p class="font-semibold mb-2">Login required</p>' +
+      '<button onclick="openLogin()" class="gt-btn-primary px-5 py-2.5 rounded-full mt-2">Login</button></div>';
     container.innerHTML = '';
+    countriesEl.innerHTML = '';
     return;
   }
 
-  status.innerHTML = `<p class="text-gt-muted"><i class="fas fa-spinner fa-spin"></i> Loading…</p>`;
+  status.innerHTML = '<p class="text-gt-muted"><i class="fas fa-spinner fa-spin"></i> Loading…</p>';
+  container.innerHTML = '';
   try {
-    const qs = q ? `?q=${encodeURIComponent(q)}&limit=9` : '?limit=9';
+    const qs = q ? ('?q=' + encodeURIComponent(q) + '&limit=9') : '?limit=9';
     const res = await fetch('/recommendations' + qs, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
     });
     const data = await res.json();
     if (!res.ok) {
-      status.innerHTML = `<p class="text-red-400">${data.error || 'Failed'}</p>`;
+      status.innerHTML = '<p class="text-red-400">' + (data.error || 'Failed') + '</p>';
       return;
     }
     const list = Array.isArray(data) ? data : (data.destinations || []);
     const countries = data.countries || [];
     status.innerHTML = q
-      ? `<p class="text-sm text-gt-muted">Showing matches related to <span class="text-gt-accent font-medium">${q}</span></p>`
-      : '';
-    countriesEl.innerHTML = countries.slice(0, 24).map(c =>
-      `<button type="button" onclick="pickSuggestion('${c.replace(/'/g, "\\'")}')"
-        class="text-xs px-3 py-1.5 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent transition">${c}</button>`
-    ).join('');
+      ? '<p class="text-sm text-gt-muted">Matches for <span class="text-gt-accent font-medium">' + q + '</span></p>'
+      : '<p class="text-sm text-gt-muted">Based on your preferences</p>';
+
+    countriesEl.innerHTML = countries.slice(0, 20).map(function(c) {
+      return '<button type="button" class="text-xs px-3 py-1.5 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent" ' +
+        'onclick="pickSuggestion(\'' + c.replace(/'/g, "\\'") + '\')">' + c + '</button>';
+    }).join('');
 
     if (!list.length) {
-      container.innerHTML = `<p class="text-gt-muted col-span-full">No matches. Try another search or update preferences.</p>`;
+      container.innerHTML = '<p class="text-gt-muted">No matches. Try another search.</p>';
       return;
     }
-    container.innerHTML = list.map(dest => `
-      <a href="/destinations/${dest.id}" class="gt-card-glow block bg-gt-surface border border-gt-border rounded-2xl overflow-hidden">
-        <div class="h-44 overflow-hidden"><img src="${getDestImage(dest)}" class="w-full h-full object-cover" alt="${dest.name}" loading="lazy"></div>
-        <div class="p-4">
-          <h2 class="font-bold text-gt-text">${dest.name}</h2>
-          <p class="text-xs text-gt-muted mb-2">${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</p>
-          <p class="text-sm text-gt-muted line-clamp-2 mb-2">${dest.description || ''}</p>
-          <div class="flex flex-wrap gap-1">${(dest.match_reasons||[]).slice(0,3).map(r=>`<span class="gt-chip text-xs px-2 py-0.5 rounded-full">${r}</span>`).join('')}</div>
-        </div>
-      </a>`).join('');
+
+    container.innerHTML = list.map(function(dest) {
+      var reasons = (dest.match_reasons || []).slice(0, 3).map(function(r) {
+        return '<span class="gt-chip text-xs px-2 py-0.5 rounded-full">' + r + '</span>';
+      }).join('');
+      return '<a href="/destinations/' + dest.id + '" class="gt-card-glow block bg-gt-surface border border-gt-border rounded-2xl overflow-hidden">' +
+        '<div class="h-44 bg-gt-surface2 overflow-hidden">' +
+        '<img src="' + getDestImage(dest) + '" class="w-full h-full object-cover" alt="' + (dest.name || '') + '" loading="lazy">' +
+        '</div><div class="p-4">' +
+        '<h2 class="font-bold text-gt-text">' + (dest.name || '') + '</h2>' +
+        '<p class="text-xs text-gt-muted mb-2">' + (dest.country || '') + (dest.continent ? ' · ' + dest.continent : '') + '</p>' +
+        '<p class="text-sm text-gt-muted line-clamp-2 mb-2">' + (dest.description || '') + '</p>' +
+        '<div class="flex flex-wrap gap-1">' + reasons + '</div></div></a>';
+    }).join('');
   } catch (e) {
-    status.innerHTML = `<p class="text-red-400">Network error</p>`;
+    status.innerHTML = '<p class="text-red-400">Network error</p>';
   }
 }
 
-loadPlaceIndex().then(() => {
+loadPlaceIndex().then(function() {
   document.getElementById('lastSearchInput').value = localStorage.getItem('lastSearch') || '';
   loadRecs();
 });

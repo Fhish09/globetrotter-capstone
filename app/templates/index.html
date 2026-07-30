@@ -2,30 +2,30 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 
-<!-- 1. HERO with looped video -->
-<section class="relative min-h-[70vh] flex items-center justify-center overflow-hidden" aria-label="Hero">
-  <video class="gt-hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1488085061387-422e58bd4a48?w=1600">
+<!-- 1. HERO — always-visible background image (+ optional video) -->
+<section class="relative min-h-[75vh] flex items-center justify-center overflow-hidden" aria-label="Hero"
+  style="background-image: url('https://images.unsplash.com/photo-1488085061387-422e58bd4a48?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center;">
+  <video class="gt-hero-video" autoplay muted loop playsinline
+         poster="https://images.unsplash.com/photo-1488085061387-422e58bd4a48?auto=format&fit=crop&w=1600&q=80">
     <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-a-beach-1584/1080p.mp4" type="video/mp4">
   </video>
-  <div class="absolute inset-0 bg-gradient-to-b from-gt-bg/70 via-gt-bg/55 to-gt-bg"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/75 via-[#0e1621]/65 to-[#0e1621]"></div>
   <div class="relative z-10 max-w-4xl mx-auto px-4 text-center py-20">
-    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="w-16 h-16 mx-auto mb-6 rounded-2xl shadow-lg">
-    <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 gt-gradient-text">GlobeTrotter</h1>
-    <p class="text-gt-muted text-base sm:text-lg max-w-xl mx-auto mb-8">Your travel companion for discovering places, planning trips, and sharing experiences — built for explorers from Cameroon to the world.</p>
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="w-16 h-16 mx-auto mb-6 rounded-2xl shadow-lg" onerror="this.style.display='none'">
+    <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white">GlobeTrotter</h1>
+    <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Your travel companion for discovering places, planning trips, and sharing experiences — from Cameroon to the world.</p>
     <div class="flex flex-wrap gap-3 justify-center">
       <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore destinations</a>
-      <a href="/itineraries" class="border border-gt-border text-gt-text px-6 py-3 rounded-full hover:border-gt-accent transition">Plan a trip</a>
+      <a href="/itineraries" class="bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full hover:bg-white/20 transition">Plan a trip</a>
     </div>
   </div>
 </section>
 
-<!-- 2. Popular places (4 Africa + rest world) -->
+<!-- 2. Popular places -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="popular-h">
   <h2 id="popular-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular places</h2>
   <p class="text-gt-muted mb-8 text-sm sm:text-base">Start with Africa, then explore the world</p>
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="popularGrid">
-    <!-- filled by JS -->
-  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="popularGrid"></div>
 </section>
 
 <!-- 3. Reasons to visit -->
@@ -70,25 +70,25 @@
 {% block scripts %}
 <script>
 const POPULAR = [
-  { name: "Kribi", country: "Cameroon", continent: "Africa", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop" },
-  { name: "Limbe", country: "Cameroon", continent: "Africa", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop" },
-  { name: "Cape Town", country: "South Africa", continent: "Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=600&h=400&fit=crop" },
-  { name: "Marrakech", country: "Morocco", continent: "Africa", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=600&h=400&fit=crop" },
-  { name: "Bali", country: "Indonesia", continent: "Asia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop" },
-  { name: "Paris", country: "France", continent: "Europe", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop" },
-  { name: "Tokyo", country: "Japan", continent: "Asia", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop" },
-  { name: "New York", country: "USA", continent: "North America", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&h=400&fit=crop" },
-  { name: "Dubai", country: "UAE", continent: "Asia", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&h=400&fit=crop" },
-  { name: "Santorini", country: "Greece", continent: "Europe", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=600&h=400&fit=crop" },
+  { name: "Kribi", country: "Cameroon", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Limbe", country: "Cameroon", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Cape Town", country: "South Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Marrakech", country: "Morocco", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Bali", country: "Indonesia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Paris", country: "France", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Tokyo", country: "Japan", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "New York", country: "USA", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Dubai", country: "UAE", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Santorini", country: "Greece", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?auto=format&fit=crop&w=600&h=400&q=80" },
 ];
 
 const REASONS = [
-  { name: "Cameroon", img: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=600&h=400&fit=crop", reasons: ["Atlantic beaches at Kribi", "Mount Cameroon hiking", "Rich cultural diversity", "Wildlife & national parks"] },
-  { name: "South Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=600&h=400&fit=crop", reasons: ["Table Mountain views", "Safari experiences", "Cape wine routes", "Vibrant cities"] },
-  { name: "Morocco", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=600&h=400&fit=crop", reasons: ["Historic medinas", "Sahara desert trips", "Souks & crafts", "Distinct cuisine"] },
-  { name: "France", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop", reasons: ["World-class museums", "Regional food culture", "Iconic cities", "Countryside escapes"] },
-  { name: "Japan", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop", reasons: ["Tradition meets tech", "Seasonal festivals", "Rail travel ease", "Unique cuisine"] },
-  { name: "Indonesia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop", reasons: ["Island landscapes", "Temples & culture", "Diving & beaches", "Warm hospitality"] },
+  { name: "Cameroon", img: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Atlantic beaches at Kribi", "Mount Cameroon hiking", "Rich cultural diversity", "Wildlife & national parks"] },
+  { name: "South Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Table Mountain views", "Safari experiences", "Cape wine routes", "Vibrant cities"] },
+  { name: "Morocco", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Historic medinas", "Sahara desert trips", "Souks & crafts", "Distinct cuisine"] },
+  { name: "France", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["World-class museums", "Regional food culture", "Iconic cities", "Countryside escapes"] },
+  { name: "Japan", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Tradition meets tech", "Seasonal festivals", "Rail travel ease", "Unique cuisine"] },
+  { name: "Indonesia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Island landscapes", "Temples & culture", "Diving & beaches", "Warm hospitality"] },
 ];
 
 const STORIES = [
@@ -102,7 +102,7 @@ const STORIES = [
 
 document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
   <a href="/destinations?q=${encodeURIComponent(p.name)}" class="gt-reveal gt-card-glow group block rounded-2xl overflow-hidden border border-gt-border bg-gt-surface" style="--reveal-delay:${i*50}ms">
-    <div class="aspect-[4/3] overflow-hidden">
+    <div class="aspect-[4/3] overflow-hidden bg-gt-surface2">
       <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
     </div>
     <div class="p-3">
@@ -114,7 +114,7 @@ document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
 
 document.getElementById('reasonsGrid').innerHTML = REASONS.map((r, i) => `
   <article class="gt-reveal gt-card-glow rounded-2xl overflow-hidden border border-gt-border bg-gt-bg" style="--reveal-delay:${i*60}ms">
-    <div class="h-40 overflow-hidden">
+    <div class="h-40 overflow-hidden bg-gt-surface2">
       <img src="${r.img}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy">
     </div>
     <div class="p-5">
@@ -139,9 +139,5 @@ document.getElementById('testimonialGrid').innerHTML = STORIES.map((s, i) => `
 
 if (window.refreshScrollReveal) window.refreshScrollReveal();
 else document.querySelectorAll('.gt-reveal').forEach(n => n.classList.add('is-visible'));
-
-// Remember last search for recommendations
-const params = new URLSearchParams(location.search);
-if (params.get('q')) localStorage.setItem('lastSearch', params.get('q'));
 </script>
 {% endblock %}

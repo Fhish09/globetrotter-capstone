@@ -10,13 +10,8 @@ def index():
 def destination_detail(dest_id):
     return render_template('destination_detail.html', dest_id=dest_id)
 
-# /recommendations HTML handled in recommendations_bp (same Accept pattern as destinations)
-# /destinations HTML handled in destinations_bp
-
-@main_bp.route('/itineraries')
-def itineraries():
-    return render_template('itineraries.html')
-
 @main_bp.route('/testimonials')
 def testimonials():
     return render_template('testimonials.html')
+
+# /destinations, /recommendations, /itineraries HTML+JSON handled in their blueprints

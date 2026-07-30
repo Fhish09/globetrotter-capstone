@@ -5,10 +5,10 @@
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
     <div>
       <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-1">My trips</h1>
-      <p class="text-gt-muted text-sm">Past and planned itineraries</p>
+      <p class="text-gt-muted text-sm">Your past and planned itineraries</p>
     </div>
-    <button onclick="openCreateModal()" class="gt-btn-primary px-5 py-2.5 rounded-full font-medium flex items-center gap-2">
-      <i class="fas fa-plus"></i> New trip
+    <button type="button" onclick="openCreateModal()" class="gt-btn-primary px-5 py-2.5 rounded-full font-medium">
+      <i class="fas fa-plus mr-1"></i> New trip
     </button>
   </div>
   <div id="status" class="mb-6"></div>
@@ -19,7 +19,7 @@
   <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[95vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-xl font-bold text-gt-text">Create itinerary</h2>
-      <button onclick="closeCreateModal()" class="text-gt-muted"><i class="fas fa-times"></i></button>
+      <button type="button" onclick="closeCreateModal()" class="text-gt-muted"><i class="fas fa-times"></i></button>
     </div>
     <div id="createError" class="hidden mb-4 bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl"></div>
     <form onsubmit="event.preventDefault(); createTrip();" class="space-y-4">
@@ -57,96 +57,115 @@ function closeCreateModal() {
   document.getElementById('createModal').classList.add('hidden');
   document.getElementById('createModal').classList.remove('flex');
 }
-
 function shareExperience(title) {
-  const text = `I visited ${title} with GlobeTrotter!`;
-  if (navigator.share) navigator.share({ title: 'My trip', text }).catch(()=>{});
-  else {
-    navigator.clipboard?.writeText(text);
-    alert('Experience text copied — share it with friends!');
-  }
+  var text = 'I visited ' + title + ' with GlobeTrotter!';
+  if (navigator.share) navigator.share({ title: 'My trip', text: text }).catch(function(){});
+  else { try { navigator.clipboard.writeText(text); alert('Copied — share with friends!'); } catch(e) { alert(text); } }
 }
-
 function rebook(dests) {
-  const q = (dests || [])[0] || '';
+  var q = (dests && dests[0]) || '';
   if (q) localStorage.setItem('lastSearch', q);
-  window.location.href = q ? `/destinations?q=${encodeURIComponent(q)}` : '/destinations';
+  window.location.href = q ? ('/destinations?q=' + encodeURIComponent(q)) : '/destinations';
 }
 
 async function loadTrips() {
-  const token = localStorage.getItem('token');
-  const status = document.getElementById('status');
-  const container = document.getElementById('trips');
+  var token = localStorage.getItem('token');
+  var status = document.getElementById('status');
+  var container = document.getElementById('trips');
   if (!token) {
-    status.innerHTML = `<div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">
-      <p class="font-semibold mb-2">Login to see your trips</p>
-      <button onclick="openLogin()" class="gt-btn-primary px-5 py-2.5 rounded-full mt-2">Login</button>
-    </div>`;
+    status.innerHTML = '<div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">' +
+      '<p class="font-semibold mb-2">Login to see your trips</p>' +
+      '<button onclick="openLogin()" class="gt-btn-primary px-5 py-2.5 rounded-full mt-2">Login</button></div>';
+    container.innerHTML = '';
     return;
   }
+  status.innerHTML = '<p class="text-gt-muted"><i class="fas fa-spinner fa-spin"></i> Loading trips…</p>';
   try {
-    const res = await fetch('/itineraries', { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } });
-    const data = await res.json();
-    if (!res.ok) { status.innerHTML = `<p class="text-red-400">${data.error || 'Error'}</p>`; return; }
-    status.innerHTML = '';
-    if (!data.length) {
-      container.innerHTML = `<p class="text-gt-muted col-span-full text-center py-12">No trips yet. Create your first itinerary.</p>`;
+    var res = await fetch('/itineraries', {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+    });
+    var data = await res.json();
+    if (!res.ok) {
+      status.innerHTML = '<p class="text-red-400">' + (data.error || 'Error loading trips') + '</p>';
       return;
     }
-    container.innerHTML = data.map(trip => `
-      <article class="bg-gt-surface border border-gt-border rounded-2xl p-6 gt-card-glow">
-        <h2 class="text-lg font-bold text-gt-text mb-1">${trip.title}</h2>
-        <p class="text-sm text-gt-muted mb-3"><i class="far fa-calendar mr-1"></i> ${trip.start_date || '—'} → ${trip.end_date || '—'}</p>
-        <div class="flex flex-wrap gap-2 mb-4">
-          ${(trip.destinations || []).map(d => `<span class="gt-chip text-xs px-3 py-1 rounded-full">${d}</span>`).join('')}
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <button type="button" onclick='shareExperience(${JSON.stringify(trip.title)})'
-            class="text-sm px-4 py-2 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent">
-            <i class="fas fa-share-alt mr-1"></i> Share experience
-          </button>
-          <button type="button" onclick='rebook(${JSON.stringify(trip.destinations || [])})'
-            class="text-sm px-4 py-2 rounded-full gt-btn-primary">
-            <i class="fas fa-redo mr-1"></i> Rebook
-          </button>
-        </div>
-      </article>`).join('');
+    if (!Array.isArray(data)) {
+      status.innerHTML = '<p class="text-red-400">Unexpected response</p>';
+      return;
+    }
+    status.innerHTML = '';
+    if (!data.length) {
+      container.innerHTML = '<div class="col-span-full text-center py-12 text-gt-muted">' +
+        '<p class="mb-4">No trips yet.</p>' +
+        '<button onclick="openCreateModal()" class="gt-btn-primary px-5 py-2.5 rounded-full">Create your first trip</button></div>';
+      return;
+    }
+    container.innerHTML = data.map(function(trip) {
+      var dests = trip.destinations || [];
+      var chips = dests.map(function(d) {
+        return '<span class="gt-chip text-xs px-3 py-1 rounded-full">' + d + '</span>';
+      }).join('');
+      var destsJson = JSON.stringify(dests).replace(/'/g, "\\'");
+      var titleJson = JSON.stringify(trip.title || '').replace(/'/g, "\\'");
+      return '<article class="bg-gt-surface border border-gt-border rounded-2xl p-6 gt-card-glow">' +
+        '<h2 class="text-lg font-bold text-gt-text mb-1">' + (trip.title || 'Trip') + '</h2>' +
+        '<p class="text-sm text-gt-muted mb-3"><i class="far fa-calendar mr-1"></i> ' +
+        (trip.start_date || '—') + ' → ' + (trip.end_date || '—') + '</p>' +
+        '<div class="flex flex-wrap gap-2 mb-4">' + chips + '</div>' +
+        '<div class="flex flex-wrap gap-2">' +
+        '<button type="button" class="text-sm px-4 py-2 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent" ' +
+        'onclick=\'shareExperience(' + titleJson + ')\'><i class="fas fa-share-alt mr-1"></i> Share experience</button>' +
+        '<button type="button" class="text-sm px-4 py-2 rounded-full gt-btn-primary" ' +
+        'onclick=\'rebook(' + destsJson + ')\'><i class="fas fa-redo mr-1"></i> Rebook</button>' +
+        '</div></article>';
+    }).join('');
   } catch (e) {
-    status.innerHTML = `<p class="text-red-400">Network error</p>`;
+    status.innerHTML = '<p class="text-red-400">Network error — is the server running?</p>';
   }
 }
 
 async function createTrip() {
-  const token = localStorage.getItem('token');
+  var token = localStorage.getItem('token');
   if (!token) { openLogin(); return; }
-  const title = document.getElementById('tripTitle').value.trim();
-  const dests = document.getElementById('tripDests').value.split(',').map(d => d.trim()).filter(Boolean);
-  const start = document.getElementById('startDate').value;
-  const end = document.getElementById('endDate').value;
-  const errorEl = document.getElementById('createError');
-  const btn = document.getElementById('createBtn');
+  var title = document.getElementById('tripTitle').value.trim();
+  var dests = document.getElementById('tripDests').value.split(',').map(function(d) { return d.trim(); }).filter(Boolean);
+  var start = document.getElementById('startDate').value;
+  var end = document.getElementById('endDate').value;
+  var errorEl = document.getElementById('createError');
+  var btn = document.getElementById('createBtn');
   if (!title) { errorEl.textContent = 'Title required'; errorEl.classList.remove('hidden'); return; }
   btn.disabled = true;
+  errorEl.classList.add('hidden');
   try {
-    const res = await fetch('/itineraries', {
+    var res = await fetch('/itineraries', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ title, destinations: dests, start_date: start, end_date: end })
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ title: title, destinations: dests, start_date: start, end_date: end })
     });
+    var data = await res.json();
     if (res.ok) {
       closeCreateModal();
-      ['tripTitle','tripDests','startDate','endDate'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('tripTitle').value = '';
+      document.getElementById('tripDests').value = '';
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
       loadTrips();
     } else {
-      const data = await res.json();
-      errorEl.textContent = data.error || 'Failed'; errorEl.classList.remove('hidden');
+      errorEl.textContent = data.error || 'Failed';
+      errorEl.classList.remove('hidden');
     }
   } catch (e) {
-    errorEl.textContent = 'Network error'; errorEl.classList.remove('hidden');
+    errorEl.textContent = 'Network error';
+    errorEl.classList.remove('hidden');
   } finally {
     btn.disabled = false;
   }
 }
+
 loadTrips();
 </script>
 {% endblock %}
