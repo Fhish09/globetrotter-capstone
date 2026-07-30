@@ -1,20 +1,13 @@
 """
 app/destinations.py
 
-Destination search endpoint.
+Destination search endpoint + HTML page for browser navigation.
 
-Routes
-------
-GET /destinations?q=paris&tag=food&continent=Europe
-    Returns destinations that match any of the provided query parameters.
-    All parameters are optional; omitting them returns the full catalogue.
-
-Data sources
-------------
-1. Curated seed data in data/destinations.json (rich descriptions + photos)
-2. REST Countries API – expands the catalogue with world capitals (no API key)
+GET /destinations
+  - Browser (Accept: text/html) → destinations.html
+  - fetch() / API clients → JSON list
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 
 from app.models import get_all_destinations
 from app.external_api import get_combined_destinations
@@ -22,19 +15,23 @@ from app.external_api import get_combined_destinations
 destinations_bp = Blueprint("destinations", __name__)
 
 
+def _wants_html() -> bool:
+    accept = request.headers.get("Accept", "")
+    # fetch() often sends */* — treat explicit HTML or no JSON preference as page only when navigating
+    if "application/json" in accept:
+        return False
+    if "text/html" in accept:
+        return True
+    # Default for plain fetch() from our templates: JSON
+    return False
+
+
 @destinations_bp.route("/destinations", methods=["GET"])
 def search_destinations():
-    """Search destinations by name keyword, tag, and/or continent.
+    """HTML page for browsers, JSON for API/fetch."""
+    if _wants_html():
+        return render_template("destinations.html")
 
-    Query parameters (all optional):
-        q          – free-text search against name, country, and description
-        tag        – filter by a single interest tag (e.g. "beach")
-        continent  – filter by continent name (e.g. "Europe")
-        max_cost   – filter by maximum average daily cost (integer)
-        source     – "local" to only return seed data, "all" (default) for combined
-
-    Returns a JSON list of matching destination objects.
-    """
     q = request.args.get("q", "").strip().lower()
     tag = request.args.get("tag", "").strip().lower()
     continent = request.args.get("continent", "").strip().lower()
@@ -48,18 +45,22 @@ def search_destinations():
         except ValueError:
             return jsonify({"error": "max_cost must be an integer"}), 400
 
-    local = get_all_destinations()
+    try:
+        local = get_all_destinations()
+    except Exception as exc:
+        return jsonify({"error": f"failed to load destinations: {exc}"}), 500
 
     if source == "local":
         destinations = local
     else:
-        # Merge curated seed data with REST Countries capitals
-        destinations = get_combined_destinations(local)
+        try:
+            destinations = get_combined_destinations(local)
+        except Exception:
+            destinations = local
 
     results = []
 
     for dest in destinations:
-        # Free-text filter
         if q:
             searchable = " ".join([
                 dest.get("name", ""),
@@ -69,15 +70,12 @@ def search_destinations():
             if q not in searchable:
                 continue
 
-        # Tag filter
         if tag and tag not in [t.lower() for t in dest.get("tags", [])]:
             continue
 
-        # Continent filter
         if continent and continent != dest.get("continent", "").lower():
             continue
 
-        # Cost filter
         if max_cost is not None:
             cost = dest.get("avg_cost_per_day")
             if cost is None or cost > max_cost:

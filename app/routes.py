@@ -6,9 +6,8 @@ main_bp = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
-@main_bp.route('/destinations')
-def destinations():
-    return render_template('destinations.html')
+# NOTE: /destinations HTML is served from destinations_bp (Accept: text/html)
+# so the same path can also return JSON for fetch() calls.
 
 @main_bp.route('/destinations/<int:dest_id>')
 def destination_detail(dest_id):
