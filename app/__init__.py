@@ -1,8 +1,4 @@
-"""
-app/__init__.py
-
-Flask application factory.
-"""
+"""Flask application factory."""
 import os
 from flask import Flask
 
@@ -17,13 +13,16 @@ def create_app(config_overrides: dict | None = None):
         "SECRET_KEY", "globetrotter-secret-change-in-prod"
     )
 
-    # Database – PostgreSQL in Docker, SQLite fallback for local tests
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
         app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     else:
-        # Fallback for tests / local without Postgres
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+        # File-based SQLite so users/trips survive Flask restarts (local Windows)
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        db_path = os.path.join(base, "data", "globetrotter.db")
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        # forward slashes work on Windows for SQLAlchemy
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path.replace("\\", "/")
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -35,11 +34,9 @@ def create_app(config_overrides: dict | None = None):
     with app.app_context():
         db.create_all()
 
-    # Frontend routes
     from app.routes import main_bp
     app.register_blueprint(main_bp)
 
-    # API blueprints
     from app.auth import auth_bp
     from app.destinations import destinations_bp
     from app.recommendations import recommendations_bp

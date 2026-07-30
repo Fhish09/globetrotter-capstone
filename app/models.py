@@ -1,11 +1,4 @@
-"""
-app/models.py
-
-Data models.
-
-- Users & itineraries → PostgreSQL (via SQLAlchemy)
-- Destinations → static JSON seed file (plus external API at runtime)
-"""
+"""Data models – users & itineraries in SQLite/Postgres; destinations in JSON."""
 from __future__ import annotations
 
 import json
@@ -14,7 +7,7 @@ import uuid
 from datetime import datetime, timezone
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy import JSON
 
 db = SQLAlchemy()
 
@@ -22,10 +15,6 @@ _BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(_BASE_DIR, "data")
 DESTINATIONS_FILE = os.path.join(DATA_DIR, "destinations.json")
 
-
-# ---------------------------------------------------------------------------
-# SQLAlchemy models (PostgreSQL)
-# ---------------------------------------------------------------------------
 
 class User(db.Model):
     __tablename__ = "users"
@@ -70,10 +59,6 @@ class Itinerary(db.Model):
         }
 
 
-# ---------------------------------------------------------------------------
-# User helpers (same interface as before)
-# ---------------------------------------------------------------------------
-
 def get_all_users() -> list:
     return [u.to_dict() for u in User.query.all()]
 
@@ -103,10 +88,6 @@ def update_user_preferences(username: str, preferences: list) -> bool:
     return True
 
 
-# ---------------------------------------------------------------------------
-# Destination helpers (still JSON seed file)
-# ---------------------------------------------------------------------------
-
 def _read_json(filepath: str) -> list:
     if not os.path.exists(filepath):
         return []
@@ -118,20 +99,19 @@ def _read_json(filepath: str) -> list:
 
 
 def get_all_destinations() -> list:
-    """Return destinations from the static catalogue (seed data)."""
     return _read_json(DESTINATIONS_FILE)
 
-
-# ---------------------------------------------------------------------------
-# Itinerary helpers
-# ---------------------------------------------------------------------------
 
 def get_all_itineraries() -> list:
     return [it.to_dict() for it in Itinerary.query.all()]
 
 
 def get_itineraries_for_user(username: str) -> list:
-    rows = Itinerary.query.filter_by(username=username).order_by(Itinerary.created_at.desc()).all()
+    rows = (
+        Itinerary.query.filter_by(username=username)
+        .order_by(Itinerary.created_at.desc())
+        .all()
+    )
     return [it.to_dict() for it in rows]
 
 

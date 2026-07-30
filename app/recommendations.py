@@ -9,7 +9,7 @@ recommendations_bp = Blueprint("recommendations", __name__)
 
 
 def _wants_html() -> bool:
-    accept = request.headers.get("Accept", "")
+    accept = (request.headers.get("Accept") or "").lower()
     if "application/json" in accept:
         return False
     if "text/html" in accept:
@@ -37,7 +37,6 @@ def _score_destination(dest: dict, preferences: list, last_search: str = "") -> 
             if pref not in matched:
                 matched.append(f"{pref} (mentioned)")
 
-    # Boost places related to last search (country or name keyword)
     if last_search:
         ls = last_search.lower()
         if ls in name or ls in country or ls in description:
@@ -66,7 +65,8 @@ def get_recommendations():
 
     user = get_user_by_username(username)
     if not user:
-        return jsonify({"error": "user not found"}), 404
+        # Token valid but user missing (e.g. old memory DB) → ask to login again
+        return jsonify({"error": "session expired — please login again"}), 401
 
     preferences = [p.lower().strip() for p in user.get("preferences", []) if p.strip()]
     last_search = (request.args.get("q") or request.args.get("last_search") or "").strip()
@@ -83,16 +83,15 @@ def get_recommendations():
     except Exception:
         destinations = local
 
-    # Country snapshot for UI
-    countries = sorted({
-        d.get("country") for d in destinations if d.get("country")
-    })[:40]
+    countries = sorted({d.get("country") for d in destinations if d.get("country")})[:40]
 
     scored = []
     for dest in destinations:
         score, matched = _score_destination(dest, preferences, last_search)
         if score > 0 or not preferences:
-            scored.append((score if preferences or last_search else 1.0, dest, matched or ["popular pick"]))
+            scored.append(
+                (score if preferences or last_search else 1.0, dest, matched or ["popular pick"])
+            )
 
     scored.sort(key=lambda x: (-x[0], x[1].get("avg_cost_per_day") or 999))
 
@@ -111,4 +110,6 @@ def get_recommendations():
         if len(results) >= limit:
             break
 
-    return jsonify({"destinations": results, "countries": countries, "last_search": last_search}), 200
+    return jsonify(
+        {"destinations": results, "countries": countries, "last_search": last_search}
+    ), 200
