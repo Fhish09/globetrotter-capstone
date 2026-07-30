@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Traveler Stories{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+  <h1 class="heading text-3xl sm:text-4xl font-bold text-gt-text mb-2">Traveler stories</h1>
+  <p class="text-gt-muted mb-10">Recent experiences from the community (demo stories for the capstone).</p>
+  <div id="allStories" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const STORIES = [
+  { name: "Amina N.", place: "Kribi", text: "The beaches in Kribi were peaceful and the grilled fish was unforgettable. Perfect weekend from Douala.", img: "https://i.pravatar.cc/100?u=amina" },
+  { name: "Jean-Paul T.", place: "Limbe", text: "Limbe Botanical Garden and the black sand beach made our family trip special. Highly recommend.", img: "https://i.pravatar.cc/100?u=jean" },
+  { name: "Marie K.", place: "Mount Cameroon", text: "Tough hike but the sunrise above the clouds was worth every step. Guides in Buea were professional.", img: "https://i.pravatar.cc/100?u=marie" },
+  { name: "Carlos M.", place: "Yaoundé", text: "Food markets and nightlife surprised me. Great base before heading to the coast.", img: "https://i.pravatar.cc/100?u=carlos" },
+  { name: "Fatima S.", place: "Cape Town", text: "Table Mountain views and the waterfront — already planning a return trip.", img: "https://i.pravatar.cc/100?u=fatima" },
+  { name: "David O.", place: "Marrakech", text: "Souks, spices, and riads. Chaotic in the best way. Go with a local guide at first.", img: "https://i.pravatar.cc/100?u=david" },
+  { name: "Grace E.", place: "Bali", text: "Rice terraces at sunrise. Quiet villages away from the party areas were the highlight.", img: "https://i.pravatar.cc/100?u=grace" },
+  { name: "Ibrahim B.", place: "Douala", text: "Used GlobeTrotter to plan a coastal loop — Kribi then Limbe. Smooth and practical.", img: "https://i.pravatar.cc/100?u=ibrahim" },
+];
+document.getElementById('allStories').innerHTML = STORIES.map(s => `
+  <article class="bg-gt-surface border border-gt-border rounded-2xl p-6 flex gap-4">
+    <img src="${s.img}" alt="" class="w-14 h-14 rounded-full object-cover shrink-0 border border-gt-border">
+    <div>
+      <h2 class="font-semibold text-gt-text">${s.name}</h2>
+      <p class="text-xs text-gt-accent mb-2">${s.place}</p>
+      <p class="text-gt-muted text-sm leading-relaxed">${s.text}</p>
+    </div>
+  </article>
+`).join('');
+</script>
+{% endblock %}
