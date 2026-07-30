@@ -1,15 +1,15 @@
-/* GlobeTrotter – Wanderlog-inspired light theme */
+/* GlobeTrotter – Telegram-inspired palette */
 :root {
-  --gt-bg: #f5f6f8;
-  --gt-surface: #ffffff;
-  --gt-surface-2: #f0f1f4;
-  --gt-border: #e5e7eb;
-  --gt-text: #1a1d26;
-  --gt-muted: #6b7280;
-  --gt-accent: #2563eb;
-  --gt-accent-hover: #1d4ed8;
-  --gt-accent-soft: rgba(37, 99, 235, 0.1);
-  --gt-accent-text: #1d4ed8;
+  --gt-bg: #0e1621;
+  --gt-surface: #17212b;
+  --gt-surface-2: #242f3d;
+  --gt-border: #2b3a4a;
+  --gt-text: #f5f5f5;
+  --gt-muted: #8b9aab;
+  --gt-accent: #2AABEE;
+  --gt-accent-hover: #1e9bd8;
+  --gt-accent-soft: rgba(42, 171, 238, 0.15);
+  --gt-accent-text: #7dd3fc;
 }
 
 body.gt-theme {
@@ -23,17 +23,16 @@ body.gt-theme {
 }
 
 .gt-theme .gt-nav {
-  background-color: rgba(255, 255, 255, 0.92);
+  background-color: rgba(14, 22, 33, 0.92);
   border-bottom: 1px solid var(--gt-border);
 }
 
-.gt-theme .gt-accent {
-  color: var(--gt-accent);
-}
+.gt-theme .gt-accent { color: var(--gt-accent); }
 
 .gt-theme .gt-btn-primary {
   background-color: var(--gt-accent);
-  color: #ffffff;
+  color: #0e1621;
+  font-weight: 600;
 }
 .gt-theme .gt-btn-primary:hover {
   background-color: var(--gt-accent-hover);
@@ -47,16 +46,21 @@ body.gt-theme {
 .gt-theme input,
 .gt-theme select,
 .gt-theme textarea {
-  background-color: var(--gt-surface);
+  background-color: var(--gt-surface-2);
   border-color: var(--gt-border);
   color: var(--gt-text);
 }
-.gt-theme input::placeholder {
-  color: #9ca3af;
-}
+.gt-theme input::placeholder { color: #6b7c8f; }
 .gt-theme input:focus,
 .gt-theme select:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 2px rgba(42, 171, 238, 0.35);
   border-color: var(--gt-accent);
+}
+
+.gt-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
 }
