@@ -1,43 +1,35 @@
-/* Fashionable CSS effects for GlobeTrotter */
+/* Light theme effects – subtle, product-app style */
 
-/* ---------- 1. Glassmorphism ---------- */
 .gt-glass {
-  background: rgba(28, 28, 31, 0.55);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  border: 1px solid rgba(143, 168, 192, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
 
 .gt-glass-strong {
-  background: rgba(18, 18, 20, 0.72);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border: 1px solid rgba(143, 168, 192, 0.14);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
 }
 
 .gt-nav.gt-glass-nav {
-  background: rgba(18, 18, 20, 0.65) !important;
-  backdrop-filter: blur(18px) saturate(1.25);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  border-bottom: 1px solid rgba(143, 168, 192, 0.1);
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid #e5e7eb;
 }
 
-/* ---------- 2. Gradient text ---------- */
 .gt-gradient-text {
-  background: linear-gradient(
-    120deg,
-    #e8e8ea 0%,
-    #8fa8c0 45%,
-    #c5d4e0 70%,
-    #e8e8ea 100%
-  );
+  background: linear-gradient(120deg, #1a1d26 0%, #2563eb 50%, #1a1d26 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: gt-gradient-shift 8s ease infinite;
+  animation: gt-gradient-shift 10s ease infinite;
 }
 
 @keyframes gt-gradient-shift {
@@ -45,13 +37,12 @@
   50% { background-position: 100% center; }
 }
 
-/* ---------- 3. Scroll reveal ---------- */
 .gt-reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(20px);
   transition:
-    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
@@ -60,39 +51,29 @@
   transform: translateY(0);
 }
 
-/* Card hover glow (pairs with reveal) */
 .gt-card-glow {
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .gt-card-glow:hover {
-  transform: translateY(-4px);
-  border-color: rgba(143, 168, 192, 0.45) !important;
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(143, 168, 192, 0.15),
-    0 0 24px rgba(143, 168, 192, 0.08);
+  transform: translateY(-3px);
+  border-color: #c7d2fe !important;
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.12);
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .gt-gradient-text {
     animation: none;
     background: none;
-    color: var(--gt-text, #e8e8ea);
+    color: var(--gt-text, #1a1d26);
     -webkit-background-clip: unset;
     background-clip: unset;
   }
-
   .gt-reveal {
     opacity: 1;
     transform: none;
     transition: none;
   }
-
   .gt-card-glow:hover {
     transform: none;
   }

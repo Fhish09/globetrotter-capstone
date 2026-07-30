@@ -1,17 +1,15 @@
-/* GlobeTrotter – design-image palette
-   Dark charcoal + muted blue-slate accents
-*/
+/* GlobeTrotter – Wanderlog-inspired light theme */
 :root {
-  --gt-bg: #121214;
-  --gt-surface: #1c1c1f;
-  --gt-surface-2: #252529;
-  --gt-border: #2e2e34;
-  --gt-text: #e8e8ea;
-  --gt-muted: #9a9aa3;
-  --gt-accent: #8fa8c0;
-  --gt-accent-hover: #a8c0d0;
-  --gt-accent-soft: rgba(143, 168, 192, 0.15);
-  --gt-accent-text: #c5d4e0;
+  --gt-bg: #f5f6f8;
+  --gt-surface: #ffffff;
+  --gt-surface-2: #f0f1f4;
+  --gt-border: #e5e7eb;
+  --gt-text: #1a1d26;
+  --gt-muted: #6b7280;
+  --gt-accent: #2563eb;
+  --gt-accent-hover: #1d4ed8;
+  --gt-accent-soft: rgba(37, 99, 235, 0.1);
+  --gt-accent-text: #1d4ed8;
 }
 
 body.gt-theme {
@@ -25,7 +23,7 @@ body.gt-theme {
 }
 
 .gt-theme .gt-nav {
-  background-color: rgba(18, 18, 20, 0.92);
+  background-color: rgba(255, 255, 255, 0.92);
   border-bottom: 1px solid var(--gt-border);
 }
 
@@ -35,7 +33,7 @@ body.gt-theme {
 
 .gt-theme .gt-btn-primary {
   background-color: var(--gt-accent);
-  color: #121214;
+  color: #ffffff;
 }
 .gt-theme .gt-btn-primary:hover {
   background-color: var(--gt-accent-hover);
@@ -49,16 +47,16 @@ body.gt-theme {
 .gt-theme input,
 .gt-theme select,
 .gt-theme textarea {
-  background-color: var(--gt-surface-2);
+  background-color: var(--gt-surface);
   border-color: var(--gt-border);
   color: var(--gt-text);
 }
 .gt-theme input::placeholder {
-  color: #6b6b75;
+  color: #9ca3af;
 }
 .gt-theme input:focus,
 .gt-theme select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(143, 168, 192, 0.45);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
   border-color: var(--gt-accent);
 }

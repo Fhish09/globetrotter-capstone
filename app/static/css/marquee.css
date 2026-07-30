@@ -1,26 +1,12 @@
-/* Responsive infinite marquee – prefers-reduced-motion safe */
-
+/* Trending marquee – light theme */
 .gt-marquee {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-block: 1px solid var(--gt-border, #2e2e34);
-  background: var(--gt-surface, #1c1c1f);
-  /* edge fade */
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
+  border-block: 1px solid var(--gt-border, #e5e7eb);
+  background: var(--gt-surface, #fff);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
 }
 
 .gt-marquee__track {
@@ -43,23 +29,24 @@
   padding: 0.4rem 0.9rem;
   margin-inline: 0.25rem;
   border-radius: 9999px;
-  border: 1px solid var(--gt-border, #2e2e34);
-  background: var(--gt-surface-2, #252529);
-  color: var(--gt-text, #e8e8ea);
+  border: 1px solid var(--gt-border, #e5e7eb);
+  background: var(--gt-surface-2, #f0f1f4);
+  color: var(--gt-text, #1a1d26);
   font-size: 0.8rem;
   font-weight: 500;
   white-space: nowrap;
   text-decoration: none;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .gt-marquee__item:hover {
-  border-color: var(--gt-accent, #8fa8c0);
-  color: var(--gt-accent, #8fa8c0);
+  border-color: var(--gt-accent, #2563eb);
+  color: var(--gt-accent, #2563eb);
+  background: var(--gt-accent-soft, rgba(37, 99, 235, 0.1));
 }
 
 .gt-marquee__item i {
-  color: var(--gt-accent, #8fa8c0);
+  color: var(--gt-accent, #2563eb);
   font-size: 0.75rem;
 }
 
@@ -69,48 +56,27 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--gt-muted, #9a9aa3);
+  color: var(--gt-muted, #6b7280);
   padding: 0.75rem 0.75rem 0.75rem 1rem;
 }
 
 @keyframes gt-marquee-scroll {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  to { transform: translateX(-50%); }
 }
 
-/* Mobile: slightly faster, tighter chips */
 @media (max-width: 640px) {
   .gt-marquee__track {
     gap: 0.25rem;
     padding: 0.6rem 0;
     animation-duration: 28s;
   }
-
   .gt-marquee__item {
     padding: 0.35rem 0.7rem;
     font-size: 0.75rem;
-    margin-inline: 0.15rem;
-  }
-
-  .gt-marquee {
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent,
-      #000 4%,
-      #000 96%,
-      transparent
-    );
-    mask-image: linear-gradient(
-      to right,
-      transparent,
-      #000 4%,
-      #000 96%,
-      transparent
-    );
   }
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .gt-marquee__track {
     animation: none;
@@ -119,7 +85,6 @@
     justify-content: center;
     padding: 0.75rem 1rem;
   }
-
   .gt-marquee {
     -webkit-mask-image: none;
     mask-image: none;
