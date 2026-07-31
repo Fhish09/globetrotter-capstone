@@ -1,9 +1,8 @@
-"""Personalised recommendations – HTML page or JSON API."""
+"""Cameroon-only personalised recommendations."""
 from flask import Blueprint, request, jsonify, render_template
 
 from app.auth import get_current_user
 from app.models import get_all_destinations, get_user_by_username
-from app.external_api import get_combined_destinations
 
 recommendations_bp = Blueprint("recommendations", __name__)
 
@@ -17,13 +16,19 @@ def _wants_html() -> bool:
     return False
 
 
+def _cameroon_only(destinations: list) -> list:
+    return [
+        d for d in destinations
+        if (d.get("country") or "Cameroon").lower() in ("cameroon", "cameroun")
+    ]
+
+
 def _score_destination(dest: dict, preferences: list, last_search: str = "") -> tuple:
     dest_tags = [t.lower() for t in dest.get("tags", [])]
     name = dest.get("name", "").lower()
     description = dest.get("description", "").lower()
-    country = dest.get("country", "").lower()
+    region = dest.get("region", "").lower()
     cost = dest.get("avg_cost_per_day") or 100
-    source = dest.get("source", "local")
 
     score = 0.0
     matched = []
@@ -39,19 +44,17 @@ def _score_destination(dest: dict, preferences: list, last_search: str = "") -> 
 
     if last_search:
         ls = last_search.lower()
-        if ls in name or ls in country or ls in description:
+        if ls in name or ls in region or ls in description or ls in " ".join(dest_tags):
             score += 4.0
             matched.append(f"related to “{last_search}”")
 
-    if cost <= 60:
+    if cost <= 45:
         score += 0.8
-    elif cost <= 100:
+    elif cost <= 60:
         score += 0.4
 
-    if not dest.get("source") or source in ("local", "tourist_curated"):
-        score += 2.0
-
-    return score, matched
+    score += 1.0  # all are curated Cameroon picks
+    return score, matched or ["Cameroon highlight"]
 
 
 @recommendations_bp.route("/recommendations", methods=["GET"])
@@ -65,7 +68,6 @@ def get_recommendations():
 
     user = get_user_by_username(username)
     if not user:
-        # Token valid but user missing (e.g. old memory DB) → ask to login again
         return jsonify({"error": "session expired — please login again"}), 401
 
     preferences = [p.lower().strip() for p in user.get("preferences", []) if p.strip()]
@@ -77,39 +79,27 @@ def get_recommendations():
     except ValueError:
         return jsonify({"error": "limit must be an integer"}), 400
 
-    local = get_all_destinations()
-    try:
-        destinations = get_combined_destinations(local)
-    except Exception:
-        destinations = local
+    destinations = _cameroon_only(get_all_destinations())
 
-    countries = sorted({d.get("country") for d in destinations if d.get("country")})[:40]
+    regions = sorted({d.get("region") for d in destinations if d.get("region")})
 
     scored = []
     for dest in destinations:
         score, matched = _score_destination(dest, preferences, last_search)
-        if score > 0 or not preferences:
-            scored.append(
-                (score if preferences or last_search else 1.0, dest, matched or ["popular pick"])
-            )
+        scored.append((score, dest, matched))
 
     scored.sort(key=lambda x: (-x[0], x[1].get("avg_cost_per_day") or 999))
 
     results = []
-    continent_count = {}
-    for score, dest, matched in scored:
-        continent = dest.get("continent", "Unknown")
-        count = continent_count.get(continent, 0)
-        if count >= 2 and len(results) >= 3:
-            continue
+    for score, dest, matched in scored[:limit]:
         entry = dict(dest)
         entry["match_score"] = round(score, 1)
         entry["match_reasons"] = matched
         results.append(entry)
-        continent_count[continent] = count + 1
-        if len(results) >= limit:
-            break
 
-    return jsonify(
-        {"destinations": results, "countries": countries, "last_search": last_search}
-    ), 200
+    return jsonify({
+        "destinations": results,
+        "regions": regions,
+        "countries": ["Cameroon"],
+        "last_search": last_search,
+    }), 200
