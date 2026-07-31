@@ -3,12 +3,12 @@
 {% block content %}
 
 <section class="relative min-h-[75vh] flex items-center justify-center overflow-hidden" aria-label="Hero"
-  style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center;">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/75 via-[#0e1621]/65 to-[#0e1621]"></div>
+  style="background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Beach_of_Kribi,_Cameroon.jpg?width=1600'); background-size: cover; background-position: center;">
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/80 via-[#0e1621]/70 to-[#0e1621]"></div>
   <div class="relative z-10 max-w-4xl mx-auto px-4 text-center py-20">
     <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="w-16 h-16 mx-auto mb-6 rounded-2xl shadow-lg" onerror="this.style.display='none'">
     <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white">Discover Cameroon</h1>
-    <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Tourist places across Cameroon — beaches, mountains, parks, and culture. Plan trips from Kribi to Waza with GlobeTrotter.</p>
+    <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Real places across Cameroon — Kribi beaches, Mount Cameroon, Limbe, Waza and more. Plan your trip with GlobeTrotter.</p>
     <div class="flex flex-wrap gap-3 justify-center">
       <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore places</a>
       <a href="/itineraries" class="bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full hover:bg-white/20 transition">Plan a trip</a>
@@ -18,7 +18,7 @@
 
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="popular-h">
   <h2 id="popular-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular places in Cameroon</h2>
-  <p class="text-gt-muted mb-8 text-sm sm:text-base">Beaches, mountains, cities, and parks travelers love</p>
+  <p class="text-gt-muted mb-8 text-sm sm:text-base">Photos of the actual destinations</p>
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="popularGrid"></div>
 </section>
 
@@ -49,7 +49,6 @@
       src="https://www.openstreetmap.org/export/embed.html?bbox=8.0%2C1.5%2C16.5%2C13.5&amp;layer=mapnik&amp;marker=7.37%2C12.35"
       referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
-  <p class="text-xs text-gt-muted mt-2"><a class="text-gt-accent hover:underline" href="https://www.openstreetmap.org/#map=6/7.37/12.35" target="_blank" rel="noopener">Open larger map</a></p>
 </section>
 
 <section class="bg-gt-surface border-t border-gt-border py-12 text-center px-4">
@@ -61,26 +60,29 @@
 
 {% block scripts %}
 <script>
+/* Images from Wikimedia Commons — real Cameroon locations */
+const img = (file) => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=800';
+
 const POPULAR = [
-  { name: "Kribi", region: "South", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Limbe", region: "Southwest", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Mount Cameroon", region: "Southwest", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Lobe Waterfalls", region: "South", img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Yaoundé", region: "Centre", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Douala", region: "Littoral", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Waza National Park", region: "Far North", img: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Foumban", region: "West", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Rhumsiki", region: "Far North", img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Buea", region: "Southwest", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Kribi", region: "South", file: "Beach_of_Kribi,_Cameroon.jpg" },
+  { name: "Limbe", region: "Southwest", file: "DOWN_BEACH_LIMBE_CAMEROON.jpg" },
+  { name: "Mount Cameroon", region: "Southwest", file: "Mount_Cameroon_2.jpg" },
+  { name: "Lobe Waterfalls", region: "South", file: "Chutes_de_la_Lobé.jpg" },
+  { name: "Yaoundé", region: "Centre", file: "Yaoundé_from_Mont_Fébé.jpg" },
+  { name: "Douala", region: "Littoral", file: "Douala_port.jpg" },
+  { name: "Waza National Park", region: "Far North", file: "Waza_National_Park_Cameroon.jpg" },
+  { name: "Foumban", region: "West", file: "Foumban_palace.jpg" },
+  { name: "Rhumsiki", region: "Far North", file: "Rhumsiki.jpg" },
+  { name: "Buea", region: "Southwest", file: "Le_Mont_Cameroun_depuis_Limbé.JPG" },
 ];
 
 const REASONS = [
-  { name: "Kribi & Lobe", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Ocean beaches", "Lobe falls into the sea", "Fresh seafood", "Easy weekend from Douala"] },
-  { name: "Limbe & Buea", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Black sand beaches", "Botanic garden", "Mount Cameroon trails", "Cool mountain climate"] },
-  { name: "Waza & Far North", img: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Wildlife viewing", "Sahel landscapes", "Rhumsiki peaks", "Unique culture"] },
-  { name: "West Grassfields", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Bamoun palace heritage", "Crafts & bronze", "Highland scenery", "Local museums"] },
-  { name: "Yaoundé", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Capital city life", "Museums & monuments", "Food & nightlife", "Central hub"] },
-  { name: "Douala", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Main airport gateway", "Markets & music", "Food scene", "Start of coastal trips"] },
+  { name: "Kribi & Lobe", file: "Beach_of_Kribi,_Cameroon.jpg", reasons: ["Ocean beaches", "Lobe falls into the sea", "Fresh seafood", "Easy weekend from Douala"] },
+  { name: "Limbe & Buea", file: "DOWN_BEACH_LIMBE_CAMEROON.jpg", reasons: ["Black sand beaches", "Botanic garden", "Mount Cameroon trails", "Cool mountain climate"] },
+  { name: "Waza & Far North", file: "Waza_National_Park_Cameroon.jpg", reasons: ["Wildlife viewing", "Sahel landscapes", "Rhumsiki peaks", "Unique culture"] },
+  { name: "West Grassfields", file: "Foumban_palace.jpg", reasons: ["Bamoun palace heritage", "Crafts & bronze", "Highland scenery", "Local museums"] },
+  { name: "Yaoundé", file: "Yaoundé_from_Mont_Fébé.jpg", reasons: ["Capital city life", "Museums & monuments", "Food & nightlife", "Central hub"] },
+  { name: "Douala", file: "Douala_port.jpg", reasons: ["Main airport gateway", "Markets & music", "Food scene", "Start of coastal trips"] },
 ];
 
 const STORIES = [
@@ -95,7 +97,8 @@ const STORIES = [
 document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
   <a href="/destinations?q=${encodeURIComponent(p.name)}" class="gt-reveal gt-card-glow group block rounded-2xl overflow-hidden border border-gt-border bg-gt-surface" style="--reveal-delay:${i*50}ms">
     <div class="aspect-[4/3] overflow-hidden bg-gt-surface2">
-      <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+      <img src="${img(p.file)}" alt="${p.name}, Cameroon" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy"
+           onerror="this.src='https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800'">
     </div>
     <div class="p-3">
       <p class="font-semibold text-gt-text text-sm">${p.name}</p>
@@ -107,7 +110,8 @@ document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
 document.getElementById('reasonsGrid').innerHTML = REASONS.map((r, i) => `
   <article class="gt-reveal gt-card-glow rounded-2xl overflow-hidden border border-gt-border bg-gt-bg" style="--reveal-delay:${i*60}ms">
     <div class="h-40 overflow-hidden bg-gt-surface2">
-      <img src="${r.img}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy">
+      <img src="${img(r.file)}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy"
+           onerror="this.src='https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800'">
     </div>
     <div class="p-5">
       <h3 class="font-bold text-lg text-gt-text mb-3">${r.name}</h3>
