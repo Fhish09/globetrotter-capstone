@@ -2,15 +2,15 @@
 {% block title %}Recommendations{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
-  <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-2">For you in Cameroon</h1>
-  <p class="text-gt-muted mb-8 text-sm sm:text-base">Search a town or region — we suggest tourist places across Cameroon.</p>
+  <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-2">For you in Douala</h1>
+  <p class="text-gt-muted mb-8 text-sm sm:text-base">Search a site or district — we suggest tourist places in Douala only.</p>
 
   <div class="bg-gt-surface border border-gt-border rounded-2xl p-4 sm:p-5 mb-8 max-w-2xl">
-    <label class="block text-sm text-gt-muted mb-2" for="lastSearchInput">Search place or region</label>
+    <label class="block text-sm text-gt-muted mb-2" for="lastSearchInput">Search site or district</label>
     <div class="flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
         <input id="lastSearchInput" type="text" autocomplete="off"
-               placeholder="e.g. Kribi, Limbe, beach, mountain…"
+               placeholder="e.g. Pagode, Bonanjo, museum, Akwa…"
                class="w-full rounded-xl px-4 py-3 border border-gt-border text-sm"
                oninput="onSearchInput()" onkeydown="onSearchKey(event)" onfocus="onSearchInput()">
         <div id="suggestBox" class="hidden absolute left-0 right-0 top-full mt-1 z-40 bg-gt-surface border border-gt-border rounded-xl shadow-xl max-h-64 overflow-y-auto"></div>
@@ -20,7 +20,7 @@
   </div>
 
   <div class="mb-4">
-    <p class="text-xs uppercase tracking-wide text-gt-muted mb-2">Regions</p>
+    <p class="text-xs uppercase tracking-wide text-gt-muted mb-2">Districts</p>
     <div id="countries" class="flex flex-wrap gap-2 min-h-[2rem]"></div>
   </div>
   <div id="status" class="mb-6"></div>
@@ -31,29 +31,28 @@
 <script>
 let allPlaces = [];
 let suggestTimer = null;
-let activeIndex = -1;
 
 function getDestImage(d) {
-  return d.image || ('https://picsum.photos/seed/' + encodeURIComponent(d.name || 'cm') + '/600/400');
+  return d.image || ('https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800');
 }
 
 async function loadPlaceIndex() {
   try {
-    var res = await fetch('/destinations?source=local', { headers: { 'Accept': 'application/json' } });
+    var res = await fetch('/destinations', { headers: { 'Accept': 'application/json' } });
     var data = await res.json();
     if (!Array.isArray(data)) return;
     var seen = new Set();
     allPlaces = [];
     data.forEach(function(d) {
       var name = d.name || '';
-      var region = d.region || '';
+      var district = d.district || '';
       if (name && !seen.has(name.toLowerCase())) {
         seen.add(name.toLowerCase());
-        allPlaces.push({ label: region ? name + ' · ' + region : name, name: name });
+        allPlaces.push({ label: district ? name + ' · ' + district : name, name: name });
       }
-      if (region && !seen.has('r:' + region.toLowerCase())) {
-        seen.add('r:' + region.toLowerCase());
-        allPlaces.push({ label: region + ' Region', name: region });
+      if (district && !seen.has('d:' + district.toLowerCase())) {
+        seen.add('d:' + district.toLowerCase());
+        allPlaces.push({ label: district, name: district });
       }
     });
   } catch (e) {}
@@ -67,7 +66,6 @@ function onSearchInput() {
 function showSuggestions() {
   var box = document.getElementById('suggestBox');
   var q = document.getElementById('lastSearchInput').value.trim().toLowerCase();
-  activeIndex = -1;
   if (!q) { box.classList.add('hidden'); box.innerHTML = ''; return; }
   var matches = allPlaces.filter(function(p) {
     return p.label.toLowerCase().indexOf(q) !== -1 || p.name.toLowerCase().indexOf(q) !== -1;
@@ -127,14 +125,14 @@ async function loadRecs() {
     var data = await res.json();
     if (!res.ok) {
       status.innerHTML = '<p class="text-red-400">' + (data.error || 'Failed') + '</p>';
-      if (res.status === 401) { localStorage.removeItem('token'); }
+      if (res.status === 401) localStorage.removeItem('token');
       return;
     }
     var list = Array.isArray(data) ? data : (data.destinations || []);
-    var regions = data.regions || [];
+    var regions = data.districts || data.regions || [];
     status.innerHTML = q
-      ? '<p class="text-sm text-gt-muted">Cameroon places related to <span class="text-gt-accent font-medium">' + q + '</span></p>'
-      : '<p class="text-sm text-gt-muted">Cameroon highlights for you</p>';
+      ? '<p class="text-sm text-gt-muted">Douala sites related to <span class="text-gt-accent font-medium">' + q + '</span></p>'
+      : '<p class="text-sm text-gt-muted">Douala highlights for you</p>';
 
     regionsEl.innerHTML = regions.map(function(r) {
       return '<button type="button" class="text-xs px-3 py-1.5 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent" ' +
@@ -142,7 +140,7 @@ async function loadRecs() {
     }).join('');
 
     if (!list.length) {
-      container.innerHTML = '<p class="text-gt-muted">No matches. Try Kribi, Limbe, or beach.</p>';
+      container.innerHTML = '<p class="text-gt-muted">No matches. Try Pagode, Bonanjo, or museum.</p>';
       return;
     }
 
@@ -152,9 +150,10 @@ async function loadRecs() {
       }).join('');
       return '<a href="/destinations/' + dest.id + '" class="gt-card-glow block bg-gt-surface border border-gt-border rounded-2xl overflow-hidden">' +
         '<div class="h-44 bg-gt-surface2 overflow-hidden">' +
-        '<img src="' + getDestImage(dest) + '" class="w-full h-full object-cover" alt="' + (dest.name || '') + '" loading="lazy"></div>' +
+        '<img src="' + getDestImage(dest) + '" class="w-full h-full object-cover" alt="' + (dest.name || '') + '" loading="lazy" ' +
+        'onerror="this.src=\'https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800\'"></div>' +
         '<div class="p-4"><h2 class="font-bold text-gt-text">' + (dest.name || '') + '</h2>' +
-        '<p class="text-xs text-gt-muted mb-2">' + (dest.region || 'Cameroon') + ' · Cameroon</p>' +
+        '<p class="text-xs text-gt-muted mb-2">' + (dest.district || 'Douala') + ' · Douala</p>' +
         '<p class="text-sm text-gt-muted line-clamp-2 mb-2">' + (dest.description || '') + '</p>' +
         '<div class="flex flex-wrap gap-1">' + reasons + '</div></div></a>';
     }).join('');
