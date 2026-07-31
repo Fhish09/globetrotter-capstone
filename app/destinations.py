@@ -1,4 +1,4 @@
-"""Cameroon destinations search — HTML page or JSON API."""
+"""Douala tourist sites search — HTML or JSON."""
 from flask import Blueprint, request, jsonify, render_template
 
 from app.models import get_all_destinations
@@ -22,8 +22,7 @@ def search_destinations():
 
     q = request.args.get("q", "").strip().lower()
     tag = request.args.get("tag", "").strip().lower()
-    region = request.args.get("region", "").strip().lower()
-    continent = request.args.get("continent", "").strip().lower()
+    district = request.args.get("district", "").strip().lower()
     max_cost_str = request.args.get("max_cost", "").strip()
 
     max_cost = None
@@ -36,13 +35,13 @@ def search_destinations():
     try:
         destinations = get_all_destinations()
     except Exception as exc:
-        return jsonify({"error": f"failed to load destinations: {exc}"}), 500
+        return jsonify({"error": str(exc)}), 500
 
-    # Only Cameroon catalogue
+    # Douala only
     destinations = [
         d for d in destinations
-        if (d.get("country") or "").lower() in ("cameroon", "cameroun", "")
-        or not d.get("country")
+        if (d.get("city") or "").lower() == "douala"
+        or (d.get("country") or "").lower() in ("cameroon", "cameroun")
     ]
 
     results = []
@@ -50,17 +49,15 @@ def search_destinations():
         if q:
             searchable = " ".join([
                 dest.get("name", ""),
-                dest.get("country", ""),
-                dest.get("region", ""),
+                dest.get("district", ""),
+                dest.get("city", ""),
                 dest.get("description", ""),
             ]).lower()
             if q not in searchable:
                 continue
         if tag and tag not in [t.lower() for t in dest.get("tags", [])]:
             continue
-        if region and region != (dest.get("region") or "").lower():
-            continue
-        if continent and continent != (dest.get("continent") or "").lower():
+        if district and district != (dest.get("district") or "").lower():
             continue
         if max_cost is not None:
             cost = dest.get("avg_cost_per_day")

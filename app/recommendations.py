@@ -1,4 +1,4 @@
-"""Cameroon-only personalised recommendations."""
+"""Douala-only personalised recommendations."""
 from flask import Blueprint, request, jsonify, render_template
 
 from app.auth import get_current_user
@@ -16,21 +16,12 @@ def _wants_html() -> bool:
     return False
 
 
-def _cameroon_only(destinations: list) -> list:
-    return [
-        d for d in destinations
-        if (d.get("country") or "Cameroon").lower() in ("cameroon", "cameroun")
-    ]
-
-
-def _score_destination(dest: dict, preferences: list, last_search: str = "") -> tuple:
+def _score(dest: dict, preferences: list, last_search: str = "") -> tuple:
     dest_tags = [t.lower() for t in dest.get("tags", [])]
     name = dest.get("name", "").lower()
     description = dest.get("description", "").lower()
-    region = dest.get("region", "").lower()
-    cost = dest.get("avg_cost_per_day") or 100
-
-    score = 0.0
+    district = dest.get("district", "").lower()
+    score = 1.0
     matched = []
 
     for pref in preferences:
@@ -44,17 +35,11 @@ def _score_destination(dest: dict, preferences: list, last_search: str = "") -> 
 
     if last_search:
         ls = last_search.lower()
-        if ls in name or ls in region or ls in description or ls in " ".join(dest_tags):
+        if ls in name or ls in district or ls in description or ls in " ".join(dest_tags):
             score += 4.0
             matched.append(f"related to “{last_search}”")
 
-    if cost <= 45:
-        score += 0.8
-    elif cost <= 60:
-        score += 0.4
-
-    score += 1.0  # all are curated Cameroon picks
-    return score, matched or ["Cameroon highlight"]
+    return score, matched or ["Douala highlight"]
 
 
 @recommendations_bp.route("/recommendations", methods=["GET"])
@@ -74,21 +59,21 @@ def get_recommendations():
     last_search = (request.args.get("q") or request.args.get("last_search") or "").strip()
 
     try:
-        limit = int(request.args.get("limit", 8))
-        limit = max(1, min(limit, 20))
+        limit = max(1, min(int(request.args.get("limit", 10)), 20))
     except ValueError:
         return jsonify({"error": "limit must be an integer"}), 400
 
-    destinations = _cameroon_only(get_all_destinations())
+    destinations = [
+        d for d in get_all_destinations()
+        if (d.get("city") or "").lower() == "douala"
+    ]
+    if not destinations:
+        destinations = get_all_destinations()
 
-    regions = sorted({d.get("region") for d in destinations if d.get("region")})
+    districts = sorted({d.get("district") for d in destinations if d.get("district")})
 
-    scored = []
-    for dest in destinations:
-        score, matched = _score_destination(dest, preferences, last_search)
-        scored.append((score, dest, matched))
-
-    scored.sort(key=lambda x: (-x[0], x[1].get("avg_cost_per_day") or 999))
+    scored = [(_score(d, preferences, last_search)[0], d, _score(d, preferences, last_search)[1]) for d in destinations]
+    scored.sort(key=lambda x: -x[0])
 
     results = []
     for score, dest, matched in scored[:limit]:
@@ -99,7 +84,9 @@ def get_recommendations():
 
     return jsonify({
         "destinations": results,
-        "regions": regions,
+        "districts": districts,
+        "regions": districts,
         "countries": ["Cameroon"],
         "last_search": last_search,
+        "city": "Douala",
     }), 200

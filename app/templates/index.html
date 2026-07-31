@@ -3,106 +3,101 @@
 {% block content %}
 
 <section class="relative min-h-[75vh] flex items-center justify-center overflow-hidden" aria-label="Hero"
-  style="background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Beach_of_Kribi,_Cameroon.jpg?width=1600'); background-size: cover; background-position: center;">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/80 via-[#0e1621]/70 to-[#0e1621]"></div>
+  style="background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Douala_Cameroon.jpg?width=1600'); background-size: cover; background-position: center;">
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/85 via-[#0e1621]/75 to-[#0e1621]"></div>
   <div class="relative z-10 max-w-4xl mx-auto px-4 text-center py-20">
     <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="w-16 h-16 mx-auto mb-6 rounded-2xl shadow-lg" onerror="this.style.display='none'">
-    <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white">Discover Cameroon</h1>
-    <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Real places across Cameroon — Kribi beaches, Mount Cameroon, Limbe, Waza and more. Plan your trip with GlobeTrotter.</p>
+    <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white">Discover Douala</h1>
+    <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Tourist sites in Cameroon’s economic capital — La Pagode, Musée Maritime, Bonanjo, Akwa, Youpwe and more.</p>
     <div class="flex flex-wrap gap-3 justify-center">
-      <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore places</a>
+      <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore sites</a>
       <a href="/itineraries" class="bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full hover:bg-white/20 transition">Plan a trip</a>
     </div>
   </div>
 </section>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="popular-h">
-  <h2 id="popular-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular places in Cameroon</h2>
-  <p class="text-gt-muted mb-8 text-sm sm:text-base">Photos of the actual destinations</p>
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular sites in Douala</h2>
+  <p class="text-gt-muted mb-8 text-sm">Bonanjo, Akwa, Deido, Youpwe…</p>
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="popularGrid"></div>
 </section>
 
-<section class="bg-gt-surface border-y border-gt-border py-14" aria-labelledby="reasons-h">
+<section class="bg-gt-surface border-y border-gt-border py-14">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <h2 id="reasons-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Why visit these places</h2>
-    <p class="text-gt-muted mb-8">What makes each highlight worth the journey</p>
+    <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Why visit</h2>
+    <p class="text-gt-muted mb-8">What makes each Douala stop worth your time</p>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="reasonsGrid"></div>
   </div>
 </section>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="stories-h">
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
   <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
     <div>
-      <h2 id="stories-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text">Traveler stories</h2>
-      <p class="text-gt-muted text-sm sm:text-base mt-1">Experiences around Cameroon (demo stories)</p>
+      <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text">Visitor stories</h2>
+      <p class="text-gt-muted text-sm mt-1">Experiences in Douala (demo)</p>
     </div>
     <a href="/testimonials" class="text-gt-accent font-medium hover:underline text-sm">Read more →</a>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="testimonialGrid"></div>
 </section>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-label="Cameroon map">
-  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Map of Cameroon</h2>
-  <p class="text-gt-muted mb-6 text-sm">Find your next stop across the country</p>
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Map of Douala</h2>
+  <p class="text-gt-muted mb-6 text-sm">Locate Bonanjo, Akwa, Deido and more</p>
   <div class="gt-map-wrap">
-    <iframe title="Map of Cameroon" loading="lazy"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=8.0%2C1.5%2C16.5%2C13.5&amp;layer=mapnik&amp;marker=7.37%2C12.35"
+    <iframe title="Map of Douala" loading="lazy"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=9.65%2C4.00%2C9.78%2C4.10&amp;layer=mapnik&amp;marker=4.0511%2C9.7679"
       referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
 </section>
 
 <section class="bg-gt-surface border-t border-gt-border py-12 text-center px-4">
-  <h2 class="heading text-2xl font-bold text-gt-text mb-3">Plan your Cameroon trip</h2>
-  <p class="text-gt-muted mb-6">Get recommendations based on your interests</p>
+  <h2 class="heading text-2xl font-bold text-gt-text mb-3">Plan your Douala day</h2>
+  <p class="text-gt-muted mb-6">Get recommendations for sites that match your interests</p>
   <a href="/recommendations" class="gt-btn-primary inline-block px-8 py-3.5 rounded-full">Get recommendations</a>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-/* Images from Wikimedia Commons — real Cameroon locations */
 const img = (file) => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=800';
+const fallback = 'https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800';
 
 const POPULAR = [
-  { name: "Kribi", region: "South", file: "Beach_of_Kribi,_Cameroon.jpg" },
-  { name: "Limbe", region: "Southwest", file: "DOWN_BEACH_LIMBE_CAMEROON.jpg" },
-  { name: "Mount Cameroon", region: "Southwest", file: "Mount_Cameroon_2.jpg" },
-  { name: "Lobe Waterfalls", region: "South", file: "Chutes_de_la_Lobé.jpg" },
-  { name: "Yaoundé", region: "Centre", file: "Yaoundé_from_Mont_Fébé.jpg" },
-  { name: "Douala", region: "Littoral", file: "Douala_port.jpg" },
-  { name: "Waza National Park", region: "Far North", file: "Waza_National_Park_Cameroon.jpg" },
-  { name: "Foumban", region: "West", file: "Foumban_palace.jpg" },
-  { name: "Rhumsiki", region: "Far North", file: "Rhumsiki.jpg" },
-  { name: "Buea", region: "Southwest", file: "Le_Mont_Cameroun_depuis_Limbé.JPG" },
+  { name: "La Pagode", district: "Bonanjo", file: "La_Pagode_Douala.jpg" },
+  { name: "Musée Maritime", district: "Bonanjo", file: "Musée_maritime_de_Douala.jpg" },
+  { name: "Cathédrale Saint-Pierre-et-Saint-Paul", district: "Bonanjo", file: "Cathédrale_de_Douala.jpg" },
+  { name: "La Nouvelle Liberté", district: "Deido", file: "Nouvelle_Liberté_Douala.jpg" },
+  { name: "Parc Bonanjo", district: "Bonanjo", file: "Parc_Bonanjo.jpg" },
+  { name: "Palais Dika Akwa", district: "Akwa", file: "Palais_Dika_Akwa.jpg" },
+  { name: "Akwa District", district: "Akwa", file: "Akwa_Douala.jpg" },
+  { name: "Youpwe", district: "Youpwe", file: "Youpwe_Douala.jpg" },
 ];
 
 const REASONS = [
-  { name: "Kribi & Lobe", file: "Beach_of_Kribi,_Cameroon.jpg", reasons: ["Ocean beaches", "Lobe falls into the sea", "Fresh seafood", "Easy weekend from Douala"] },
-  { name: "Limbe & Buea", file: "DOWN_BEACH_LIMBE_CAMEROON.jpg", reasons: ["Black sand beaches", "Botanic garden", "Mount Cameroon trails", "Cool mountain climate"] },
-  { name: "Waza & Far North", file: "Waza_National_Park_Cameroon.jpg", reasons: ["Wildlife viewing", "Sahel landscapes", "Rhumsiki peaks", "Unique culture"] },
-  { name: "West Grassfields", file: "Foumban_palace.jpg", reasons: ["Bamoun palace heritage", "Crafts & bronze", "Highland scenery", "Local museums"] },
-  { name: "Yaoundé", file: "Yaoundé_from_Mont_Fébé.jpg", reasons: ["Capital city life", "Museums & monuments", "Food & nightlife", "Central hub"] },
-  { name: "Douala", file: "Douala_port.jpg", reasons: ["Main airport gateway", "Markets & music", "Food scene", "Start of coastal trips"] },
+  { name: "Bonanjo heritage", file: "La_Pagode_Douala.jpg", reasons: ["La Pagode of the Bell kings", "Colonial-era architecture", "Parc Bonanjo walks", "Musée Maritime nearby"] },
+  { name: "Culture & art", file: "Nouvelle_Liberté_Douala.jpg", reasons: ["La Nouvelle Liberté sculpture", "Doual'art exhibitions", "Sawa heritage", "Photo-friendly landmarks"] },
+  { name: "Akwa energy", file: "Akwa_Douala.jpg", reasons: ["Nightlife and hotels", "Street food", "Shopping streets", "Palais Dika Akwa"] },
+  { name: "Local life", file: "Youpwe_Douala.jpg", reasons: ["Youpwe fish market", "Marché Mboppi", "Pirogues and port culture", "Real Douala atmosphere"] },
 ];
 
 const STORIES = [
-  { name: "Amina N.", place: "Kribi", text: "Kribi’s coastline was calm and the seafood was incredible. Ideal short trip from Douala.", img: "https://i.pravatar.cc/100?u=amina" },
-  { name: "Jean-Paul T.", place: "Limbe", text: "Black sand beaches and the botanical garden made Limbe a highlight for our family.", img: "https://i.pravatar.cc/100?u=jean" },
-  { name: "Marie K.", place: "Mount Cameroon", text: "Hard climb, unforgettable sunrise. Local guides in Buea were excellent.", img: "https://i.pravatar.cc/100?u=marie" },
-  { name: "Ibrahim B.", place: "Douala → Kribi", text: "Planned a coastal weekend here — simple and practical itinerary.", img: "https://i.pravatar.cc/100?u=ibrahim" },
-  { name: "Fatima S.", place: "Waza", text: "Saw elephants at Waza in the dry season. Worth the journey north.", img: "https://i.pravatar.cc/100?u=fatima" },
-  { name: "Grace E.", place: "Foumban", text: "The palace museum and crafts market were the cultural highlight of our west tour.", img: "https://i.pravatar.cc/100?u=grace" },
+  { name: "Amina N.", place: "La Pagode", text: "Standing in front of La Pagode in Bonanjo was the highlight of our Douala city walk.", img: "https://i.pravatar.cc/100?u=amina" },
+  { name: "Jean-Paul T.", place: "Musée Maritime", text: "The maritime museum made the city’s port history clear — great for families.", img: "https://i.pravatar.cc/100?u=jean" },
+  { name: "Marie K.", place: "Nouvelle Liberté", text: "The metal sculpture at Deido is unforgettable. Go early to avoid traffic.", img: "https://i.pravatar.cc/100?u=marie" },
+  { name: "Ibrahim B.", place: "Youpwe", text: "Fresh fish and working pirogues — Youpwe feels like the real coastal Douala.", img: "https://i.pravatar.cc/100?u=ibrahim" },
+  { name: "Fatima S.", place: "Akwa", text: "Evening in Akwa: food, music, and the energy of the economic capital.", img: "https://i.pravatar.cc/100?u=fatima" },
+  { name: "Grace E.", place: "Bonanjo", text: "A full morning walking Bonanjo monuments is the best first-day plan.", img: "https://i.pravatar.cc/100?u=grace" },
 ];
 
 document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
   <a href="/destinations?q=${encodeURIComponent(p.name)}" class="gt-reveal gt-card-glow group block rounded-2xl overflow-hidden border border-gt-border bg-gt-surface" style="--reveal-delay:${i*50}ms">
     <div class="aspect-[4/3] overflow-hidden bg-gt-surface2">
-      <img src="${img(p.file)}" alt="${p.name}, Cameroon" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy"
-           onerror="this.src='https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800'">
+      <img src="${img(p.file)}" alt="${p.name}, Douala" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" onerror="this.src='${fallback}'">
     </div>
     <div class="p-3">
       <p class="font-semibold text-gt-text text-sm">${p.name}</p>
-      <p class="text-xs text-gt-muted">${p.region}, Cameroon</p>
+      <p class="text-xs text-gt-muted">${p.district}, Douala</p>
     </div>
   </a>
 `).join('');
@@ -110,8 +105,7 @@ document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
 document.getElementById('reasonsGrid').innerHTML = REASONS.map((r, i) => `
   <article class="gt-reveal gt-card-glow rounded-2xl overflow-hidden border border-gt-border bg-gt-bg" style="--reveal-delay:${i*60}ms">
     <div class="h-40 overflow-hidden bg-gt-surface2">
-      <img src="${img(r.file)}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy"
-           onerror="this.src='https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800'">
+      <img src="${img(r.file)}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='${fallback}'">
     </div>
     <div class="p-5">
       <h3 class="font-bold text-lg text-gt-text mb-3">${r.name}</h3>
