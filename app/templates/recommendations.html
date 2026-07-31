@@ -2,36 +2,28 @@
 {% block title %}Recommendations{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
-  <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-2">For you</h1>
-  <p class="text-gt-muted mb-8 text-sm sm:text-base">Search a place or country, then browse matched destinations below.</p>
+  <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-2">For you in Cameroon</h1>
+  <p class="text-gt-muted mb-8 text-sm sm:text-base">Search a town or region — we suggest tourist places across Cameroon.</p>
 
-  <!-- Search block -->
   <div class="bg-gt-surface border border-gt-border rounded-2xl p-4 sm:p-5 mb-8 max-w-2xl">
-    <label class="block text-sm text-gt-muted mb-2" for="lastSearchInput">Search area</label>
+    <label class="block text-sm text-gt-muted mb-2" for="lastSearchInput">Search place or region</label>
     <div class="flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
         <input id="lastSearchInput" type="text" autocomplete="off"
-               placeholder="Type Kribi, Cameroon, beach…"
+               placeholder="e.g. Kribi, Limbe, beach, mountain…"
                class="w-full rounded-xl px-4 py-3 border border-gt-border text-sm"
-               oninput="onSearchInput()"
-               onkeydown="onSearchKey(event)"
-               onfocus="onSearchInput()">
-        <div id="suggestBox"
-             class="hidden absolute left-0 right-0 top-full mt-1 z-40 bg-gt-surface border border-gt-border rounded-xl shadow-xl max-h-64 overflow-y-auto"></div>
+               oninput="onSearchInput()" onkeydown="onSearchKey(event)" onfocus="onSearchInput()">
+        <div id="suggestBox" class="hidden absolute left-0 right-0 top-full mt-1 z-40 bg-gt-surface border border-gt-border rounded-xl shadow-xl max-h-64 overflow-y-auto"></div>
       </div>
       <button type="button" onclick="loadRecs()" class="gt-btn-primary px-6 py-3 rounded-full text-sm shrink-0">Update</button>
     </div>
   </div>
 
-  <!-- Country chips -->
   <div class="mb-4">
-    <p class="text-xs uppercase tracking-wide text-gt-muted mb-2">Countries</p>
+    <p class="text-xs uppercase tracking-wide text-gt-muted mb-2">Regions</p>
     <div id="countries" class="flex flex-wrap gap-2 min-h-[2rem]"></div>
   </div>
-
   <div id="status" class="mb-6"></div>
-
-  <!-- Results grid -->
   <div id="recs" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </section>
 {% endblock %}
@@ -42,31 +34,26 @@ let suggestTimer = null;
 let activeIndex = -1;
 
 function getDestImage(d) {
-  return d.image || `https://picsum.photos/seed/${encodeURIComponent(d.name || 'place')}/600/400`;
+  return d.image || ('https://picsum.photos/seed/' + encodeURIComponent(d.name || 'cm') + '/600/400');
 }
 
 async function loadPlaceIndex() {
   try {
-    const res = await fetch('/destinations?source=local', { headers: { 'Accept': 'application/json' } });
-    const data = await res.json();
+    var res = await fetch('/destinations?source=local', { headers: { 'Accept': 'application/json' } });
+    var data = await res.json();
     if (!Array.isArray(data)) return;
-    const seen = new Set();
+    var seen = new Set();
     allPlaces = [];
-    data.forEach(d => {
-      const name = d.name || '';
-      const country = d.country || '';
+    data.forEach(function(d) {
+      var name = d.name || '';
+      var region = d.region || '';
       if (name && !seen.has(name.toLowerCase())) {
         seen.add(name.toLowerCase());
-        allPlaces.push({ label: country ? name + ', ' + country : name, name, country });
+        allPlaces.push({ label: region ? name + ' · ' + region : name, name: name });
       }
-      if (country && !seen.has('c:' + country.toLowerCase())) {
-        seen.add('c:' + country.toLowerCase());
-        allPlaces.push({ label: country, name: country, country });
-      }
-    });
-    ['Kribi', 'Limbe', 'Douala', 'Yaoundé', 'Mount Cameroon', 'Buea'].forEach(n => {
-      if (!seen.has(n.toLowerCase())) {
-        allPlaces.unshift({ label: n + ', Cameroon', name: n, country: 'Cameroon' });
+      if (region && !seen.has('r:' + region.toLowerCase())) {
+        seen.add('r:' + region.toLowerCase());
+        allPlaces.push({ label: region + ' Region', name: region });
       }
     });
   } catch (e) {}
@@ -78,19 +65,19 @@ function onSearchInput() {
 }
 
 function showSuggestions() {
-  const box = document.getElementById('suggestBox');
-  const q = document.getElementById('lastSearchInput').value.trim().toLowerCase();
+  var box = document.getElementById('suggestBox');
+  var q = document.getElementById('lastSearchInput').value.trim().toLowerCase();
   activeIndex = -1;
   if (!q) { box.classList.add('hidden'); box.innerHTML = ''; return; }
-  const matches = allPlaces.filter(p =>
-    p.label.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)
-  ).slice(0, 8);
+  var matches = allPlaces.filter(function(p) {
+    return p.label.toLowerCase().indexOf(q) !== -1 || p.name.toLowerCase().indexOf(q) !== -1;
+  }).slice(0, 8);
   if (!matches.length) { box.classList.add('hidden'); return; }
-  box.innerHTML = matches.map(p =>
-    '<button type="button" class="suggest-item w-full text-left px-4 py-2.5 text-sm text-gt-text hover:bg-gt-surface2 border-b border-gt-border last:border-0" ' +
-    'onmousedown="event.preventDefault(); pickSuggestion(\'' + p.name.replace(/'/g, "\\'") + '\')">' +
-    '<i class="fas fa-map-marker-alt text-gt-accent mr-2 text-xs"></i>' + p.label + '</button>'
-  ).join('');
+  box.innerHTML = matches.map(function(p) {
+    return '<button type="button" class="suggest-item w-full text-left px-4 py-2.5 text-sm text-gt-text hover:bg-gt-surface2 border-b border-gt-border last:border-0" ' +
+      'onmousedown="event.preventDefault(); pickSuggestion(\'' + p.name.replace(/'/g, "\\'") + '\')">' +
+      '<i class="fas fa-map-marker-alt text-gt-accent mr-2 text-xs"></i>' + p.label + '</button>';
+  }).join('');
   box.classList.remove('hidden');
 }
 
@@ -102,27 +89,23 @@ function pickSuggestion(value) {
 }
 
 function onSearchKey(e) {
-  const box = document.getElementById('suggestBox');
-  const items = box.querySelectorAll('.suggest-item');
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    if (activeIndex >= 0 && items[activeIndex]) items[activeIndex].dispatchEvent(new MouseEvent('mousedown'));
-    else { loadRecs(); box.classList.add('hidden'); }
-  } else if (e.key === 'Escape') box.classList.add('hidden');
+  var box = document.getElementById('suggestBox');
+  if (e.key === 'Enter') { e.preventDefault(); loadRecs(); box.classList.add('hidden'); }
+  else if (e.key === 'Escape') box.classList.add('hidden');
 }
 
-document.addEventListener('click', (e) => {
+document.addEventListener('click', function(e) {
   if (!e.target.closest('#lastSearchInput') && !e.target.closest('#suggestBox')) {
     document.getElementById('suggestBox').classList.add('hidden');
   }
 });
 
 async function loadRecs() {
-  const token = localStorage.getItem('token');
-  const status = document.getElementById('status');
-  const container = document.getElementById('recs');
-  const countriesEl = document.getElementById('countries');
-  const q = document.getElementById('lastSearchInput').value.trim();
+  var token = localStorage.getItem('token');
+  var status = document.getElementById('status');
+  var container = document.getElementById('recs');
+  var regionsEl = document.getElementById('countries');
+  var q = document.getElementById('lastSearchInput').value.trim();
   if (q) localStorage.setItem('lastSearch', q);
   document.getElementById('suggestBox').classList.add('hidden');
 
@@ -131,35 +114,35 @@ async function loadRecs() {
       '<p class="font-semibold mb-2">Login required</p>' +
       '<button onclick="openLogin()" class="gt-btn-primary px-5 py-2.5 rounded-full mt-2">Login</button></div>';
     container.innerHTML = '';
-    countriesEl.innerHTML = '';
     return;
   }
 
   status.innerHTML = '<p class="text-gt-muted"><i class="fas fa-spinner fa-spin"></i> Loading…</p>';
   container.innerHTML = '';
   try {
-    const qs = q ? ('?q=' + encodeURIComponent(q) + '&limit=9') : '?limit=9';
-    const res = await fetch('/recommendations' + qs, {
+    var qs = q ? ('?q=' + encodeURIComponent(q) + '&limit=12') : '?limit=12';
+    var res = await fetch('/recommendations' + qs, {
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
     });
-    const data = await res.json();
+    var data = await res.json();
     if (!res.ok) {
       status.innerHTML = '<p class="text-red-400">' + (data.error || 'Failed') + '</p>';
+      if (res.status === 401) { localStorage.removeItem('token'); }
       return;
     }
-    const list = Array.isArray(data) ? data : (data.destinations || []);
-    const countries = data.countries || [];
+    var list = Array.isArray(data) ? data : (data.destinations || []);
+    var regions = data.regions || [];
     status.innerHTML = q
-      ? '<p class="text-sm text-gt-muted">Matches for <span class="text-gt-accent font-medium">' + q + '</span></p>'
-      : '<p class="text-sm text-gt-muted">Based on your preferences</p>';
+      ? '<p class="text-sm text-gt-muted">Cameroon places related to <span class="text-gt-accent font-medium">' + q + '</span></p>'
+      : '<p class="text-sm text-gt-muted">Cameroon highlights for you</p>';
 
-    countriesEl.innerHTML = countries.slice(0, 20).map(function(c) {
+    regionsEl.innerHTML = regions.map(function(r) {
       return '<button type="button" class="text-xs px-3 py-1.5 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent" ' +
-        'onclick="pickSuggestion(\'' + c.replace(/'/g, "\\'") + '\')">' + c + '</button>';
+        'onclick="pickSuggestion(\'' + r.replace(/'/g, "\\'") + '\')">' + r + '</button>';
     }).join('');
 
     if (!list.length) {
-      container.innerHTML = '<p class="text-gt-muted">No matches. Try another search.</p>';
+      container.innerHTML = '<p class="text-gt-muted">No matches. Try Kribi, Limbe, or beach.</p>';
       return;
     }
 
@@ -169,10 +152,9 @@ async function loadRecs() {
       }).join('');
       return '<a href="/destinations/' + dest.id + '" class="gt-card-glow block bg-gt-surface border border-gt-border rounded-2xl overflow-hidden">' +
         '<div class="h-44 bg-gt-surface2 overflow-hidden">' +
-        '<img src="' + getDestImage(dest) + '" class="w-full h-full object-cover" alt="' + (dest.name || '') + '" loading="lazy">' +
-        '</div><div class="p-4">' +
-        '<h2 class="font-bold text-gt-text">' + (dest.name || '') + '</h2>' +
-        '<p class="text-xs text-gt-muted mb-2">' + (dest.country || '') + (dest.continent ? ' · ' + dest.continent : '') + '</p>' +
+        '<img src="' + getDestImage(dest) + '" class="w-full h-full object-cover" alt="' + (dest.name || '') + '" loading="lazy"></div>' +
+        '<div class="p-4"><h2 class="font-bold text-gt-text">' + (dest.name || '') + '</h2>' +
+        '<p class="text-xs text-gt-muted mb-2">' + (dest.region || 'Cameroon') + ' · Cameroon</p>' +
         '<p class="text-sm text-gt-muted line-clamp-2 mb-2">' + (dest.description || '') + '</p>' +
         '<div class="flex flex-wrap gap-1">' + reasons + '</div></div></a>';
     }).join('');

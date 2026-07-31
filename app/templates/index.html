@@ -2,67 +2,59 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 
-<!-- 1. HERO — always-visible background image (+ optional video) -->
 <section class="relative min-h-[75vh] flex items-center justify-center overflow-hidden" aria-label="Hero"
-  style="background-image: url('https://images.unsplash.com/photo-1488085061387-422e58bd4a48?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center;">
-  <video class="gt-hero-video" autoplay muted loop playsinline
-         poster="https://images.unsplash.com/photo-1488085061387-422e58bd4a48?auto=format&fit=crop&w=1600&q=80">
-    <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-a-beach-1584/1080p.mp4" type="video/mp4">
-  </video>
+  style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center;">
   <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/75 via-[#0e1621]/65 to-[#0e1621]"></div>
   <div class="relative z-10 max-w-4xl mx-auto px-4 text-center py-20">
     <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="w-16 h-16 mx-auto mb-6 rounded-2xl shadow-lg" onerror="this.style.display='none'">
-    <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white">GlobeTrotter</h1>
-    <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Your travel companion for discovering places, planning trips, and sharing experiences — from Cameroon to the world.</p>
+    <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white">Discover Cameroon</h1>
+    <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Tourist places across Cameroon — beaches, mountains, parks, and culture. Plan trips from Kribi to Waza with GlobeTrotter.</p>
     <div class="flex flex-wrap gap-3 justify-center">
-      <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore destinations</a>
+      <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore places</a>
       <a href="/itineraries" class="bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full hover:bg-white/20 transition">Plan a trip</a>
     </div>
   </div>
 </section>
 
-<!-- 2. Popular places -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="popular-h">
-  <h2 id="popular-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular places</h2>
-  <p class="text-gt-muted mb-8 text-sm sm:text-base">Start with Africa, then explore the world</p>
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="popularGrid"></div>
+  <h2 id="popular-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular places in Cameroon</h2>
+  <p class="text-gt-muted mb-8 text-sm sm:text-base">Beaches, mountains, cities, and parks travelers love</p>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="popularGrid"></div>
 </section>
 
-<!-- 3. Reasons to visit -->
 <section class="bg-gt-surface border-y border-gt-border py-14" aria-labelledby="reasons-h">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <h2 id="reasons-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Why visit</h2>
-    <p class="text-gt-muted mb-8">Highlights that make these destinations worth the journey</p>
+    <h2 id="reasons-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Why visit these places</h2>
+    <p class="text-gt-muted mb-8">What makes each highlight worth the journey</p>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="reasonsGrid"></div>
   </div>
 </section>
 
-<!-- 4. Testimonials -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-labelledby="stories-h">
   <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
     <div>
       <h2 id="stories-h" class="heading text-2xl sm:text-3xl font-bold text-gt-text">Traveler stories</h2>
-      <p class="text-gt-muted text-sm sm:text-base mt-1">Experiences from the community (demo stories)</p>
+      <p class="text-gt-muted text-sm sm:text-base mt-1">Experiences around Cameroon (demo stories)</p>
     </div>
     <a href="/testimonials" class="text-gt-accent font-medium hover:underline text-sm">Read more →</a>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="testimonialGrid"></div>
 </section>
 
-<!-- 5. World map -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-label="World map">
-  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Explore the map</h2>
-  <p class="text-gt-muted mb-6 text-sm">A view of the world — plan your next route</p>
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14" aria-label="Cameroon map">
+  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Map of Cameroon</h2>
+  <p class="text-gt-muted mb-6 text-sm">Find your next stop across the country</p>
   <div class="gt-map-wrap">
-    <iframe title="World map" loading="lazy"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=-180%2C-60%2C180%2C80&amp;layer=mapnik"
+    <iframe title="Map of Cameroon" loading="lazy"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=8.0%2C1.5%2C16.5%2C13.5&amp;layer=mapnik&amp;marker=7.37%2C12.35"
       referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
+  <p class="text-xs text-gt-muted mt-2"><a class="text-gt-accent hover:underline" href="https://www.openstreetmap.org/#map=6/7.37/12.35" target="_blank" rel="noopener">Open larger map</a></p>
 </section>
 
 <section class="bg-gt-surface border-t border-gt-border py-12 text-center px-4">
-  <h2 class="heading text-2xl font-bold text-gt-text mb-3">Ready when you are</h2>
-  <p class="text-gt-muted mb-6">Get recommendations or start an itinerary</p>
+  <h2 class="heading text-2xl font-bold text-gt-text mb-3">Plan your Cameroon trip</h2>
+  <p class="text-gt-muted mb-6">Get recommendations based on your interests</p>
   <a href="/recommendations" class="gt-btn-primary inline-block px-8 py-3.5 rounded-full">Get recommendations</a>
 </section>
 {% endblock %}
@@ -70,25 +62,25 @@
 {% block scripts %}
 <script>
 const POPULAR = [
-  { name: "Kribi", country: "Cameroon", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Limbe", country: "Cameroon", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Cape Town", country: "South Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Marrakech", country: "Morocco", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Bali", country: "Indonesia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Paris", country: "France", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Tokyo", country: "Japan", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "New York", country: "USA", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Dubai", country: "UAE", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&h=400&q=80" },
-  { name: "Santorini", country: "Greece", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Kribi", region: "South", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Limbe", region: "Southwest", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Mount Cameroon", region: "Southwest", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Lobe Waterfalls", region: "South", img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Yaoundé", region: "Centre", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Douala", region: "Littoral", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Waza National Park", region: "Far North", img: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Foumban", region: "West", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Rhumsiki", region: "Far North", img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=600&h=400&q=80" },
+  { name: "Buea", region: "Southwest", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&h=400&q=80" },
 ];
 
 const REASONS = [
-  { name: "Cameroon", img: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Atlantic beaches at Kribi", "Mount Cameroon hiking", "Rich cultural diversity", "Wildlife & national parks"] },
-  { name: "South Africa", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Table Mountain views", "Safari experiences", "Cape wine routes", "Vibrant cities"] },
-  { name: "Morocco", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Historic medinas", "Sahara desert trips", "Souks & crafts", "Distinct cuisine"] },
-  { name: "France", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["World-class museums", "Regional food culture", "Iconic cities", "Countryside escapes"] },
-  { name: "Japan", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Tradition meets tech", "Seasonal festivals", "Rail travel ease", "Unique cuisine"] },
-  { name: "Indonesia", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Island landscapes", "Temples & culture", "Diving & beaches", "Warm hospitality"] },
+  { name: "Kribi & Lobe", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Ocean beaches", "Lobe falls into the sea", "Fresh seafood", "Easy weekend from Douala"] },
+  { name: "Limbe & Buea", img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Black sand beaches", "Botanic garden", "Mount Cameroon trails", "Cool mountain climate"] },
+  { name: "Waza & Far North", img: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Wildlife viewing", "Sahel landscapes", "Rhumsiki peaks", "Unique culture"] },
+  { name: "West Grassfields", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Bamoun palace heritage", "Crafts & bronze", "Highland scenery", "Local museums"] },
+  { name: "Yaoundé", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Capital city life", "Museums & monuments", "Food & nightlife", "Central hub"] },
+  { name: "Douala", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&h=400&q=80", reasons: ["Main airport gateway", "Markets & music", "Food scene", "Start of coastal trips"] },
 ];
 
 const STORIES = [
@@ -96,8 +88,8 @@ const STORIES = [
   { name: "Jean-Paul T.", place: "Limbe", text: "Black sand beaches and the botanical garden made Limbe a highlight for our family.", img: "https://i.pravatar.cc/100?u=jean" },
   { name: "Marie K.", place: "Mount Cameroon", text: "Hard climb, unforgettable sunrise. Local guides in Buea were excellent.", img: "https://i.pravatar.cc/100?u=marie" },
   { name: "Ibrahim B.", place: "Douala → Kribi", text: "Planned a coastal weekend here — simple and practical itinerary.", img: "https://i.pravatar.cc/100?u=ibrahim" },
-  { name: "Fatima S.", place: "Cape Town", text: "Table Mountain and the waterfront. Already saving for a return.", img: "https://i.pravatar.cc/100?u=fatima" },
-  { name: "Grace E.", place: "Bali", text: "Rice terraces at dawn beat the crowded beach clubs.", img: "https://i.pravatar.cc/100?u=grace" },
+  { name: "Fatima S.", place: "Waza", text: "Saw elephants at Waza in the dry season. Worth the journey north.", img: "https://i.pravatar.cc/100?u=fatima" },
+  { name: "Grace E.", place: "Foumban", text: "The palace museum and crafts market were the cultural highlight of our west tour.", img: "https://i.pravatar.cc/100?u=grace" },
 ];
 
 document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
@@ -107,7 +99,7 @@ document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
     </div>
     <div class="p-3">
       <p class="font-semibold text-gt-text text-sm">${p.name}</p>
-      <p class="text-xs text-gt-muted">${p.country}</p>
+      <p class="text-xs text-gt-muted">${p.region}, Cameroon</p>
     </div>
   </a>
 `).join('');
