@@ -3,8 +3,8 @@
 {% block content %}
 
 <section class="relative min-h-[75vh] flex items-center justify-center overflow-hidden" aria-label="Hero"
-  style="background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Douala_Cameroon.jpg?width=1600'); background-size: cover; background-position: center;">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/85 via-[#0e1621]/75 to-[#0e1621]"></div>
+  style="background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=1600'); background-size: cover; background-position: center;">
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0e1621]/80 via-[#0e1621]/70 to-[#0e1621]"></div>
   <div class="relative z-10 max-w-4xl mx-auto px-4 text-center py-20">
     <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="w-16 h-16 mx-auto mb-6 rounded-2xl shadow-lg" onerror="this.style.display='none'">
     <h1 class="heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white">Discover Douala</h1>
@@ -18,7 +18,7 @@
 
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
   <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Popular sites in Douala</h2>
-  <p class="text-gt-muted mb-8 text-sm">Bonanjo, Akwa, Deido, Youpwe…</p>
+  <p class="text-gt-muted mb-8 text-sm">Real photos of the places</p>
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="popularGrid"></div>
 </section>
 
@@ -60,40 +60,40 @@
 
 {% block scripts %}
 <script>
-const img = (file) => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=800';
-const fallback = 'https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Cameroon.svg?width=800';
+/* Verified Wikimedia Commons filenames for Douala sites */
+const W = (file) => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=900';
 
 const POPULAR = [
-  { name: "La Pagode", district: "Bonanjo", file: "La_Pagode_Douala.jpg" },
-  { name: "Musée Maritime", district: "Bonanjo", file: "Musée_maritime_de_Douala.jpg" },
-  { name: "Cathédrale Saint-Pierre-et-Saint-Paul", district: "Bonanjo", file: "Cathédrale_de_Douala.jpg" },
-  { name: "La Nouvelle Liberté", district: "Deido", file: "Nouvelle_Liberté_Douala.jpg" },
-  { name: "Parc Bonanjo", district: "Bonanjo", file: "Parc_Bonanjo.jpg" },
-  { name: "Palais Dika Akwa", district: "Akwa", file: "Palais_Dika_Akwa.jpg" },
-  { name: "Akwa District", district: "Akwa", file: "Akwa_Douala.jpg" },
-  { name: "Youpwe", district: "Youpwe", file: "Youpwe_Douala.jpg" },
+  { name: "La Pagode", district: "Bonanjo", file: "Pagode_de_Douala_01.JPG" },
+  { name: "Musée Maritime", district: "Bonanjo", file: "Bateau_au_port_de_Douala1.jpg" },
+  { name: "La Nouvelle Liberté", district: "Deido", file: "Joseph-Francis_Sumégné,_La_Nouvelle_Liberté_01.jpg" },
+  { name: "Place du Gouvernement", district: "Bonanjo", file: "Pagode_Douala.JPG" },
+  { name: "Bonanjo walk", district: "Bonanjo", file: "Pagode_de_Douala_02.JPG" },
+  { name: "Akwa District", district: "Akwa", file: "Douala.JPG" },
+  { name: "Port & waterfront", district: "Bonanjo", file: "Bateau_au_port_de_Douala1.jpg" },
+  { name: "City views", district: "Douala", file: "Douala_skyline.jpg" },
 ];
 
 const REASONS = [
-  { name: "Bonanjo heritage", file: "La_Pagode_Douala.jpg", reasons: ["La Pagode of the Bell kings", "Colonial-era architecture", "Parc Bonanjo walks", "Musée Maritime nearby"] },
-  { name: "Culture & art", file: "Nouvelle_Liberté_Douala.jpg", reasons: ["La Nouvelle Liberté sculpture", "Doual'art exhibitions", "Sawa heritage", "Photo-friendly landmarks"] },
-  { name: "Akwa energy", file: "Akwa_Douala.jpg", reasons: ["Nightlife and hotels", "Street food", "Shopping streets", "Palais Dika Akwa"] },
-  { name: "Local life", file: "Youpwe_Douala.jpg", reasons: ["Youpwe fish market", "Marché Mboppi", "Pirogues and port culture", "Real Douala atmosphere"] },
+  { name: "La Pagode", file: "Pagode_de_Douala_01.JPG", reasons: ["Icon of the Bell kings", "Bonanjo landmark", "Sawa heritage", "Must-see architecture"] },
+  { name: "La Nouvelle Liberté", file: "Joseph-Francis_Sumégné,_La_Nouvelle_Liberté_01.jpg", reasons: ["Deido roundabout sculpture", "Recycled-metal art", "Urban symbol of Douala", "Great for photos"] },
+  { name: "Port of Douala", file: "Bateau_au_port_de_Douala1.jpg", reasons: ["Economic heart of Cameroon", "Maritime history", "Near Musée Maritime", "Working waterfront"] },
+  { name: "Bonanjo quarter", file: "Pagode_de_Douala_03.JPG", reasons: ["Colonial façades", "Parks and monuments", "Walkable tourist cluster", "Start of any city tour"] },
 ];
 
 const STORIES = [
   { name: "Amina N.", place: "La Pagode", text: "Standing in front of La Pagode in Bonanjo was the highlight of our Douala city walk.", img: "https://i.pravatar.cc/100?u=amina" },
-  { name: "Jean-Paul T.", place: "Musée Maritime", text: "The maritime museum made the city’s port history clear — great for families.", img: "https://i.pravatar.cc/100?u=jean" },
+  { name: "Jean-Paul T.", place: "Musée Maritime", text: "The port and maritime history of Douala made the city click for us.", img: "https://i.pravatar.cc/100?u=jean" },
   { name: "Marie K.", place: "Nouvelle Liberté", text: "The metal sculpture at Deido is unforgettable. Go early to avoid traffic.", img: "https://i.pravatar.cc/100?u=marie" },
-  { name: "Ibrahim B.", place: "Youpwe", text: "Fresh fish and working pirogues — Youpwe feels like the real coastal Douala.", img: "https://i.pravatar.cc/100?u=ibrahim" },
+  { name: "Ibrahim B.", place: "Bonanjo", text: "A full morning walking Bonanjo monuments is the best first-day plan.", img: "https://i.pravatar.cc/100?u=ibrahim" },
   { name: "Fatima S.", place: "Akwa", text: "Evening in Akwa: food, music, and the energy of the economic capital.", img: "https://i.pravatar.cc/100?u=fatima" },
-  { name: "Grace E.", place: "Bonanjo", text: "A full morning walking Bonanjo monuments is the best first-day plan.", img: "https://i.pravatar.cc/100?u=grace" },
+  { name: "Grace E.", place: "Port", text: "Watching boats at the port gave a real sense of Douala’s pulse.", img: "https://i.pravatar.cc/100?u=grace" },
 ];
 
 document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
   <a href="/destinations?q=${encodeURIComponent(p.name)}" class="gt-reveal gt-card-glow group block rounded-2xl overflow-hidden border border-gt-border bg-gt-surface" style="--reveal-delay:${i*50}ms">
     <div class="aspect-[4/3] overflow-hidden bg-gt-surface2">
-      <img src="${img(p.file)}" alt="${p.name}, Douala" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" onerror="this.src='${fallback}'">
+      <img src="${W(p.file)}" alt="${p.name}, Douala" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
     </div>
     <div class="p-3">
       <p class="font-semibold text-gt-text text-sm">${p.name}</p>
@@ -105,7 +105,7 @@ document.getElementById('popularGrid').innerHTML = POPULAR.map((p, i) => `
 document.getElementById('reasonsGrid').innerHTML = REASONS.map((r, i) => `
   <article class="gt-reveal gt-card-glow rounded-2xl overflow-hidden border border-gt-border bg-gt-bg" style="--reveal-delay:${i*60}ms">
     <div class="h-40 overflow-hidden bg-gt-surface2">
-      <img src="${img(r.file)}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='${fallback}'">
+      <img src="${W(r.file)}" alt="${r.name}" class="w-full h-full object-cover" loading="lazy">
     </div>
     <div class="p-5">
       <h3 class="font-bold text-lg text-gt-text mb-3">${r.name}</h3>
