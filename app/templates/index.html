@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+  #doualaMap { height: 420px; width: 100%; border-radius: 1rem; z-index: 1; }
+  @media (min-width: 768px) { #doualaMap { height: 520px; } }
+  .leaflet-popup-content-wrapper {
+    background: #17212b; color: #f5f5f5; border-radius: 12px;
+    border: 1px solid #2b3a4a; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  .leaflet-popup-tip { background: #17212b; }
+  .leaflet-popup-content a { color: #2AABEE; font-weight: 600; }
+  .leaflet-container { background: #0e1621; font-family: Inter, sans-serif; }
+</style>
 
 <section class="relative min-h-[75vh] flex items-center justify-center overflow-hidden" aria-label="Hero"
   style="background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=1600'); background-size: cover; background-position: center;">
@@ -11,7 +23,7 @@
     <p class="text-gray-200 text-base sm:text-lg max-w-xl mx-auto mb-8">Tourist sites in Cameroon’s economic capital — La Pagode, Musée Maritime, Bonanjo, Akwa, Youpwe and more.</p>
     <div class="flex flex-wrap gap-3 justify-center">
       <a href="/destinations" class="gt-btn-primary px-6 py-3 rounded-full">Explore sites</a>
-      <a href="/itineraries" class="bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full hover:bg-white/20 transition">Plan a trip</a>
+      <a href="#map-section" class="bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full hover:bg-white/20 transition">View map</a>
     </div>
   </div>
 </section>
@@ -41,14 +53,14 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="testimonialGrid"></div>
 </section>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
-  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Map of Douala</h2>
-  <p class="text-gt-muted mb-6 text-sm">Locate Bonanjo, Akwa, Deido and more</p>
-  <div class="gt-map-wrap">
-    <iframe title="Map of Douala" loading="lazy"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=9.65%2C4.00%2C9.78%2C4.10&amp;layer=mapnik&amp;marker=4.0511%2C9.7679"
-      referrerpolicy="no-referrer-when-downgrade"></iframe>
+<section id="map-section" class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+  <h2 class="heading text-2xl sm:text-3xl font-bold text-gt-text mb-2">Map of Douala sites</h2>
+  <p class="text-gt-muted mb-4 text-sm">Click a pin for name, district, budget (FCFA) and link to the site page</p>
+  <div class="flex flex-wrap gap-2 mb-4" id="mapLegend"></div>
+  <div class="rounded-2xl overflow-hidden border border-gt-border shadow-lg">
+    <div id="doualaMap" role="img" aria-label="Interactive map of Douala tourist sites"></div>
   </div>
+  <p class="text-xs text-gt-muted mt-2">Map data © OpenStreetMap contributors · Pins ≈ site locations</p>
 </section>
 
 <section class="bg-gt-surface border-t border-gt-border py-12 text-center px-4">
@@ -59,9 +71,13 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-/* Verified Wikimedia Commons filenames for Douala sites */
 const W = (file) => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=900';
+function formatFcfa(n) {
+  if (n == null) return '—';
+  return Number(n).toLocaleString('fr-FR') + ' FCFA';
+}
 
 const POPULAR = [
   { name: "La Pagode", district: "Bonanjo", file: "Pagode_de_Douala_01.JPG" },
@@ -126,6 +142,61 @@ document.getElementById('testimonialGrid').innerHTML = STORIES.map((s, i) => `
     </div>
   </article>
 `).join('');
+
+/* —— Interactive map with pins —— */
+async function initDoualaMap() {
+  const map = L.map('doualaMap', { scrollWheelZoom: false }).setView([4.05, 9.70], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  map.once('focus', () => map.scrollWheelZoom.enable());
+
+  const accentIcon = L.divIcon({
+    className: '',
+    html: '<div style="width:14px;height:14px;background:#2AABEE;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.45)"></div>',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+
+  try {
+    const res = await fetch('/destinations', { headers: { 'Accept': 'application/json' } });
+    const sites = await res.json();
+    if (!Array.isArray(sites) || !sites.length) return;
+
+    const bounds = [];
+    const districts = new Set();
+
+    sites.forEach(s => {
+      if (s.lat == null || s.lng == null) return;
+      districts.add(s.district || 'Douala');
+      bounds.push([s.lat, s.lng]);
+      const popup = `
+        <strong style="font-size:14px">${s.name}</strong><br>
+        <span style="color:#8b9aab;font-size:12px">${s.district || ''} · Douala</span><br>
+        <span style="color:#2AABEE;font-size:12px;font-weight:600">${formatFcfa(s.avg_cost_per_day)}</span><br>
+        <a href="/destinations/${s.id}">View site →</a>`;
+      L.marker([s.lat, s.lng], { icon: accentIcon })
+        .addTo(map)
+        .bindPopup(popup);
+    });
+
+    if (bounds.length) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+
+    document.getElementById('mapLegend').innerHTML = [...districts].sort().map(d =>
+      `<span class="text-xs px-3 py-1 rounded-full border border-gt-border text-gt-muted">${d}</span>`
+    ).join('');
+  } catch (e) {
+    console.warn('Map pins failed', e);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDoualaMap);
+} else {
+  initDoualaMap();
+}
 
 if (window.refreshScrollReveal) window.refreshScrollReveal();
 else document.querySelectorAll('.gt-reveal').forEach(n => n.classList.add('is-visible'));
