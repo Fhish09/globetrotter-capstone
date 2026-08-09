@@ -1,11 +1,11 @@
-"""Create and list itineraries — HTML page or JSON API."""
+"""Itineraries + Douala day-plan builder."""
 import uuid
 import datetime
 
 from flask import Blueprint, request, jsonify, render_template
 
 from app.auth import get_current_user
-from app.models import get_itineraries_for_user, save_itinerary
+from app.models import get_itineraries_for_user, save_itinerary, get_all_destinations
 
 itineraries_bp = Blueprint("itineraries", __name__)
 
@@ -32,6 +32,12 @@ def list_itineraries():
     return jsonify(itineraries), 200
 
 
+@itineraries_bp.route("/day-plan", methods=["GET"])
+def day_plan_page():
+    """Interactive one-day Douala itinerary builder (HTML)."""
+    return render_template("day_plan.html")
+
+
 @itineraries_bp.route("/itineraries", methods=["POST"])
 def create_itinerary():
     username = get_current_user(request)
@@ -53,9 +59,12 @@ def create_itinerary():
         "username": username,
         "title": title,
         "destinations": destinations,
+        "slots": data.get("slots") or {},
+        "total_fcfa": data.get("total_fcfa"),
         "start_date": data.get("start_date", ""),
         "end_date": data.get("end_date", ""),
         "notes": data.get("notes", ""),
+        "kind": data.get("kind", "trip"),
         "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
     save_itinerary(itinerary)

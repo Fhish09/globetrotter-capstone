@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+{% block title %}Day plan{% endblock %}
+{% block content %}
+<style>
+  @media print {
+    nav, footer, .no-print, #loginModal, #registerModal, #prefsModal { display: none !important; }
+    body { background: #fff !important; color: #111 !important; }
+    .print-card { border: 1px solid #ccc !important; background: #fff !important; color: #111 !important; }
+    .print-card * { color: #111 !important; }
+    main { padding: 0 !important; }
+  }
+</style>
+
+<section class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+  <div class="no-print mb-8">
+    <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-2">Douala day plan</h1>
+    <p class="text-gt-muted text-sm sm:text-base">Build a one-day route — morning, lunch, evening — with a live <strong class="text-gt-accent">FCFA</strong> total.</p>
+  </div>
+
+  <!-- Ready-made templates -->
+  <div class="no-print mb-10">
+    <p class="text-xs uppercase tracking-wide text-gt-muted mb-3">Quick templates</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="templates"></div>
+  </div>
+
+  <!-- Builder -->
+  <div class="no-print space-y-6 mb-10">
+    <div class="bg-gt-surface border border-gt-border rounded-2xl p-5">
+      <label class="block text-sm text-gt-muted mb-1">Day title</label>
+      <input id="dayTitle" type="text" value="One day in Douala"
+             class="w-full rounded-xl px-4 py-3 border border-gt-border text-sm"
+             oninput="renderPreview()">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-gt-surface border border-gt-border rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-8 h-8 rounded-full bg-gt-accent/20 text-gt-accent flex items-center justify-center text-sm"><i class="fas fa-sun"></i></span>
+          <div>
+            <p class="font-semibold text-gt-text text-sm">Morning</p>
+            <p class="text-xs text-gt-muted">Heritage / walk</p>
+          </div>
+        </div>
+        <select id="slotMorning" class="w-full rounded-xl px-3 py-2.5 border border-gt-border text-sm bg-gt-surface2" onchange="renderPreview()">
+          <option value="">— choose site —</option>
+        </select>
+      </div>
+      <div class="bg-gt-surface border border-gt-border rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm"><i class="fas fa-utensils"></i></span>
+          <div>
+            <p class="font-semibold text-gt-text text-sm">Lunch</p>
+            <p class="text-xs text-gt-muted">Food / market</p>
+          </div>
+        </div>
+        <select id="slotLunch" class="w-full rounded-xl px-3 py-2.5 border border-gt-border text-sm bg-gt-surface2" onchange="renderPreview()">
+          <option value="">— choose site —</option>
+        </select>
+      </div>
+      <div class="bg-gt-surface border border-gt-border rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-sm"><i class="fas fa-moon"></i></span>
+          <div>
+            <p class="font-semibold text-gt-text text-sm">Evening</p>
+            <p class="text-xs text-gt-muted">City / nightlife</p>
+          </div>
+        </div>
+        <select id="slotEvening" class="w-full rounded-xl px-3 py-2.5 border border-gt-border text-sm bg-gt-surface2" onchange="renderPreview()">
+          <option value="">— choose site —</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <button type="button" onclick="window.print()" class="px-5 py-2.5 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent text-sm">
+        <i class="fas fa-print mr-1"></i> Print
+      </button>
+      <button type="button" onclick="sharePlan()" class="px-5 py-2.5 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent text-sm">
+        <i class="fas fa-share-alt mr-1"></i> Share
+      </button>
+      <button type="button" onclick="savePlan()" class="gt-btn-primary px-5 py-2.5 rounded-full text-sm font-medium">
+        <i class="fas fa-save mr-1"></i> Save to My Trips
+      </button>
+    </div>
+    <p id="saveMsg" class="text-sm text-gt-muted hidden"></p>
+  </div>
+
+  <!-- Preview / print card -->
+  <div id="preview" class="print-card bg-gt-surface border border-gt-border rounded-2xl p-6 sm:p-8">
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gt-accent mb-1">GlobeTrotter · Douala</p>
+        <h2 id="previewTitle" class="heading text-2xl font-bold text-gt-text">One day in Douala</h2>
+        <p class="text-sm text-gt-muted mt-1">Suggested day itinerary</p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-gt-muted">Estimated total</p>
+        <p id="previewTotal" class="text-2xl font-bold text-gt-accent">0 FCFA</p>
+      </div>
+    </div>
+    <ol id="previewSteps" class="space-y-4"></ol>
+    <p class="text-xs text-gt-muted mt-6 border-t border-gt-border pt-4">
+      Budgets are approximate (entry, snack, local transport). Prices in FCFA.
+    </p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let SITES = [];
+
+const TEMPLATES = [
+  {
+    id: 'classic',
+    title: 'Classic heritage day',
+    blurb: 'Morning Bonanjo → lunch Youpwe → evening Akwa',
+    morning: 'La Pagode',
+    lunch: 'Youpwe',
+    evening: 'Akwa',
+  },
+  {
+    id: 'culture',
+    title: 'Culture & art',
+    blurb: 'Museum + Nouvelle Liberté + Akwa',
+    morning: 'Musée Maritime',
+    lunch: 'Marché',
+    evening: 'Nouvelle Liberté',
+  },
+  {
+    id: 'walk',
+    title: 'Bonanjo walk day',
+    blurb: 'Walk the monuments, market, night out',
+    morning: 'Bonanjo Heritage',
+    lunch: 'Mboppi',
+    evening: 'Akwa',
+  },
+];
+
+function formatFcfa(n) {
+  return Number(n || 0).toLocaleString('fr-FR') + ' FCFA';
+}
+
+function findSite(hint) {
+  if (!hint) return null;
+  const h = hint.toLowerCase();
+  return SITES.find(s =>
+    (s.name || '').toLowerCase().includes(h) ||
+    (s.district || '').toLowerCase().includes(h)
+  ) || null;
+}
+
+function fillSelects() {
+  ['slotMorning', 'slotLunch', 'slotEvening'].forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— choose site —</option>' +
+      SITES.map(s => `<option value="${s.id}">${s.name} (${formatFcfa(s.avg_cost_per_day)})</option>`).join('');
+    if (cur) sel.value = cur;
+  });
+}
+
+function siteById(id) {
+  return SITES.find(s => String(s.id) === String(id));
+}
+
+function currentSlots() {
+  return {
+    morning: siteById(document.getElementById('slotMorning').value),
+    lunch: siteById(document.getElementById('slotLunch').value),
+    evening: siteById(document.getElementById('slotEvening').value),
+  };
+}
+
+function renderPreview() {
+  const title = document.getElementById('dayTitle').value.trim() || 'One day in Douala';
+  document.getElementById('previewTitle').textContent = title;
+  const { morning, lunch, evening } = currentSlots();
+  const steps = [
+    { label: 'Morning', icon: 'fa-sun', site: morning },
+    { label: 'Lunch', icon: 'fa-utensils', site: lunch },
+    { label: 'Evening', icon: 'fa-moon', site: evening },
+  ];
+  let total = 0;
+  document.getElementById('previewSteps').innerHTML = steps.map((st, i) => {
+    if (st.site) total += Number(st.site.avg_cost_per_day) || 0;
+    const name = st.site ? st.site.name : 'Not chosen yet';
+    const meta = st.site
+      ? `${st.site.district || 'Douala'} · ${formatFcfa(st.site.avg_cost_per_day)}`
+      : 'Pick a site above';
+    const tip = st.site && st.site.cost_note ? st.site.cost_note : '';
+    return `<li class="flex gap-4">
+      <div class="flex flex-col items-center">
+        <span class="w-9 h-9 rounded-full bg-gt-surface2 border border-gt-border flex items-center justify-center text-gt-accent text-sm">
+          <i class="fas ${st.icon}"></i>
+        </span>
+        ${i < 2 ? '<span class="w-px flex-1 bg-gt-border my-1 min-h-[1.5rem]"></span>' : ''}
+      </div>
+      <div class="pb-2 flex-1">
+        <p class="text-xs text-gt-accent uppercase tracking-wide">${st.label}</p>
+        <p class="font-semibold text-gt-text">${name}</p>
+        <p class="text-sm text-gt-muted">${meta}</p>
+        ${tip ? `<p class="text-xs text-gt-muted mt-1">${tip}</p>` : ''}
+      </div>
+    </li>`;
+  }).join('');
+  document.getElementById('previewTotal').textContent = formatFcfa(total);
+  return total;
+}
+
+function applyTemplate(t) {
+  document.getElementById('dayTitle').value = t.title;
+  const m = findSite(t.morning);
+  const l = findSite(t.lunch);
+  const e = findSite(t.evening);
+  if (m) document.getElementById('slotMorning').value = m.id;
+  if (l) document.getElementById('slotLunch').value = l.id;
+  if (e) document.getElementById('slotEvening').value = e.id;
+  renderPreview();
+}
+
+function renderTemplates() {
+  document.getElementById('templates').innerHTML = TEMPLATES.map(t => `
+    <button type="button" onclick='applyTemplate(${JSON.stringify(t)})'
+      class="text-left bg-gt-bg border border-gt-border rounded-2xl p-4 hover:border-gt-accent transition">
+      <p class="font-semibold text-gt-text text-sm mb-1">${t.title}</p>
+      <p class="text-xs text-gt-muted">${t.blurb}</p>
+    </button>
+  `).join('');
+}
+
+function sharePlan() {
+  const title = document.getElementById('dayTitle').value.trim();
+  const { morning, lunch, evening } = currentSlots();
+  const total = renderPreview();
+  const parts = [
+    morning && ('Morning: ' + morning.name),
+    lunch && ('Lunch: ' + lunch.name),
+    evening && ('Evening: ' + evening.name),
+  ].filter(Boolean);
+  const text = `${title}\n${parts.join(' → ')}\nTotal ≈ ${formatFcfa(total)}\n— GlobeTrotter Douala`;
+  if (navigator.share) {
+    navigator.share({ title, text }).catch(() => {});
+  } else {
+    try {
+      navigator.clipboard.writeText(text);
+      alert('Plan copied — paste it anywhere to share.');
+    } catch (e) {
+      prompt('Copy your plan:', text);
+    }
+  }
+}
+
+async function savePlan() {
+  const token = localStorage.getItem('token');
+  const msg = document.getElementById('saveMsg');
+  if (!token) { openLogin(); return; }
+  const { morning, lunch, evening } = currentSlots();
+  const dests = [morning, lunch, evening].filter(Boolean).map(s => s.name);
+  if (!dests.length) {
+    msg.textContent = 'Choose at least one site.';
+    msg.classList.remove('hidden');
+    return;
+  }
+  const total = renderPreview();
+  const title = document.getElementById('dayTitle').value.trim() || 'Douala day plan';
+  msg.textContent = 'Saving…';
+  msg.classList.remove('hidden');
+  try {
+    const res = await fetch('/itineraries', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        title,
+        destinations: dests,
+        kind: 'day_plan',
+        total_fcfa: total,
+        slots: {
+          morning: morning ? morning.name : null,
+          lunch: lunch ? lunch.name : null,
+          evening: evening ? evening.name : null,
+        },
+        start_date: new Date().toISOString().slice(0, 10),
+        end_date: new Date().toISOString().slice(0, 10),
+        notes: 'Douala one-day plan',
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      msg.innerHTML = 'Saved! <a class="text-gt-accent underline" href="/itineraries">Open My Trips</a>';
+    } else {
+      msg.textContent = data.error || 'Could not save';
+    }
+  } catch (e) {
+    msg.textContent = 'Network error';
+  }
+}
+
+async function init() {
+  renderTemplates();
+  try {
+    const res = await fetch('/destinations', { headers: { 'Accept': 'application/json' } });
+    SITES = await res.json();
+    if (!Array.isArray(SITES)) SITES = [];
+  } catch (e) {
+    SITES = [];
+  }
+  fillSelects();
+  // Default classic template
+  applyTemplate(TEMPLATES[0]);
+}
+init();
+</script>
+{% endblock %}

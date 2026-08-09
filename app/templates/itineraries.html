@@ -5,11 +5,16 @@
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
     <div>
       <h1 class="heading text-2xl sm:text-4xl font-bold text-gt-text mb-1">My trips</h1>
-      <p class="text-gt-muted text-sm">Your past and planned itineraries</p>
+      <p class="text-gt-muted text-sm">Saved day plans and itineraries</p>
     </div>
-    <button type="button" onclick="openCreateModal()" class="gt-btn-primary px-5 py-2.5 rounded-full font-medium">
-      <i class="fas fa-plus mr-1"></i> New trip
-    </button>
+    <div class="flex flex-wrap gap-2">
+      <a href="/day-plan" class="gt-btn-primary px-5 py-2.5 rounded-full font-medium text-sm">
+        <i class="fas fa-route mr-1"></i> Day plan builder
+      </a>
+      <button type="button" onclick="openCreateModal()" class="px-5 py-2.5 rounded-full font-medium text-sm border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent">
+        <i class="fas fa-plus mr-1"></i> New trip
+      </button>
+    </div>
   </div>
   <div id="status" class="mb-6"></div>
   <div id="trips" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
@@ -25,11 +30,11 @@
     <form onsubmit="event.preventDefault(); createTrip();" class="space-y-4">
       <div>
         <label class="block text-sm text-gt-muted mb-1">Title *</label>
-        <input id="tripTitle" required class="w-full rounded-xl px-4 py-3 border border-gt-border" placeholder="e.g. Kribi weekend">
+        <input id="tripTitle" required class="w-full rounded-xl px-4 py-3 border border-gt-border" placeholder="e.g. Weekend in Douala">
       </div>
       <div>
-        <label class="block text-sm text-gt-muted mb-1">Destinations</label>
-        <input id="tripDests" class="w-full rounded-xl px-4 py-3 border border-gt-border" placeholder="Kribi, Limbe">
+        <label class="block text-sm text-gt-muted mb-1">Sites</label>
+        <input id="tripDests" class="w-full rounded-xl px-4 py-3 border border-gt-border" placeholder="La Pagode, Youpwe, Akwa">
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
@@ -58,14 +63,18 @@ function closeCreateModal() {
   document.getElementById('createModal').classList.remove('flex');
 }
 function shareExperience(title) {
-  var text = 'I visited ' + title + ' with GlobeTrotter!';
+  var text = 'I planned “' + title + '” with GlobeTrotter Douala!';
   if (navigator.share) navigator.share({ title: 'My trip', text: text }).catch(function(){});
-  else { try { navigator.clipboard.writeText(text); alert('Copied — share with friends!'); } catch(e) { alert(text); } }
+  else { try { navigator.clipboard.writeText(text); alert('Copied!'); } catch(e) { alert(text); } }
 }
 function rebook(dests) {
   var q = (dests && dests[0]) || '';
   if (q) localStorage.setItem('lastSearch', q);
-  window.location.href = q ? ('/destinations?q=' + encodeURIComponent(q)) : '/destinations';
+  window.location.href = q ? ('/destinations?q=' + encodeURIComponent(q)) : '/day-plan';
+}
+function formatFcfa(n) {
+  if (n == null) return '';
+  return Number(n).toLocaleString('fr-FR') + ' FCFA';
 }
 
 async function loadTrips() {
@@ -75,29 +84,27 @@ async function loadTrips() {
   if (!token) {
     status.innerHTML = '<div class="bg-gt-surface border border-gt-border rounded-2xl p-8 text-center">' +
       '<p class="font-semibold mb-2">Login to see your trips</p>' +
-      '<button onclick="openLogin()" class="gt-btn-primary px-5 py-2.5 rounded-full mt-2">Login</button></div>';
+      '<p class="text-sm text-gt-muted mb-4">Or build a day plan without saving</p>' +
+      '<a href="/day-plan" class="gt-btn-primary px-5 py-2.5 rounded-full inline-block mr-2">Day plan</a>' +
+      '<button onclick="openLogin()" class="px-5 py-2.5 rounded-full border border-gt-border text-gt-muted">Login</button></div>';
     container.innerHTML = '';
     return;
   }
-  status.innerHTML = '<p class="text-gt-muted"><i class="fas fa-spinner fa-spin"></i> Loading trips…</p>';
+  status.innerHTML = '<p class="text-gt-muted"><i class="fas fa-spinner fa-spin"></i> Loading…</p>';
   try {
     var res = await fetch('/itineraries', {
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
     });
     var data = await res.json();
     if (!res.ok) {
-      status.innerHTML = '<p class="text-red-400">' + (data.error || 'Error loading trips') + '</p>';
-      return;
-    }
-    if (!Array.isArray(data)) {
-      status.innerHTML = '<p class="text-red-400">Unexpected response</p>';
+      status.innerHTML = '<p class="text-red-400">' + (data.error || 'Error') + '</p>';
       return;
     }
     status.innerHTML = '';
     if (!data.length) {
       container.innerHTML = '<div class="col-span-full text-center py-12 text-gt-muted">' +
         '<p class="mb-4">No trips yet.</p>' +
-        '<button onclick="openCreateModal()" class="gt-btn-primary px-5 py-2.5 rounded-full">Create your first trip</button></div>';
+        '<a href="/day-plan" class="gt-btn-primary px-5 py-2.5 rounded-full inline-block">Build a day plan</a></div>';
       return;
     }
     container.innerHTML = data.map(function(trip) {
@@ -105,22 +112,35 @@ async function loadTrips() {
       var chips = dests.map(function(d) {
         return '<span class="gt-chip text-xs px-3 py-1 rounded-full">' + d + '</span>';
       }).join('');
-      var destsJson = JSON.stringify(dests).replace(/'/g, "\\'");
-      var titleJson = JSON.stringify(trip.title || '').replace(/'/g, "\\'");
+      var slots = trip.slots || {};
+      var slotLine = '';
+      if (slots.morning || slots.lunch || slots.evening) {
+        slotLine = '<p class="text-xs text-gt-muted mb-2">' +
+          [slots.morning && ('☀ ' + slots.morning),
+           slots.lunch && ('🍽 ' + slots.lunch),
+           slots.evening && ('🌙 ' + slots.evening)].filter(Boolean).join(' → ') +
+          '</p>';
+      }
+      var total = trip.total_fcfa != null
+        ? '<p class="text-gt-accent font-semibold text-sm mb-3">' + formatFcfa(trip.total_fcfa) + '</p>'
+        : '';
+      var destsJson = JSON.stringify(dests);
+      var titleJson = JSON.stringify(trip.title || '');
       return '<article class="bg-gt-surface border border-gt-border rounded-2xl p-6 gt-card-glow">' +
         '<h2 class="text-lg font-bold text-gt-text mb-1">' + (trip.title || 'Trip') + '</h2>' +
-        '<p class="text-sm text-gt-muted mb-3"><i class="far fa-calendar mr-1"></i> ' +
-        (trip.start_date || '—') + ' → ' + (trip.end_date || '—') + '</p>' +
+        '<p class="text-sm text-gt-muted mb-2"><i class="far fa-calendar mr-1"></i> ' +
+        (trip.start_date || '—') + (trip.end_date ? ' → ' + trip.end_date : '') + '</p>' +
+        slotLine + total +
         '<div class="flex flex-wrap gap-2 mb-4">' + chips + '</div>' +
         '<div class="flex flex-wrap gap-2">' +
         '<button type="button" class="text-sm px-4 py-2 rounded-full border border-gt-border text-gt-muted hover:border-gt-accent hover:text-gt-accent" ' +
-        'onclick=\'shareExperience(' + titleJson + ')\'><i class="fas fa-share-alt mr-1"></i> Share experience</button>' +
+        'onclick=\'shareExperience(' + titleJson + ')\'><i class="fas fa-share-alt mr-1"></i> Share</button>' +
         '<button type="button" class="text-sm px-4 py-2 rounded-full gt-btn-primary" ' +
         'onclick=\'rebook(' + destsJson + ')\'><i class="fas fa-redo mr-1"></i> Rebook</button>' +
         '</div></article>';
     }).join('');
   } catch (e) {
-    status.innerHTML = '<p class="text-red-400">Network error — is the server running?</p>';
+    status.innerHTML = '<p class="text-red-400">Network error</p>';
   }
 }
 
@@ -149,10 +169,6 @@ async function createTrip() {
     var data = await res.json();
     if (res.ok) {
       closeCreateModal();
-      document.getElementById('tripTitle').value = '';
-      document.getElementById('tripDests').value = '';
-      document.getElementById('startDate').value = '';
-      document.getElementById('endDate').value = '';
       loadTrips();
     } else {
       errorEl.textContent = data.error || 'Failed';
