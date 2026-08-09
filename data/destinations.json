@@ -13,7 +13,13 @@
     "avg_cost_per_day": 2000,
     "currency": "FCFA",
     "cost_note": "Exterior visit free; budget for taxi and snack",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=900",
+    "tips": {
+      "hours": "Best viewed daytime; exterior accessible most days. Interior access varies — ask on site or at doual'art nearby.",
+      "transport": "Bonanjo is walkable once you are there. From Akwa: short taxi or moto (~500–1000 FCFA). Agree the price before you start.",
+      "timing": "Go early morning (8–10h) for better light and fewer cars around Place du Gouvernement.",
+      "safety": "Stay on main streets in Bonanjo. Keep phone and cash discreet. Avoid flashing valuables near busy corners."
+    }
   },
   {
     "id": 2,
@@ -29,7 +35,13 @@
     "avg_cost_per_day": 3500,
     "currency": "FCFA",
     "cost_note": "Adult entry about 3 500 FCFA (official tariff)",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bateau_au_port_de_Douala1.jpg?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bateau_au_port_de_Douala1.jpg?width=900",
+    "tips": {
+      "hours": "Typically Tue–Fri ~9h–17h30; weekends often open later morning. Closed Mondays on many schedules — confirm before you go.",
+      "transport": "Rue de l’Hôpital, Bonanjo. Taxi from Akwa or Deido is straightforward; moto works if you know the area.",
+      "timing": "Weekday mornings are quieter. Combine with Parc Bonanjo and La Pagode the same half-day.",
+      "safety": "Official site with staff. Phone photos may need a small extra fee — ask at the desk."
+    }
   },
   {
     "id": 3,
@@ -45,7 +57,13 @@
     "avg_cost_per_day": 1000,
     "currency": "FCFA",
     "cost_note": "Entry free; small transport budget",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_02.JPG?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_02.JPG?width=900",
+    "tips": {
+      "hours": "Open for visits outside mass times; Sunday mornings are for worship — be respectful if services are on.",
+      "transport": "Central Bonanjo / near Collège Libermann area. Walk from Place du Gouvernement if you are already on a heritage route.",
+      "timing": "Late morning or late afternoon for exterior photos; avoid blocking entrances during mass.",
+      "safety": "Calm area by day. Dress modestly if you enter. Do not leave bags unattended."
+    }
   },
   {
     "id": 4,
@@ -61,7 +79,13 @@
     "avg_cost_per_day": 1000,
     "currency": "FCFA",
     "cost_note": "Public monument, free to view",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Joseph-Francis_Sumégné,_La_Nouvelle_Liberté_01.jpg?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Joseph-Francis_Sumégné,_La_Nouvelle_Liberté_01.jpg?width=900",
+    "tips": {
+      "hours": "Outdoor monument — visible 24/7. Best light morning or late afternoon.",
+      "transport": "Rond-point Deido — heavy traffic. Taxi is safer than standing in the middle. Moto can drop you on the sidewalk side.",
+      "timing": "Go early to avoid peak traffic and for cleaner photos. Do not stop the car in the roundabout.",
+      "safety": "Very busy junction. Stay on the pavement; watch for motos on the sidewalk. Keep phones secure while shooting."
+    }
   },
   {
     "id": 5,
@@ -77,7 +101,13 @@
     "avg_cost_per_day": 1000,
     "currency": "FCFA",
     "cost_note": "Public park, free entry",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_03.JPG?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_03.JPG?width=900",
+    "tips": {
+      "hours": "Daytime use is best; treat it as a short break between Bonanjo sights.",
+      "transport": "Walk from La Pagode / Place du Gouvernement — no need for another taxi if you are already in Bonanjo.",
+      "timing": "Mid-morning shade is pleasant. After heavy rain, paths can be wet.",
+      "safety": "Fine by day with other visitors. Avoid isolated corners after dark."
+    }
   },
   {
     "id": 6,
@@ -93,7 +123,13 @@
     "avg_cost_per_day": 2000,
     "currency": "FCFA",
     "cost_note": "Exterior / guided visit budget",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Palace_of_King_Duala_Manga_Bell.jpg?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Palace_of_King_Duala_Manga_Bell.jpg?width=900",
+    "tips": {
+      "hours": "Exterior is the main tourist view; interior access is not always public — check locally.",
+      "transport": "Akwa — taxi or moto from Bonanjo is a short hop. Boulevard de la République area is busy.",
+      "timing": "Daytime for photos. Combine with an Akwa evening if you want food after.",
+      "safety": "Busy commercial zone. Use licensed taxis at night; agree fares first."
+    }
   },
   {
     "id": 7,
@@ -109,7 +145,13 @@
     "avg_cost_per_day": 2000,
     "currency": "FCFA",
     "cost_note": "Exhibitions often free or low fee",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_04.JPG?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_04.JPG?width=900",
+    "tips": {
+      "hours": "Check exhibition days — not every day is open like a big museum. Linked to the Pagode / Bonanjo cultural circuit.",
+      "transport": "Same Bonanjo cluster as La Pagode — walk between stops.",
+      "timing": "Pair with La Pagode the same morning.",
+      "safety": "Cultural venue area is generally fine by day. Ask staff about current shows."
+    }
   },
   {
     "id": 8,
@@ -125,7 +167,13 @@
     "avg_cost_per_day": 1000,
     "currency": "FCFA",
     "cost_note": "Public square, free",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_Douala.JPG?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_Douala.JPG?width=900",
+    "tips": {
+      "hours": "Open public space — daytime visits recommended.",
+      "transport": "Heart of Bonanjo. Start or end your heritage walk here.",
+      "timing": "Early morning for cooler air and fewer vehicles.",
+      "safety": "Stay aware of traffic when crossing. Standard city caution with bags."
+    }
   },
   {
     "id": 9,
@@ -141,7 +189,13 @@
     "avg_cost_per_day": 20000,
     "currency": "FCFA",
     "cost_note": "Food, drinks, local transport for an evening out",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Douala.JPG?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Douala.JPG?width=900",
+    "tips": {
+      "hours": "Shops by day; nightlife from evening. Food stands stay busy late.",
+      "transport": "Central hub — taxis and motos everywhere. At night prefer a known taxi or ride from your hotel.",
+      "timing": "Evening for atmosphere; daytime for shopping without the crush.",
+      "safety": "Busy and generally animated. Keep wallets front-pocket, avoid isolated side streets late, and fix moto/taxi prices before boarding."
+    }
   },
   {
     "id": 10,
@@ -157,7 +211,13 @@
     "avg_cost_per_day": 8000,
     "currency": "FCFA",
     "cost_note": "Light shopping / street food budget",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Douala_skyline.jpg?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Douala_skyline.jpg?width=900",
+    "tips": {
+      "hours": "Peak activity morning to mid-afternoon. Many stalls wind down toward evening.",
+      "transport": "Taxi or moto; the area is congested. Know your exit point before you dive in.",
+      "timing": "Go with a clear list — it is easy to get overwhelmed. Morning is less humid than afternoon.",
+      "safety": "Crowded — bags in front, minimal jewellery. Negotiate calmly; walk away if pressure feels wrong."
+    }
   },
   {
     "id": 11,
@@ -173,7 +233,13 @@
     "avg_cost_per_day": 6000,
     "currency": "FCFA",
     "cost_note": "Fresh fish meal and transport",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bateau_au_port_de_Douala1.jpg?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bateau_au_port_de_Douala1.jpg?width=900",
+    "tips": {
+      "hours": "Fish market is liveliest in the morning when the catch arrives.",
+      "transport": "Taxi from Bonanjo/Akwa; ask for Youpwe / the fishing quarter. Moto is possible but roads can be rough.",
+      "timing": "Morning for market energy; lunch for grilled fish. Footwear that can handle wet ground helps.",
+      "safety": "Working waterfront — watch your step near pirogues. Ask before photographing people closely. Keep valuables secure."
+    }
   },
   {
     "id": 12,
@@ -189,6 +255,12 @@
     "avg_cost_per_day": 3000,
     "currency": "FCFA",
     "cost_note": "Taxi + water/snack for a half-day walk",
-    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_05.JPG?width=900"
+    "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_05.JPG?width=900",
+    "tips": {
+      "hours": "Best as a 2–3 hour daytime circuit (Pagode → Place → Parc → Cathedral → Maritime Museum).",
+      "transport": "Arrive by taxi to Bonanjo, then walk. Carry small notes for water and a return taxi.",
+      "timing": "Start before 10h — heat and traffic rise fast. Rainy season: pack a light poncho.",
+      "safety": "Stick to main administrative streets. Share your rough plan with someone; daytime walking is the norm for visitors."
+    }
   }
 ]

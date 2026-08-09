@@ -23,6 +23,10 @@
                     <p id="destDescription" class="text-gt-muted leading-relaxed"></p>
                 </div>
                 <div>
+                    <h2 class="text-xl font-bold text-gt-text mb-3">Local tips</h2>
+                    <div id="destTips" class="space-y-3"></div>
+                </div>
+                <div>
                     <h2 class="text-xl font-bold text-gt-text mb-3">Tags</h2>
                     <div id="destTags" class="flex flex-wrap gap-2"></div>
                 </div>
@@ -37,9 +41,9 @@
                     <p class="text-sm text-gt-muted mb-1">District</p>
                     <p id="destDistrict" class="text-lg font-semibold text-gt-text"></p>
                 </div>
-                <button onclick="addToItinerary()" class="w-full gt-btn-primary py-3.5 rounded-xl font-semibold min-h-[48px]">
-                    <i class="fas fa-plus mr-2"></i> Add to Itinerary
-                </button>
+                <a href="/day-plan" class="block w-full text-center gt-btn-primary py-3.5 rounded-xl font-semibold min-h-[48px]">
+                    <i class="fas fa-route mr-2"></i> Add to day plan
+                </a>
             </div>
         </div>
     </div>
@@ -60,6 +64,27 @@ function formatFcfa(n) {
 function getDestImage(dest) {
     return dest.image || `https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=1200`;
 }
+function renderTips(tips) {
+    if (!tips) {
+        document.getElementById('destTips').innerHTML = '<p class="text-gt-muted text-sm">No tips yet.</p>';
+        return;
+    }
+    const rows = [
+        { key: 'hours', icon: 'fa-clock', label: 'Hours' },
+        { key: 'transport', icon: 'fa-motorcycle', label: 'Moto / taxi' },
+        { key: 'timing', icon: 'fa-sun', label: 'Best time' },
+        { key: 'safety', icon: 'fa-shield-alt', label: 'Safety' },
+    ];
+    document.getElementById('destTips').innerHTML = rows.filter(r => tips[r.key]).map(r => `
+      <div class="bg-gt-surface border border-gt-border rounded-xl p-4 flex gap-3">
+        <span class="text-gt-accent mt-0.5"><i class="fas ${r.icon}"></i></span>
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gt-accent mb-1">${r.label}</p>
+          <p class="text-sm text-gt-muted leading-relaxed">${tips[r.key]}</p>
+        </div>
+      </div>
+    `).join('');
+}
 async function loadDestination() {
     try {
         const res = await fetch('/destinations', { headers: { 'Accept': 'application/json' } });
@@ -77,11 +102,12 @@ async function loadDestination() {
         document.getElementById('destLocation').textContent = (dest.district ? dest.district + ' · ' : '') + 'Douala, Cameroon';
         document.getElementById('destDescription').textContent = dest.description || 'No description available.';
         document.getElementById('destCost').textContent = formatFcfa(dest.avg_cost_per_day);
-        document.getElementById('destCostNote').textContent = dest.cost_note || 'Prices in Central African CFA franc (FCFA)';
+        document.getElementById('destCostNote').textContent = dest.cost_note || 'Prices in FCFA';
         document.getElementById('destDistrict').textContent = dest.district || 'Douala';
         document.getElementById('destTags').innerHTML = (dest.tags || []).map(t =>
             `<span class="gt-chip px-3 py-1.5 rounded-full text-sm font-medium">${t}</span>`
         ).join('');
+        renderTips(dest.tips);
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('content').classList.remove('hidden');
         window.currentDest = dest;
@@ -89,10 +115,6 @@ async function loadDestination() {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('error').classList.remove('hidden');
     }
-}
-function addToItinerary() {
-    if (!localStorage.getItem('token')) { openLogin(); return; }
-    window.location.href = '/itineraries';
 }
 loadDestination();
 </script>
