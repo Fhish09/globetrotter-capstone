@@ -1,20 +1,9 @@
-"""
-app/auth.py
-
-User registration, login, JWT handling, and profile management.
-
-Routes
-------
-POST /register     – create a new user account
-POST /login        – authenticate and return a JWT token
-GET  /me           – return the current user's profile (preferences)
-PUT  /preferences  – update the current user's preferences
-"""
+"""User registration, login, JWT, profile."""
 import uuid
 import datetime
 
 import jwt
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.models import get_user_by_username, save_user, update_user_preferences
@@ -22,12 +11,7 @@ from app.models import get_user_by_username, save_user, update_user_preferences
 auth_bp = Blueprint("auth", __name__)
 
 
-# ---------------------------------------------------------------------------
-# Helper – JWT utilities
-# ---------------------------------------------------------------------------
-
 def create_token(username: str, secret: str) -> str:
-    """Return a signed JWT for *username* valid for 24 hours."""
     now = datetime.datetime.now(datetime.timezone.utc)
     payload = {
         "sub": username,
@@ -38,16 +22,10 @@ def create_token(username: str, secret: str) -> str:
 
 
 def decode_token(token: str, secret: str) -> dict:
-    """Decode and verify *token*. Raises jwt.PyJWTError on failure."""
     return jwt.decode(token, secret, algorithms=["HS256"])
 
 
 def get_current_user(request_obj) -> str | None:
-    """Extract and validate the JWT from the Authorization header.
-
-    Returns the username (subject claim) or None if the token is missing /
-    invalid.
-    """
     auth_header = request_obj.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
         return None
@@ -59,51 +37,11 @@ def get_current_user(request_obj) -> str | None:
         return None
 
 
-# ---------------------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------------------
-
-@auth_bp.route("/register", methods=["POST"])
-def register():
-    """Register a new user.
-
-    Expected JSON body:
-        { "username": "alice", "password": "s3cr3t", "preferences": ["beach", "food"] }
-
-    Returns 201 on success, 400 on validation errors, 409 if the username is
-    already taken.
-    """
-    data = request.get_json(silent=True) or {}
-    username = data.get("username", "").strip()
-    password = data.get("password", "")
-    preferences = data.get("preferences", [])  # optional list of interest tags
-
-    if not username or not password:
-        return jsonify({"error": "username and password are required"}), 400
-
-    if get_user_by_username(username):
-        return jsonify({"error": "username already exists"}), 409
-
-    user = {
-        "id": str(uuid.uuid4()),
-        "username": username,
-        # Store a Werkzeug password hash – never store plain-text passwords.
-        "password_hash": generate_password_hash(password),
-        "preferences": preferences,
-    }
-    save_user(user)
-    return jsonify({"message": "user registered successfully", "username": username}), 201
-
-
-@auth_bp.route("/login", methods=["POST"])
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    """Authenticate a user and return a JWT.
+    if request.method == "GET":
+        return render_template("login.html", mode="login")
 
-    Expected JSON body:
-        { "username": "alice", "password": "s3cr3t" }
-
-    Returns 200 with a token on success, 400/401 on failure.
-    """
     data = request.get_json(silent=True) or {}
     username = data.get("username", "").strip()
     password = data.get("password", "")
@@ -119,9 +57,34 @@ def login():
     return jsonify({"token": token, "username": username}), 200
 
 
+@auth_bp.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "GET":
+        return render_template("login.html", mode="register")
+
+    data = request.get_json(silent=True) or {}
+    username = data.get("username", "").strip()
+    password = data.get("password", "")
+    preferences = data.get("preferences", [])
+
+    if not username or not password:
+        return jsonify({"error": "username and password are required"}), 400
+
+    if get_user_by_username(username):
+        return jsonify({"error": "username already exists"}), 409
+
+    user = {
+        "id": str(uuid.uuid4()),
+        "username": username,
+        "password_hash": generate_password_hash(password),
+        "preferences": preferences,
+    }
+    save_user(user)
+    return jsonify({"message": "user registered successfully", "username": username}), 201
+
+
 @auth_bp.route("/me", methods=["GET"])
 def get_me():
-    """Return the current authenticated user's profile (without password hash)."""
     username = get_current_user(request)
     if not username:
         return jsonify({"error": "authentication required"}), 401
@@ -138,13 +101,6 @@ def get_me():
 
 @auth_bp.route("/preferences", methods=["PUT"])
 def update_preferences():
-    """Update the current user's travel preferences.
-
-    Expected JSON body:
-        { "preferences": ["beach", "food", "adventure"] }
-
-    Requires: Authorization: Bearer <token>
-    """
     username = get_current_user(request)
     if not username:
         return jsonify({"error": "authentication required"}), 401
@@ -158,9 +114,7 @@ def update_preferences():
     if not isinstance(preferences, list):
         return jsonify({"error": "preferences must be a list"}), 400
 
-    # Clean up: strip whitespace and remove empties
     cleaned = [p.strip().lower() for p in preferences if isinstance(p, str) and p.strip()]
-
     success = update_user_preferences(username, cleaned)
     if not success:
         return jsonify({"error": "user not found"}), 404

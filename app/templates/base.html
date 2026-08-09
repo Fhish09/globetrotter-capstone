@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>{% block title %}GlobeTrotter{% endblock %} - Travel Assistant</title>
+    <title>{% block title %}GlobeTrotter{% endblock %} · Douala</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -11,14 +11,14 @@
           extend: {
             colors: {
               gt: {
-                bg: '#0e1621',
-                surface: '#17212b',
-                surface2: '#242f3d',
-                border: '#2b3a4a',
-                text: '#f5f5f5',
-                muted: '#8b9aab',
-                accent: '#2AABEE',
-                accentHover: '#1e9bd8',
+                bg: '#f7f5fb',
+                surface: '#ffffff',
+                surface2: '#f0ebf8',
+                border: '#e4dcf0',
+                text: '#1a1228',
+                muted: '#6b6280',
+                accent: '#7c3aed',
+                accentHover: '#6d28d9',
               }
             }
           }
@@ -35,8 +35,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .heading { font-family: 'Playfair Display', serif; }
-        .modal-enter { animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         html, body { overflow-x: hidden; max-width: 100vw; }
         .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
     </style>
@@ -47,33 +45,33 @@
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex justify-between h-14 sm:h-16 items-center">
                 <a href="/" class="flex items-center gap-2.5 min-w-0">
-                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter logo" class="gt-logo w-9 h-9 rounded-xl">
-                    <span class="heading text-lg sm:text-xl font-bold text-gt-text truncate">GlobeTrotter</span>
+                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter" class="gt-logo w-9 h-9 rounded-xl">
+                    <span class="heading text-lg sm:text-xl font-bold text-gt-accent truncate">GlobeTrotter</span>
                 </a>
-                <div class="hidden md:flex items-center gap-5 lg:gap-7">
-                    <a href="/" class="text-gt-muted hover:text-gt-accent font-medium transition">Home</a>
-                    <a href="/destinations" class="text-gt-muted hover:text-gt-accent font-medium transition">Destinations</a>
-                    <a href="/day-plan" class="text-gt-muted hover:text-gt-accent font-medium transition">Day plan</a>
-                    <a href="/recommendations" class="text-gt-muted hover:text-gt-accent font-medium transition">Recommendations</a>
-                    <a href="/itineraries" class="text-gt-muted hover:text-gt-accent font-medium transition">My Trips</a>
+                <div class="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-medium">
+                    <a href="/" class="text-gt-muted hover:text-gt-accent transition">Home</a>
+                    <a href="/destinations" class="text-gt-muted hover:text-gt-accent transition">Destinations</a>
+                    <a href="/day-plan" class="text-gt-muted hover:text-gt-accent transition">Day plan</a>
+                    <a href="/recommendations" class="text-gt-muted hover:text-gt-accent transition">Recommendations</a>
+                    <a href="/itineraries" class="text-gt-muted hover:text-gt-accent transition">My Trips</a>
                 </div>
                 <div class="hidden md:flex items-center gap-3">
-                    <div id="authButtons" class="flex items-center gap-3">
-                        <button onclick="openLogin()" class="text-gt-muted hover:text-gt-accent font-medium px-2 py-2">Login</button>
-                        <button onclick="openRegister()" class="gt-btn-primary px-4 py-2 rounded-full text-sm font-medium">Sign Up</button>
+                    <div id="authButtons" class="flex items-center gap-2">
+                        <a href="/login" class="text-gt-muted hover:text-gt-accent font-medium px-2 py-2">Login</a>
+                        <a href="/register" class="gt-btn-primary px-4 py-2 rounded-full text-sm font-medium">Sign Up</a>
                     </div>
                     <div id="userMenu" class="hidden items-center gap-3">
-                        <button onclick="openPreferences()" class="text-gt-muted hover:text-gt-accent text-sm font-medium flex items-center gap-1.5 py-2"><i class="fas fa-sliders-h"></i> Preferences</button>
+                        <button type="button" onclick="openPreferences()" class="text-gt-muted hover:text-gt-accent text-sm font-medium"><i class="fas fa-sliders-h"></i> Preferences</button>
                         <span id="usernameDisplay" class="text-sm text-gt-muted"></span>
-                        <button onclick="logout()" class="text-red-400 hover:text-red-300 text-sm font-medium py-2">Logout</button>
+                        <button type="button" onclick="logout()" class="text-red-500 hover:text-red-600 text-sm font-medium">Logout</button>
                     </div>
                 </div>
-                <button id="mobileMenuBtn" type="button" class="md:hidden p-3 -mr-2 text-gt-muted" onclick="toggleMobileMenu()" aria-label="Menu">
+                <button type="button" class="md:hidden p-3 -mr-2 text-gt-muted" onclick="toggleMobileMenu()" aria-label="Menu">
                     <i id="menuIcon" class="fas fa-bars text-xl"></i>
                 </button>
             </div>
         </div>
-        <div id="mobileMenu" class="hidden md:hidden border-t border-gt-border bg-gt-surface safe-bottom">
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gt-border bg-white safe-bottom">
             <div class="px-4 py-3 space-y-1">
                 <a href="/" class="block py-3 px-2 text-gt-muted hover:text-gt-accent font-medium">Home</a>
                 <a href="/destinations" class="block py-3 px-2 text-gt-muted hover:text-gt-accent font-medium">Destinations</a>
@@ -82,85 +80,56 @@
                 <a href="/itineraries" class="block py-3 px-2 text-gt-muted hover:text-gt-accent font-medium">My Trips</a>
                 <hr class="my-2 border-gt-border">
                 <div id="mobileAuth">
-                    <button onclick="openLogin(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 text-gt-muted font-medium">Login</button>
-                    <button onclick="openRegister(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 text-gt-accent font-medium">Sign Up</button>
+                    <a href="/login" class="block py-3 px-2 text-gt-muted font-medium">Login</a>
+                    <a href="/register" class="block py-3 px-2 text-gt-accent font-medium">Sign Up</a>
                 </div>
                 <div id="mobileUser" class="hidden">
                     <p id="mobileUsername" class="text-sm text-gt-muted px-2"></p>
-                    <button onclick="openPreferences(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 text-gt-accent font-medium">Preferences</button>
-                    <button onclick="logout()" class="block w-full text-left py-3 px-2 text-red-400 font-medium">Logout</button>
+                    <button type="button" onclick="openPreferences(); toggleMobileMenu();" class="block w-full text-left py-3 px-2 text-gt-accent font-medium">Preferences</button>
+                    <button type="button" onclick="logout()" class="block w-full text-left py-3 px-2 text-red-500 font-medium">Logout</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div id="weatherStrip" class="bg-gt-surface2/80 border-b border-gt-border text-xs sm:text-sm">
+    <div id="weatherStrip" class="bg-gt-surface2 border-b border-gt-border text-xs sm:text-sm">
       <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-gt-muted">
-        <span class="text-gt-accent font-medium"><i class="fas fa-cloud-sun-rain mr-1"></i> Douala</span>
-        <span id="weatherLive"><i class="fas fa-spinner fa-spin"></i> Loading weather…</span>
-        <span id="weatherSeason" class="text-gt-muted/90"></span>
+        <span class="text-gt-accent font-semibold"><i class="fas fa-cloud-sun-rain mr-1"></i> Douala</span>
+        <span id="weatherLive"><i class="fas fa-spinner fa-spin"></i> Loading…</span>
+        <span id="weatherSeason"></span>
       </div>
     </div>
 
     <main class="flex-grow w-full">{% block content %}{% endblock %}</main>
 
-    <footer class="bg-gt-surface border-t border-gt-border text-gt-muted py-8 mt-auto safe-bottom">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs sm:text-sm">© 2026 GlobeTrotter Capstone · Douala, Cameroon</div>
+    <footer class="bg-white border-t border-gt-border text-gt-muted py-10 mt-auto safe-bottom">
+        <div class="max-w-7xl mx-auto px-4 grid sm:grid-cols-3 gap-8 text-sm">
+          <div>
+            <p class="heading text-gt-accent text-lg font-bold mb-2">GlobeTrotter</p>
+            <p class="text-gt-muted text-xs">Discover tourist sites in Douala, Cameroon — budgets in FCFA.</p>
+          </div>
+          <div>
+            <p class="font-semibold text-gt-text mb-2">Quick links</p>
+            <a href="/destinations" class="block text-gt-muted hover:text-gt-accent py-0.5">Destinations</a>
+            <a href="/day-plan" class="block text-gt-muted hover:text-gt-accent py-0.5">Day plan</a>
+            <a href="/recommendations" class="block text-gt-muted hover:text-gt-accent py-0.5">Recommendations</a>
+          </div>
+          <div>
+            <p class="font-semibold text-gt-text mb-2">Capstone</p>
+            <p class="text-xs">© 2026 GlobeTrotter · Douala focus</p>
+          </div>
+        </div>
     </footer>
 
-    <div id="loginModal" class="fixed inset-0 bg-black/60 hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="px-6 py-5 border-b border-gt-border flex items-center gap-3">
-                <img src="{{ url_for('static', filename='img/logo.svg') }}" class="w-10 h-10 rounded-xl" alt="">
-                <div class="flex-1"><h2 class="text-xl font-bold">Welcome back</h2><p class="text-gt-muted text-sm">Login to continue</p></div>
-                <button type="button" onclick="closeModals()" class="text-gt-muted p-2"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6">
-                <div id="loginError" class="hidden mb-4 bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl"></div>
-                <div class="space-y-4">
-                    <div><label class="block text-sm text-gt-muted mb-1" for="loginUser">Username</label>
-                    <input type="text" id="loginUser" class="w-full rounded-xl px-4 py-3 border border-gt-border" autocomplete="username"></div>
-                    <div><label class="block text-sm text-gt-muted mb-1" for="loginPass">Password</label>
-                    <input type="password" id="loginPass" class="w-full rounded-xl px-4 py-3 border border-gt-border" autocomplete="current-password"></div>
-                </div>
-                <button id="loginBtn" type="button" onclick="doLogin()" class="w-full mt-6 gt-btn-primary py-3.5 rounded-full font-semibold"><span>Login</span></button>
-                <p class="text-center text-sm text-gt-muted mt-5">No account? <button type="button" onclick="switchToRegister()" class="text-gt-accent font-medium">Sign up</button></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="registerModal" class="fixed inset-0 bg-black/60 hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
-            <div class="px-6 py-5 border-b border-gt-border flex items-center gap-3">
-                <img src="{{ url_for('static', filename='img/logo.svg') }}" class="w-10 h-10 rounded-xl" alt="">
-                <div class="flex-1"><h2 class="text-xl font-bold">Join GlobeTrotter</h2><p class="text-gt-muted text-sm">Create your account</p></div>
-                <button type="button" onclick="closeModals()" class="text-gt-muted p-2"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6">
-                <div id="regError" class="hidden mb-4 bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl"></div>
-                <div class="space-y-4">
-                    <div><label class="block text-sm text-gt-muted mb-1" for="regUser">Username</label>
-                    <input type="text" id="regUser" class="w-full rounded-xl px-4 py-3 border border-gt-border"></div>
-                    <div><label class="block text-sm text-gt-muted mb-1" for="regPass">Password</label>
-                    <input type="password" id="regPass" class="w-full rounded-xl px-4 py-3 border border-gt-border"></div>
-                    <div><label class="block text-sm text-gt-muted mb-1" for="regPrefs">Preferences</label>
-                    <input type="text" id="regPrefs" placeholder="history, food, culture" class="w-full rounded-xl px-4 py-3 border border-gt-border"></div>
-                </div>
-                <button id="regBtn" type="button" onclick="doRegister()" class="w-full mt-6 gt-btn-primary py-3.5 rounded-full font-semibold"><span>Create Account</span></button>
-                <p class="text-center text-sm text-gt-muted mt-5">Have an account? <button type="button" onclick="switchToLogin()" class="text-gt-accent font-medium">Login</button></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="prefsModal" class="fixed inset-0 bg-black/60 hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-        <div class="bg-gt-surface border border-gt-border rounded-t-3xl sm:rounded-3xl max-w-md w-full modal-enter overflow-hidden max-h-[95vh] overflow-y-auto">
+    <div id="prefsModal" class="fixed inset-0 bg-black/40 hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+        <div class="bg-white border border-gt-border rounded-t-3xl sm:rounded-3xl max-w-md w-full overflow-hidden max-h-[95vh] overflow-y-auto shadow-xl">
             <div class="px-6 py-5 border-b border-gt-border flex justify-between items-center">
-                <h2 class="text-xl font-bold">Your Preferences</h2>
+                <h2 class="text-xl font-bold text-gt-text">Your Preferences</h2>
                 <button type="button" onclick="closeModals()" class="text-gt-muted p-2"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6">
-                <div id="prefsError" class="hidden mb-4 bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl"></div>
-                <div id="prefsSuccess" class="hidden mb-4 bg-emerald-500/10 text-emerald-400 text-sm px-4 py-3 rounded-xl"></div>
+                <div id="prefsError" class="hidden mb-4 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
+                <div id="prefsSuccess" class="hidden mb-4 bg-emerald-50 text-emerald-700 text-sm px-4 py-3 rounded-xl"></div>
                 <label class="block text-sm text-gt-muted mb-1" for="editPrefs">Travel interests</label>
                 <input type="text" id="editPrefs" class="w-full rounded-xl px-4 py-3 border border-gt-border" placeholder="history, food, culture">
                 <div class="mt-3 flex flex-wrap gap-2" id="prefChips"></div>
@@ -200,17 +169,15 @@
             nodes.forEach(n => io.observe(n));
         }
         window.refreshScrollReveal = function() { initScrollReveal(); };
-        function openLogin() { closeModals(); document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('loginModal').classList.add('flex'); document.body.style.overflow = 'hidden'; }
-        function openRegister() { closeModals(); document.getElementById('registerModal').classList.remove('hidden'); document.getElementById('registerModal').classList.add('flex'); document.body.style.overflow = 'hidden'; }
+        function openLogin() { location.href = '/login'; }
+        function openRegister() { location.href = '/register'; }
         async function openPreferences() {
-            closeModals();
+            if (!localStorage.getItem('token')) { location.href = '/login'; return; }
             document.getElementById('prefsModal').classList.remove('hidden');
             document.getElementById('prefsModal').classList.add('flex');
             document.body.style.overflow = 'hidden';
-            const token = localStorage.getItem('token');
-            if (!token) return;
             try {
-                const res = await fetch('/me', { headers: { Authorization: `Bearer ${token}` } });
+                const res = await fetch('/me', { headers: { Authorization: 'Bearer ' + localStorage.getItem('token') } });
                 if (res.ok) {
                     const data = await res.json();
                     const prefs = data.preferences || [];
@@ -223,56 +190,21 @@
             document.getElementById('prefChips').innerHTML = prefs.map(p => `<span class="gt-chip text-xs px-3 py-1 rounded-full">${p}</span>`).join('');
         }
         function closeModals() {
-            ['loginModal','registerModal','prefsModal'].forEach(id => {
-                const el = document.getElementById(id);
-                el.classList.add('hidden'); el.classList.remove('flex');
-            });
+            document.getElementById('prefsModal').classList.add('hidden');
+            document.getElementById('prefsModal').classList.remove('flex');
             document.body.style.overflow = '';
         }
-        function switchToRegister() { closeModals(); openRegister(); }
-        function switchToLogin() { closeModals(); openLogin(); }
         function logout() { localStorage.removeItem('token'); location.reload(); }
-        async function doLogin() {
-            const username = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value;
-            const errorEl = document.getElementById('loginError');
-            const btn = document.getElementById('loginBtn');
-            if (!username || !password) { errorEl.textContent = 'Fill all fields'; errorEl.classList.remove('hidden'); return; }
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            try {
-                const res = await fetch('/login', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username, password}) });
-                const data = await res.json();
-                if (data.token) { localStorage.setItem('token', data.token); closeModals(); location.reload(); }
-                else { errorEl.textContent = data.error || 'Invalid'; errorEl.classList.remove('hidden'); }
-            } catch (e) { errorEl.textContent = 'Network error'; errorEl.classList.remove('hidden'); }
-            finally { btn.disabled = false; btn.innerHTML = '<span>Login</span>'; }
-        }
-        async function doRegister() {
-            const username = document.getElementById('regUser').value.trim();
-            const password = document.getElementById('regPass').value;
-            const prefs = document.getElementById('regPrefs').value.split(',').map(p => p.trim()).filter(Boolean);
-            const errorEl = document.getElementById('regError');
-            const btn = document.getElementById('regBtn');
-            if (!username || !password) { errorEl.textContent = 'Username and password required'; errorEl.classList.remove('hidden'); return; }
-            btn.disabled = true;
-            try {
-                const res = await fetch('/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username, password, preferences: prefs}) });
-                const data = await res.json();
-                if (res.ok) { closeModals(); document.getElementById('loginUser').value = username; openLogin(); document.getElementById('loginError').textContent = 'Account created — login'; document.getElementById('loginError').classList.remove('hidden'); }
-                else { errorEl.textContent = data.error || 'Failed'; errorEl.classList.remove('hidden'); }
-            } catch (e) { errorEl.textContent = 'Network error'; errorEl.classList.remove('hidden'); }
-            finally { btn.disabled = false; btn.innerHTML = '<span>Create Account</span>'; }
-        }
         async function savePreferences() {
             const token = localStorage.getItem('token');
-            if (!token) { openLogin(); return; }
+            if (!token) { location.href = '/login'; return; }
             const prefs = document.getElementById('editPrefs').value.split(',').map(p => p.trim()).filter(Boolean);
             const errorEl = document.getElementById('prefsError');
             const successEl = document.getElementById('prefsSuccess');
             const btn = document.getElementById('prefsBtn');
             btn.disabled = true;
             try {
-                const res = await fetch('/preferences', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ preferences: prefs }) });
+                const res = await fetch('/preferences', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ preferences: prefs }) });
                 const data = await res.json();
                 if (res.ok) { successEl.textContent = 'Saved'; successEl.classList.remove('hidden'); renderPrefChips(data.preferences || prefs); }
                 else { errorEl.textContent = data.error || 'Failed'; errorEl.classList.remove('hidden'); }

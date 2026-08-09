@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if mode == 'register' %}Sign up{% else %}Login{% endif %} · GlobeTrotter</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.svg') }}" type="image/svg+xml">
+</head>
+<body class="auth-page">
+  <div class="auth-blob auth-blob-1" aria-hidden="true"></div>
+  <div class="auth-blob auth-blob-2" aria-hidden="true"></div>
+  <a class="auth-back" href="/">← Back to home</a>
+
+  <div class="auth-card" id="authCard">
+    <div style="text-align:center;margin-bottom:1rem">
+      <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="48" height="48" style="border-radius:12px">
+    </div>
+    <h1 id="authTitle">{% if mode == 'register' %}Create account{% else %}Welcome back{% endif %}</h1>
+    <p class="sub" id="authSub">{% if mode == 'register' %}Join GlobeTrotter Douala{% else %}Login to save trips & day plans{% endif %}</p>
+    <div class="auth-error" id="authError"></div>
+
+    <form id="authForm" onsubmit="event.preventDefault(); submitAuth();">
+      <label for="username">Username</label>
+      <input id="username" name="username" autocomplete="username" required placeholder="Your username">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+      <div id="prefsWrap" style="{% if mode != 'register' %}display:none{% endif %}">
+        <label for="prefs">Interests (optional)</label>
+        <input id="prefs" placeholder="history, food, culture">
+      </div>
+      <button type="submit" class="auth-btn" id="authBtn">
+        {% if mode == 'register' %}Sign up{% else %}Login{% endif %}
+      </button>
+    </form>
+
+    <p class="switch" id="authSwitch">
+      {% if mode == 'register' %}
+        Have an account? <a href="/login">Login</a>
+      {% else %}
+        No account? <a href="/register">Sign up</a>
+      {% endif %}
+    </p>
+  </div>
+
+  <script>
+  const MODE = {{ 'true' if mode == 'register' else 'false' }};
+  async function submitAuth() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const err = document.getElementById('authError');
+    const btn = document.getElementById('authBtn');
+    err.style.display = 'none';
+    if (!username || !password) {
+      err.textContent = 'Fill all fields';
+      err.style.display = 'block';
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = MODE ? 'Creating…' : 'Logging in…';
+    try {
+      if (MODE) {
+        const prefs = document.getElementById('prefs').value.split(',').map(p => p.trim()).filter(Boolean);
+        const res = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, preferences: prefs })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        // auto login
+        const loginRes = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const loginData = await loginRes.json();
+        if (loginData.token) {
+          localStorage.setItem('token', loginData.token);
+          location.href = '/';
+        } else {
+          location.href = '/login';
+        }
+      } else {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Invalid');
+        localStorage.setItem('token', data.token);
+        location.href = '/';
+      }
+    } catch (e) {
+      err.textContent = e.message || 'Error';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = MODE ? 'Sign up' : 'Login';
+    }
+  }
+  </script>
+</body>
+</html>
