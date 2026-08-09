@@ -1,0 +1,139 @@
+/* Glass login – TikTok-style simple animation */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.35), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(124, 58, 237, 0.4), transparent 50%),
+    linear-gradient(160deg, #1a1228 0%, #2e1065 50%, #4c1d95 100%);
+}
+.auth-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: floatBlob 8s ease-in-out infinite;
+}
+.auth-blob-1 {
+  width: 280px; height: 280px;
+  background: #a855f7;
+  top: -40px; left: -40px;
+}
+.auth-blob-2 {
+  width: 220px; height: 220px;
+  background: #7c3aed;
+  bottom: 10%; right: -30px;
+  animation-delay: -3s;
+}
+@keyframes floatBlob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -24px) scale(1.08); }
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem 1.75rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  color: #fff;
+  animation: authIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes authIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.auth-card h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.auth-card .sub {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+.auth-card label {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 0.35rem;
+}
+.auth-card input {
+  width: 100%;
+  border-radius: 0.85rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.auth-card input::placeholder { color: rgba(255, 255, 255, 0.45); }
+.auth-card input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.35);
+}
+.auth-card .auth-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.9rem;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  color: #4c1d95;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.auth-card .auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(255, 255, 255, 0.25);
+}
+.auth-card .auth-btn:disabled { opacity: 0.7; cursor: wait; }
+.auth-card .switch {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+.auth-card .switch a {
+  color: #e9d5ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-card .switch a:hover { text-decoration: underline; }
+.auth-error {
+  display: none;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fecaca;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+.auth-back {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.9rem;
+  z-index: 2;
+}
+.auth-back:hover { color: #fff; }
+@media (prefers-reduced-motion: reduce) {
+  .auth-card { animation: none; }
+  .auth-blob { animation: none; }
+}
