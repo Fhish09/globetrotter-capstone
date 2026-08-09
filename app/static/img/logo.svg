@@ -1,7 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="14" fill="#2AABEE"/>
-  <circle cx="32" cy="32" r="18" stroke="#0e1621" stroke-width="3" fill="none"/>
-  <ellipse cx="32" cy="32" rx="8" ry="18" stroke="#0e1621" stroke-width="2.5" fill="none"/>
-  <path d="M14 32h36M32 14c6 6 6 24 0 36M32 14c-6 6-6 24 0 36" stroke="#0e1621" stroke-width="2.5" stroke-linecap="round"/>
-  <circle cx="46" cy="18" r="4" fill="#0e1621"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="GlobeTrotter">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="55%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="globe" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#e9d5ff"/>
+      <stop offset="100%" stop-color="#c4b5fd"/>
+    </linearGradient>
+  </defs>
+  <!-- soft splash -->
+  <circle cx="64" cy="68" r="52" fill="url(#g)" opacity="0.15"/>
+  <!-- orbit rings -->
+  <ellipse cx="64" cy="70" rx="54" ry="18" fill="none" stroke="#7c3aed" stroke-width="2.5" opacity="0.55" transform="rotate(-18 64 70)"/>
+  <ellipse cx="64" cy="70" rx="48" ry="14" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.4" transform="rotate(12 64 70)"/>
+  <!-- globe -->
+  <circle cx="64" cy="72" r="28" fill="url(#globe)" stroke="#6d28d9" stroke-width="1.5"/>
+  <ellipse cx="64" cy="72" rx="12" ry="28" fill="none" stroke="#7c3aed" stroke-width="1.2" opacity="0.5"/>
+  <path d="M36 72h56M42 58h44M44 86h40" stroke="#7c3aed" stroke-width="1.2" opacity="0.45" fill="none"/>
+  <!-- landmarks silhouette -->
+  <g fill="#5b21b6" opacity="0.9">
+    <!-- Eiffel-like -->
+    <path d="M28 78 L32 48 L36 78 Z"/>
+    <rect x="30.5" y="54" width="3" height="2"/>
+    <!-- tower -->
+    <rect x="42" y="52" width="5" height="26" rx="1"/>
+    <rect x="40" y="50" width="9" height="4" rx="1"/>
+    <!-- building -->
+    <rect x="88" y="58" width="10" height="20" rx="1"/>
+    <rect x="90" y="52" width="6" height="6" rx="0.5"/>
+  </g>
+  <!-- plane -->
+  <g transform="translate(86 34) rotate(18)">
+    <path d="M0 8 L28 4 L32 8 L28 12 L0 10 Z" fill="#4c1d95"/>
+    <path d="M10 8 L4 0 L8 8 Z" fill="#6d28d9"/>
+    <path d="M10 10 L4 18 L8 10 Z" fill="#6d28d9"/>
+    <circle cx="26" cy="8" r="2" fill="#a855f7"/>
+  </g>
 </svg>
