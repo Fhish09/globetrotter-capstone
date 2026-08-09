@@ -94,6 +94,14 @@
         </div>
     </nav>
 
+    <div id="weatherStrip" class="bg-gt-surface2/80 border-b border-gt-border text-xs sm:text-sm">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-gt-muted">
+        <span class="text-gt-accent font-medium"><i class="fas fa-cloud-sun-rain mr-1"></i> Douala</span>
+        <span id="weatherLive"><i class="fas fa-spinner fa-spin"></i> Loading weather…</span>
+        <span id="weatherSeason" class="text-gt-muted/90"></span>
+      </div>
+    </div>
+
     <main class="flex-grow w-full">{% block content %}{% endblock %}</main>
 
     <footer class="bg-gt-surface border-t border-gt-border text-gt-muted py-8 mt-auto safe-bottom">
@@ -273,6 +281,7 @@
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModals(); });
     </script>
+    <script src="{{ url_for('static', filename='js/weather.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
