@@ -11,6 +11,11 @@
   }
   .leaflet-popup-tip { background: #fff; }
   .leaflet-popup-content a { color: #c2187a; font-weight: 600; }
+  .story-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+    background: #dfe5e7; border: 1px solid var(--gt-border, #eadfe8);
+  }
 </style>
 
 <section class="relative min-h-[70vh] flex items-center overflow-hidden"
@@ -114,6 +119,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 const W = (f) => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(f) + '?width=900';
+const DEFAULT_AVATAR = "{{ url_for('static', filename='img/avatar-default.svg') }}";
 function formatFcfa(n) { return Number(n||0).toLocaleString('fr-FR') + ' FCFA'; }
 
 const DEALS = [
@@ -135,9 +141,9 @@ const TOP = [
 ];
 
 const STORIES = [
-  { name: 'Amina N.', place: 'La Pagode', text: 'Standing in front of La Pagode was the highlight of our city walk.', img: 'https://i.pravatar.cc/100?u=amina' },
-  { name: 'Jean-Paul T.', place: 'Musée Maritime', text: 'The port history of Douala made the city click for us.', img: 'https://i.pravatar.cc/100?u=jean' },
-  { name: 'Marie K.', place: 'Nouvelle Liberté', text: 'Go early to Deido — less traffic, better photos.', img: 'https://i.pravatar.cc/100?u=marie' },
+  { name: 'Amina N.', place: 'La Pagode', text: 'Standing in front of La Pagode was the highlight of our city walk.' },
+  { name: 'Jean-Paul T.', place: 'Musée Maritime', text: 'The port history of Douala made the city click for us.' },
+  { name: 'Marie K.', place: 'Nouvelle Liberté', text: 'Go early to Deido — less traffic, better photos.' },
 ];
 
 document.getElementById('dealsGrid').innerHTML = DEALS.map(d => `
@@ -167,7 +173,7 @@ document.getElementById('topGrid').innerHTML = TOP.map(t => `
 
 document.getElementById('storyGrid').innerHTML = STORIES.map(s => `
   <article class="bg-white border border-gt-border rounded-2xl p-5 flex gap-4 gt-card-glow">
-    <img src="${s.img}" alt="" class="w-12 h-12 rounded-full object-cover shrink-0 border border-gt-border">
+    <img src="${DEFAULT_AVATAR}" alt="" class="story-avatar" width="48" height="48">
     <div>
       <p class="font-semibold text-sm">${s.name}</p>
       <p class="text-xs text-gt-accent mb-1">${s.place}</p>
