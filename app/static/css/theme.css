@@ -1,17 +1,22 @@
-/* GlobeTrotter – Ticket Plan inspired light purple */
+/* GlobeTrotter – colours from Ticket Plan pin (magenta / plum / white) */
 :root {
-  --gt-bg: #f7f5fb;
+  /* Brand magenta (logo, titles, active nav) */
+  --gt-accent: #c2187a;
+  --gt-accent-hover: #a01265;
+  --gt-accent-soft: rgba(194, 24, 122, 0.12);
+  --gt-accent-text: #9d1262;
+  /* Deep plum (buttons, icons) */
+  --gt-plum: #7a1b6b;
+  --gt-plum-soft: #e8b4d4;
+  /* Surfaces */
+  --gt-bg: #faf8fc;
   --gt-surface: #ffffff;
-  --gt-surface-2: #f0ebf8;
-  --gt-border: #e4dcf0;
-  --gt-text: #1a1228;
-  --gt-muted: #6b6280;
-  --gt-accent: #7c3aed;
-  --gt-accent-hover: #6d28d9;
-  --gt-accent-soft: rgba(124, 58, 237, 0.12);
-  --gt-accent-text: #6d28d9;
-  --gt-magenta: #a855f7;
-  --gt-gradient: linear-gradient(135deg, #7c3aed 0%, #a855f7 55%, #c084fc 100%);
+  --gt-surface-2: #f5f0f6;
+  --gt-border: #eadfe8;
+  /* Text */
+  --gt-text: #1f1520;
+  --gt-muted: #6b5c68;
+  --gt-gradient: linear-gradient(135deg, #c2187a 0%, #9d1262 55%, #7a1b6b 100%);
 }
 
 body.gt-theme {
@@ -25,7 +30,7 @@ body.gt-theme {
 }
 
 .gt-theme .gt-nav {
-  background-color: rgba(255, 255, 255, 0.92);
+  background-color: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid var(--gt-border);
 }
 
@@ -35,13 +40,13 @@ body.gt-theme {
   background: var(--gt-gradient);
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.28);
+  box-shadow: 0 8px 20px rgba(194, 24, 122, 0.28);
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 .gt-theme .gt-btn-primary:hover {
   filter: brightness(1.05);
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.35);
+  box-shadow: 0 12px 28px rgba(194, 24, 122, 0.35);
 }
 .gt-theme .gt-btn-primary:active { transform: translateY(0); }
 
@@ -57,15 +62,14 @@ body.gt-theme {
   border-color: var(--gt-border);
   color: var(--gt-text);
 }
-.gt-theme input::placeholder { color: #9a90b0; }
+.gt-theme input::placeholder { color: #9a8794; }
 .gt-theme input:focus,
 .gt-theme select:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 0 0 3px rgba(194, 24, 122, 0.2);
   border-color: var(--gt-accent);
 }
 
-/* Logo – mobile small, desktop larger */
 .gt-logo {
   width: 40px;
   height: 40px;
@@ -73,20 +77,13 @@ body.gt-theme {
   flex-shrink: 0;
   object-fit: contain;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 2px 8px rgba(194, 24, 122, 0.12);
 }
 @media (min-width: 768px) {
-  .gt-logo {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-  }
+  .gt-logo { width: 48px; height: 48px; border-radius: 14px; }
 }
 @media (min-width: 1024px) {
-  .gt-logo {
-    width: 52px;
-    height: 52px;
-  }
+  .gt-logo { width: 52px; height: 52px; }
 }
 
 .gt-section-title {
