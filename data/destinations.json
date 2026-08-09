@@ -8,7 +8,9 @@
     "continent": "Africa",
     "description": "Historic residence of the Bell royal dynasty in Bonanjo, built in the early 1900s. Often called La Pagode, it is one of Douala’s most iconic monuments and a symbol of Sawa heritage.",
     "tags": ["history", "culture", "monument", "architecture", "heritage"],
-    "avg_cost_per_day": 25,
+    "avg_cost_per_day": 2000,
+    "currency": "FCFA",
+    "cost_note": "Exterior visit free; budget for taxi and snack",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=900"
   },
   {
@@ -20,7 +22,9 @@
     "continent": "Africa",
     "description": "National maritime museum in Bonanjo telling the story of Cameroon’s coastal peoples, trade, pirogues and the port of Douala. A top cultural stop for visitors.",
     "tags": ["museum", "history", "culture", "maritime", "family"],
-    "avg_cost_per_day": 20,
+    "avg_cost_per_day": 3500,
+    "currency": "FCFA",
+    "cost_note": "Adult entry about 3 500 FCFA (official tariff)",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bateau_au_port_de_Douala1.jpg?width=900"
   },
   {
@@ -32,7 +36,9 @@
     "continent": "Africa",
     "description": "Landmark Catholic cathedral with twin towers, completed in the 1930s. An important religious and architectural site in central Douala.",
     "tags": ["architecture", "history", "culture", "religion", "monument"],
-    "avg_cost_per_day": 15,
+    "avg_cost_per_day": 1000,
+    "currency": "FCFA",
+    "cost_note": "Entry free; small transport budget",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_02.JPG?width=900"
   },
   {
@@ -44,7 +50,9 @@
     "continent": "Africa",
     "description": "Famous recycled-metal sculpture by Joseph-Francis Sumégné at the Deido roundabout. A modern art landmark expressing freedom and urban creativity.",
     "tags": ["art", "monument", "culture", "photography", "city"],
-    "avg_cost_per_day": 10,
+    "avg_cost_per_day": 1000,
+    "currency": "FCFA",
+    "cost_note": "Public monument, free to view",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Joseph-Francis_Sumégné,_La_Nouvelle_Liberté_01.jpg?width=900"
   },
   {
@@ -56,7 +64,9 @@
     "continent": "Africa",
     "description": "Green park in the heart of the administrative district. Ideal for a short walk, photos, and a break near Place du Gouvernement and nearby monuments.",
     "tags": ["park", "nature", "family", "relax", "city"],
-    "avg_cost_per_day": 10,
+    "avg_cost_per_day": 1000,
+    "currency": "FCFA",
+    "cost_note": "Public park, free entry",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_03.JPG?width=900"
   },
   {
@@ -68,7 +78,9 @@
     "continent": "Africa",
     "description": "Striking palace built by Prince Dika Akwa in Akwa. Showcases Sawa architecture and is a notable heritage stop in the business district.",
     "tags": ["history", "architecture", "culture", "heritage", "monument"],
-    "avg_cost_per_day": 20,
+    "avg_cost_per_day": 2000,
+    "currency": "FCFA",
+    "cost_note": "Exterior / guided visit budget",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Palace_of_King_Duala_Manga_Bell.jpg?width=900"
   },
   {
@@ -80,7 +92,9 @@
     "continent": "Africa",
     "description": "Contemporary art centre linked to La Pagode area. Exhibitions, public art projects, and a window into Douala’s creative scene.",
     "tags": ["art", "culture", "museum", "city", "photography"],
-    "avg_cost_per_day": 15,
+    "avg_cost_per_day": 2000,
+    "currency": "FCFA",
+    "cost_note": "Exhibitions often free or low fee",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_04.JPG?width=900"
   },
   {
@@ -92,7 +106,9 @@
     "continent": "Africa",
     "description": "Historic square in Bonanjo surrounded by colonial-era buildings, close to La Pagode, the park, and memorials. Best explored on foot.",
     "tags": ["history", "architecture", "monument", "walk", "city"],
-    "avg_cost_per_day": 10,
+    "avg_cost_per_day": 1000,
+    "currency": "FCFA",
+    "cost_note": "Public square, free",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_Douala.JPG?width=900"
   },
   {
@@ -104,7 +120,9 @@
     "continent": "Africa",
     "description": "Lively commercial and nightlife heart of Douala. Shopping, street food, hotels, and the pulse of the economic capital after dark.",
     "tags": ["city", "food", "nightlife", "shopping", "culture"],
-    "avg_cost_per_day": 40,
+    "avg_cost_per_day": 20000,
+    "currency": "FCFA",
+    "cost_note": "Food, drinks, local transport for an evening out",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Douala.JPG?width=900"
   },
   {
@@ -116,7 +134,9 @@
     "continent": "Africa",
     "description": "One of Central Africa’s largest markets. Spices, fabrics, electronics, and daily life — intense, colourful, and very Douala.",
     "tags": ["market", "shopping", "food", "culture", "city"],
-    "avg_cost_per_day": 25,
+    "avg_cost_per_day": 8000,
+    "currency": "FCFA",
+    "cost_note": "Light shopping / street food budget",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Douala_skyline.jpg?width=900"
   },
   {
@@ -128,7 +148,9 @@
     "continent": "Africa",
     "description": "Traditional fishing neighbourhood by the water. Fresh fish market, pirogues, and a glimpse of Douala’s coastal working life.",
     "tags": ["food", "culture", "maritime", "market", "photography"],
-    "avg_cost_per_day": 20,
+    "avg_cost_per_day": 6000,
+    "currency": "FCFA",
+    "cost_note": "Fresh fish meal and transport",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bateau_au_port_de_Douala1.jpg?width=900"
   },
   {
@@ -140,7 +162,9 @@
     "continent": "Africa",
     "description": "Self-guided stroll through Douala’s administrative quarter: colonial façades, monuments, palm avenues, and the densest cluster of tourist sights in the city.",
     "tags": ["walk", "history", "architecture", "city", "photography"],
-    "avg_cost_per_day": 15,
+    "avg_cost_per_day": 3000,
+    "currency": "FCFA",
+    "cost_note": "Taxi + water/snack for a half-day walk",
     "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_05.JPG?width=900"
   }
 ]

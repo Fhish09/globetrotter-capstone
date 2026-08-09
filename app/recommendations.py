@@ -1,4 +1,4 @@
-"""Douala-only personalised recommendations."""
+"""Douala-only personalised recommendations (costs in FCFA)."""
 from flask import Blueprint, request, jsonify, render_template
 
 from app.auth import get_current_user
@@ -21,6 +21,7 @@ def _score(dest: dict, preferences: list, last_search: str = "") -> tuple:
     name = dest.get("name", "").lower()
     description = dest.get("description", "").lower()
     district = dest.get("district", "").lower()
+    cost = dest.get("avg_cost_per_day") or 50000
     score = 1.0
     matched = []
 
@@ -38,6 +39,12 @@ def _score(dest: dict, preferences: list, last_search: str = "") -> tuple:
         if ls in name or ls in district or ls in description or ls in " ".join(dest_tags):
             score += 4.0
             matched.append(f"related to “{last_search}”")
+
+    # Prefer cheaper Douala sites slightly (FCFA)
+    if cost <= 3000:
+        score += 0.8
+    elif cost <= 10000:
+        score += 0.4
 
     return score, matched or ["Douala highlight"]
 
@@ -72,7 +79,10 @@ def get_recommendations():
 
     districts = sorted({d.get("district") for d in destinations if d.get("district")})
 
-    scored = [(_score(d, preferences, last_search)[0], d, _score(d, preferences, last_search)[1]) for d in destinations]
+    scored = []
+    for d in destinations:
+        s, m = _score(d, preferences, last_search)
+        scored.append((s, d, m))
     scored.sort(key=lambda x: -x[0])
 
     results = []
@@ -80,6 +90,7 @@ def get_recommendations():
         entry = dict(dest)
         entry["match_score"] = round(score, 1)
         entry["match_reasons"] = matched
+        entry["currency"] = "FCFA"
         results.append(entry)
 
     return jsonify({
@@ -87,6 +98,7 @@ def get_recommendations():
         "districts": districts,
         "regions": districts,
         "countries": ["Cameroon"],
+        "currency": "FCFA",
         "last_search": last_search,
         "city": "Douala",
     }), 200

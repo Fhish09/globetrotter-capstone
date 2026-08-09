@@ -3,29 +3,30 @@
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
     <div class="mb-6 sm:mb-10">
-        <h1 class="heading text-2xl sm:text-3xl md:text-4xl font-bold text-gt-text mb-1">Explore Destinations</h1>
-        <p class="text-gt-muted text-sm sm:text-base">Find your next adventure</p>
+        <h1 class="heading text-2xl sm:text-3xl md:text-4xl font-bold text-gt-text mb-1">Explore Douala</h1>
+        <p class="text-gt-muted text-sm sm:text-base">Tourist sites — prices in FCFA</p>
     </div>
     <div class="cq-filters-container bg-gt-surface border border-gt-border rounded-2xl p-4 sm:p-6 mb-8">
         <form onsubmit="event.preventDefault(); applyFilters();" class="cq-filters" role="search">
             <div class="cq-filter-search">
                 <label for="searchQ" class="block text-sm font-medium text-gt-muted mb-1">Search</label>
-                <input type="search" id="searchQ" placeholder="City, country..." class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2" autocomplete="off">
+                <input type="search" id="searchQ" placeholder="Pagode, Bonanjo, museum…" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2" autocomplete="off">
             </div>
             <div class="cq-filter-field">
                 <label for="tagFilter" class="block text-sm font-medium text-gt-muted mb-1">Tag</label>
                 <select id="tagFilter" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2">
                     <option value="">All</option>
-                    <option value="beach">Beach</option>
-                    <option value="food">Food</option>
+                    <option value="history">History</option>
                     <option value="culture">Culture</option>
-                    <option value="nature">Nature</option>
-                    <option value="adventure">Adventure</option>
+                    <option value="art">Art</option>
+                    <option value="food">Food</option>
+                    <option value="museum">Museum</option>
+                    <option value="city">City</option>
                 </select>
             </div>
             <div class="cq-filter-field">
-                <label for="maxCost" class="block text-sm font-medium text-gt-muted mb-1">Max Cost / day</label>
-                <input type="number" id="maxCost" placeholder="e.g. 100" min="0" max="1000" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2">
+                <label for="maxCost" class="block text-sm font-medium text-gt-muted mb-1">Max budget (FCFA)</label>
+                <input type="number" id="maxCost" placeholder="e.g. 10000" min="0" max="100000" step="500" class="w-full rounded-xl px-4 py-3 text-base border border-gt-border bg-gt-surface2">
             </div>
             <button id="filterBtn" type="submit" class="cq-filter-btn gt-btn-primary px-6 py-3 rounded-xl font-medium min-h-[48px]"><span>Apply Filters</span></button>
         </form>
@@ -39,18 +40,22 @@
 {% endblock %}
 {% block scripts %}
 <script>
+function formatFcfa(n) {
+    if (n == null || n === '') return '—';
+    return Number(n).toLocaleString('fr-FR') + ' FCFA';
+}
 function getDestImage(dest) {
-    return dest.image || `https://picsum.photos/seed/${encodeURIComponent(dest.name)}/600/400`;
+    return dest.image || `https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=600`;
 }
 async function loadResults(params = '') {
     const btn = document.getElementById('filterBtn');
     btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
     try {
-        const res = await fetch('/destinations' + params);
+        const res = await fetch('/destinations' + params, { headers: { 'Accept': 'application/json' } });
         const data = await res.json();
         const container = document.getElementById('results');
-        if (!data.length) {
-            container.innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-gt-muted"><p>No destinations match your filters</p></div>`;
+        if (!Array.isArray(data) || !data.length) {
+            container.innerHTML = `<div style="grid-column:1/-1" class="text-center py-16 text-gt-muted"><p>No sites match your filters</p></div>`;
             return;
         }
         container.innerHTML = data.map(dest => `
@@ -61,9 +66,9 @@ async function loadResults(params = '') {
                 <div class="cq-card-body">
                     <div class="flex justify-between items-start gap-2 mb-2">
                         <h2 class="cq-card-title font-bold text-gt-text group-hover:text-gt-accent transition">${dest.name}</h2>
-                        <span class="text-gt-accent font-semibold text-sm shrink-0">$${dest.avg_cost_per_day || '—'}</span>
+                        <span class="text-gt-accent font-semibold text-xs sm:text-sm shrink-0 whitespace-nowrap">${formatFcfa(dest.avg_cost_per_day)}</span>
                     </div>
-                    <p class="text-xs text-gt-muted mb-2 truncate">${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}</p>
+                    <p class="text-xs text-gt-muted mb-2 truncate">${dest.district || ''} · Douala</p>
                     <p class="text-gt-muted text-sm mb-3 line-clamp-2">${dest.description || ''}</p>
                     <div class="flex flex-wrap gap-1.5">
                         ${(dest.tags || []).slice(0,4).map(t => `<span class="gt-chip text-xs px-2.5 py-1 rounded-full">${t}</span>`).join('')}

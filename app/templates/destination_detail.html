@@ -3,11 +3,11 @@
 {% block content %}
 <section class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
     <div id="loading" class="text-center py-20 text-gt-muted" role="status">
-        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i><p>Loading destination...</p>
+        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i><p>Loading...</p>
     </div>
     <div id="content" class="hidden">
         <a href="/destinations" class="inline-flex items-center gap-2 text-gt-accent hover:underline mb-8 font-medium">
-            <i class="fas fa-arrow-left"></i> Back to Destinations
+            <i class="fas fa-arrow-left"></i> Back to sites
         </a>
         <div class="relative rounded-3xl overflow-hidden border border-gt-border shadow-xl mb-10 h-72 md:h-96">
             <img id="destImage" src="" alt="" class="w-full h-full object-cover">
@@ -29,12 +29,13 @@
             </div>
             <div class="space-y-4">
                 <div class="bg-gt-surface border border-gt-border rounded-2xl p-6">
-                    <p class="text-sm text-gt-muted mb-1">Average cost per day</p>
-                    <p id="destCost" class="text-3xl font-bold text-gt-accent"></p>
+                    <p class="text-sm text-gt-muted mb-1">Typical budget</p>
+                    <p id="destCost" class="text-2xl font-bold text-gt-accent"></p>
+                    <p id="destCostNote" class="text-xs text-gt-muted mt-2"></p>
                 </div>
                 <div class="bg-gt-surface border border-gt-border rounded-2xl p-6">
-                    <p class="text-sm text-gt-muted mb-1">Continent</p>
-                    <p id="destContinent" class="text-lg font-semibold text-gt-text"></p>
+                    <p class="text-sm text-gt-muted mb-1">District</p>
+                    <p id="destDistrict" class="text-lg font-semibold text-gt-text"></p>
                 </div>
                 <button onclick="addToItinerary()" class="w-full gt-btn-primary py-3.5 rounded-xl font-semibold min-h-[48px]">
                     <i class="fas fa-plus mr-2"></i> Add to Itinerary
@@ -44,20 +45,24 @@
     </div>
     <div id="error" class="hidden text-center py-20" role="alert">
         <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-4"></i>
-        <p class="text-gt-muted text-lg">Destination not found</p>
-        <a href="/destinations" class="text-gt-accent mt-4 inline-block hover:underline">Back to all destinations</a>
+        <p class="text-gt-muted text-lg">Site not found</p>
+        <a href="/destinations" class="text-gt-accent mt-4 inline-block hover:underline">Back to all sites</a>
     </div>
 </section>
 {% endblock %}
 {% block scripts %}
 <script>
 const destId = {{ dest_id }};
+function formatFcfa(n) {
+    if (n == null || n === '') return '—';
+    return Number(n).toLocaleString('fr-FR') + ' FCFA';
+}
 function getDestImage(dest) {
-    return dest.image || `https://picsum.photos/seed/${encodeURIComponent(dest.name)}/1200/600`;
+    return dest.image || `https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=1200`;
 }
 async function loadDestination() {
     try {
-        const res = await fetch('/destinations');
+        const res = await fetch('/destinations', { headers: { 'Accept': 'application/json' } });
         const data = await res.json();
         const dest = data.find(d => d.id === destId);
         if (!dest) {
@@ -69,10 +74,11 @@ async function loadDestination() {
         document.getElementById('destImage').src = getDestImage(dest);
         document.getElementById('destImage').alt = dest.name;
         document.getElementById('destName').textContent = dest.name;
-        document.getElementById('destLocation').textContent = `${dest.country || ''} ${dest.continent ? '• ' + dest.continent : ''}`;
+        document.getElementById('destLocation').textContent = (dest.district ? dest.district + ' · ' : '') + 'Douala, Cameroon';
         document.getElementById('destDescription').textContent = dest.description || 'No description available.';
-        document.getElementById('destCost').textContent = dest.avg_cost_per_day ? `$${dest.avg_cost_per_day}` : '—';
-        document.getElementById('destContinent').textContent = dest.continent || '—';
+        document.getElementById('destCost').textContent = formatFcfa(dest.avg_cost_per_day);
+        document.getElementById('destCostNote').textContent = dest.cost_note || 'Prices in Central African CFA franc (FCFA)';
+        document.getElementById('destDistrict').textContent = dest.district || 'Douala';
         document.getElementById('destTags').innerHTML = (dest.tags || []).map(t =>
             `<span class="gt-chip px-3 py-1.5 rounded-full text-sm font-medium">${t}</span>`
         ).join('');
