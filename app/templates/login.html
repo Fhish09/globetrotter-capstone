@@ -12,29 +12,38 @@
   <div class="auth-blob auth-blob-2" aria-hidden="true"></div>
   <a class="auth-back" href="/">← Back to home</a>
 
-  <div class="auth-card" id="authCard">
-    <div style="text-align:center;margin-bottom:1rem">
-      <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="48" height="48" style="border-radius:12px">
+  <div class="login-box">
+    <div class="logo-wrap">
+      <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GlobeTrotter">
     </div>
-    <h1 id="authTitle">{% if mode == 'register' %}Create account{% else %}Welcome back{% endif %}</h1>
-    <p class="sub" id="authSub">{% if mode == 'register' %}Join GlobeTrotter Douala{% else %}Login to save trips & day plans{% endif %}</p>
-    <div class="auth-error" id="authError"></div>
+    <h2 id="authTitle">{% if mode == 'register' %}Sign Up{% else %}Login{% endif %}</h2>
+    <p class="sub">{% if mode == 'register' %}Join GlobeTrotter Douala{% else %}Welcome back — save trips & day plans{% endif %}</p>
 
-    <form id="authForm" onsubmit="event.preventDefault(); submitAuth();">
-      <label for="username">Username</label>
-      <input id="username" name="username" autocomplete="username" required placeholder="Your username">
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
-      <div id="prefsWrap" style="{% if mode != 'register' %}display:none{% endif %}">
-        <label for="prefs">Interests (optional)</label>
-        <input id="prefs" placeholder="history, food, culture">
+    <div class="auth-error" id="authError" role="alert"></div>
+
+    <form id="authForm" onsubmit="event.preventDefault(); submitAuth();" autocomplete="on">
+      <div class="user-box">
+        <input type="text" id="username" name="username" required placeholder=" " autocomplete="username">
+        <label for="username">Username</label>
       </div>
-      <button type="submit" class="auth-btn" id="authBtn">
-        {% if mode == 'register' %}Sign up{% else %}Login{% endif %}
+      <div class="user-box">
+        <input type="password" id="password" name="password" required placeholder=" " autocomplete="{% if mode == 'register' %}new-password{% else %}current-password{% endif %}">
+        <label for="password">Password</label>
+      </div>
+      {% if mode == 'register' %}
+      <div class="user-box" id="prefsWrap">
+        <input type="text" id="prefs" name="prefs" placeholder=" ">
+        <label for="prefs">Interests (optional)</label>
+      </div>
+      {% endif %}
+
+      <button type="submit" class="btn-anim" id="authBtn">
+        <span></span><span></span><span></span><span></span>
+        {% if mode == 'register' %}Create account{% else %}Submit{% endif %}
       </button>
     </form>
 
-    <p class="switch" id="authSwitch">
+    <p class="switch">
       {% if mode == 'register' %}
         Have an account? <a href="/login">Login</a>
       {% else %}
@@ -45,6 +54,18 @@
 
   <script>
   const MODE = {{ 'true' if mode == 'register' else 'false' }};
+
+  // Keep floating labels correct if browser autofills
+  document.querySelectorAll('.user-box input').forEach(function (inp) {
+    function sync() {
+      if (inp.value) inp.classList.add('has-value');
+      else inp.classList.remove('has-value');
+    }
+    inp.addEventListener('input', sync);
+    inp.addEventListener('change', sync);
+    setTimeout(sync, 100);
+  });
+
   async function submitAuth() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
@@ -52,27 +73,32 @@
     const btn = document.getElementById('authBtn');
     err.style.display = 'none';
     if (!username || !password) {
-      err.textContent = 'Fill all fields';
+      err.textContent = 'Fill username and password';
       err.style.display = 'block';
       return;
     }
     btn.disabled = true;
-    btn.textContent = MODE ? 'Creating…' : 'Logging in…';
+    const label = MODE ? 'Creating…' : 'Logging in…';
+    btn.childNodes.forEach(function (n) {
+      if (n.nodeType === 3 && n.textContent.trim()) n.textContent = ' ' + label + ' ';
+    });
     try {
       if (MODE) {
-        const prefs = document.getElementById('prefs').value.split(',').map(p => p.trim()).filter(Boolean);
+        const prefsEl = document.getElementById('prefs');
+        const prefs = prefsEl
+          ? prefsEl.value.split(',').map(function (p) { return p.trim(); }).filter(Boolean)
+          : [];
         const res = await fetch('/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, preferences: prefs })
+          body: JSON.stringify({ username: username, password: password, preferences: prefs })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
-        // auto login
         const loginRes = await fetch('/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username: username, password: password })
         });
         const loginData = await loginRes.json();
         if (loginData.token) {
@@ -85,10 +111,10 @@
         const res = await fetch('/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username: username, password: password })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Invalid');
+        if (!res.ok) throw new Error(data.error || 'Invalid credentials');
         localStorage.setItem('token', data.token);
         location.href = '/';
       }
@@ -96,7 +122,8 @@
       err.textContent = e.message || 'Error';
       err.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = MODE ? 'Sign up' : 'Login';
+      // restore button text nodes roughly
+      location.reload();
     }
   }
   </script>
