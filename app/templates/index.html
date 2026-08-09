@@ -6,23 +6,22 @@
   #doualaMap { height: 420px; width: 100%; border-radius: 1rem; z-index: 1; }
   @media (min-width: 768px) { #doualaMap { height: 520px; } }
   .leaflet-popup-content-wrapper {
-    background: #fff; color: #1a1228; border-radius: 12px;
-    border: 1px solid #e4dcf0; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    background: #fff; color: #1f1520; border-radius: 12px;
+    border: 1px solid #eadfe8; box-shadow: 0 8px 24px rgba(0,0,0,.12);
   }
   .leaflet-popup-tip { background: #fff; }
-  .leaflet-popup-content a { color: #7c3aed; font-weight: 600; }
+  .leaflet-popup-content a { color: #c2187a; font-weight: 600; }
 </style>
 
-<!-- Hero -->
 <section class="relative min-h-[70vh] flex items-center overflow-hidden"
-  style="background-image: linear-gradient(120deg, rgba(76,29,149,0.75), rgba(124,58,237,0.55)), url('https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=1600'); background-size: cover; background-position: center;">
+  style="background-image: linear-gradient(120deg, rgba(74,26,58,0.55), rgba(194,24,122,0.4)), url('https://commons.wikimedia.org/wiki/Special:FilePath/Pagode_de_Douala_01.JPG?width=1600'); background-size: cover; background-position: center;">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 w-full grid lg:grid-cols-2 gap-10 items-center">
     <div class="text-white">
       <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" class="w-12 h-12 rounded-xl mb-5 shadow-lg">
       <h1 class="heading text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">EXPLORE<br>BEAUTIFUL<br>DOUALA WITH US</h1>
       <p class="text-white/90 text-base sm:text-lg max-w-md mb-8">Tourist sites in Cameroon’s economic capital — La Pagode, Musée Maritime, Bonanjo, Akwa, Youpwe. Plan in FCFA.</p>
       <div class="flex flex-wrap gap-3">
-        <a href="/destinations" class="bg-white text-purple-800 font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition">Discover Now</a>
+        <a href="/destinations" class="bg-white text-pink-900 font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition">Discover Now</a>
         <a href="#map-section" class="border border-white/50 text-white px-6 py-3 rounded-full hover:bg-white/10 transition">View map</a>
       </div>
     </div>
@@ -35,7 +34,6 @@
   </div>
 </section>
 
-<!-- Hot deals style -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 -mt-12 relative z-10 mb-16">
   <div class="bg-white rounded-3xl shadow-xl border border-gt-border p-6 sm:p-8">
     <h2 class="text-center gt-section-title text-xl sm:text-2xl mb-1">HOT SITES</h2>
@@ -44,37 +42,35 @@
   </div>
 </section>
 
-<!-- Top destinations mosaic -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
   <h2 class="text-center gt-section-title text-xl sm:text-2xl mb-1">TOP DESTINATIONS</h2>
   <p class="text-center text-gt-muted text-sm mb-8">Experience Douala’s landmarks</p>
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="topGrid"></div>
 </section>
 
-<!-- Why / features -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
   <div class="rounded-3xl overflow-hidden relative"
-    style="background-image: linear-gradient(120deg, rgba(76,29,149,0.85), rgba(168,85,247,0.7)), url('https://commons.wikimedia.org/wiki/Special:FilePath/Douala_skyline.jpg?width=1400'); background-size: cover; background-position: center;">
+    style="background-image: linear-gradient(120deg, rgba(74,26,58,0.75), rgba(194,24,122,0.55)), url('https://commons.wikimedia.org/wiki/Special:FilePath/Douala_skyline.jpg?width=1400'); background-size: cover; background-position: center;">
     <div class="p-8 sm:p-12">
       <h2 class="text-center text-white text-2xl font-bold mb-8">Why GlobeTrotter Douala</h2>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white/95 rounded-2xl p-5 text-center gt-card-glow">
-          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-purple-100 text-gt-accent flex items-center justify-center"><i class="fas fa-map-marked-alt"></i></div>
+          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-pink-100 text-gt-accent flex items-center justify-center"><i class="fas fa-map-marked-alt"></i></div>
           <p class="font-semibold text-sm text-gt-text">12 local sites</p>
           <p class="text-xs text-gt-muted mt-1">Pins on the map</p>
         </div>
         <div class="bg-white/95 rounded-2xl p-5 text-center gt-card-glow">
-          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-purple-100 text-gt-accent flex items-center justify-center"><i class="fas fa-coins"></i></div>
+          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-pink-100 text-gt-accent flex items-center justify-center"><i class="fas fa-coins"></i></div>
           <p class="font-semibold text-sm text-gt-text">Budgets in FCFA</p>
           <p class="text-xs text-gt-muted mt-1">Real local costs</p>
         </div>
         <div class="bg-white/95 rounded-2xl p-5 text-center gt-card-glow">
-          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-purple-100 text-gt-accent flex items-center justify-center"><i class="fas fa-route"></i></div>
+          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-pink-100 text-gt-accent flex items-center justify-center"><i class="fas fa-route"></i></div>
           <p class="font-semibold text-sm text-gt-text">Day plan builder</p>
           <p class="text-xs text-gt-muted mt-1">Morning → evening</p>
         </div>
         <div class="bg-white/95 rounded-2xl p-5 text-center gt-card-glow">
-          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-purple-100 text-gt-accent flex items-center justify-center"><i class="fas fa-lightbulb"></i></div>
+          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-pink-100 text-gt-accent flex items-center justify-center"><i class="fas fa-lightbulb"></i></div>
           <p class="font-semibold text-sm text-gt-text">Local tips</p>
           <p class="text-xs text-gt-muted mt-1">Moto, hours, safety</p>
         </div>
@@ -83,7 +79,6 @@
   </div>
 </section>
 
-<!-- Stories -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
   <div class="flex justify-between items-end mb-8">
     <div>
@@ -95,7 +90,6 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="storyGrid"></div>
 </section>
 
-<!-- Map -->
 <section id="map-section" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
   <h2 class="gt-section-title text-xl sm:text-2xl mb-1">Map of Douala sites</h2>
   <p class="text-gt-muted text-sm mb-4">Click a pin — name, district, FCFA, link</p>
@@ -111,7 +105,7 @@
   <p class="text-gt-muted mb-6">Recommendations & day builder with FCFA totals</p>
   <div class="flex flex-wrap gap-3 justify-center">
     <a href="/day-plan" class="gt-btn-primary px-8 py-3.5 rounded-full">Day plan builder</a>
-    <a href="/recommendations" class="border border-gt-accent text-gt-accent px-8 py-3.5 rounded-full hover:bg-purple-50 transition">Recommendations</a>
+    <a href="/recommendations" class="border border-gt-accent text-gt-accent px-8 py-3.5 rounded-full hover:bg-pink-50 transition">Recommendations</a>
   </div>
 </section>
 {% endblock %}
@@ -163,9 +157,9 @@ document.getElementById('dealsGrid').innerHTML = DEALS.map(d => `
 document.getElementById('topGrid').innerHTML = TOP.map(t => `
   <a href="/destinations?q=${encodeURIComponent(t.name)}" class="gt-dest-tile aspect-[4/5] block relative">
     <img src="${W(t.file)}" alt="${t.name}" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
-    <div class="absolute inset-0 bg-gradient-to-t from-purple-950/80 via-transparent to-transparent"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#4a1a3a]/85 via-transparent to-transparent"></div>
     <div class="absolute bottom-0 left-0 right-0 p-3 text-white">
-      <p class="text-[10px] uppercase tracking-wide text-purple-200">${t.place}</p>
+      <p class="text-[10px] uppercase tracking-wide text-pink-100">${t.place}</p>
       <p class="font-bold text-sm sm:text-base">${t.name}</p>
     </div>
   </a>
@@ -188,7 +182,7 @@ async function initDoualaMap() {
   map.once('focus', () => map.scrollWheelZoom.enable());
   const icon = L.divIcon({
     className: '',
-    html: '<div style="width:14px;height:14px;background:#7c3aed;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>',
+    html: '<div style="width:14px;height:14px;background:#c2187a;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>',
     iconSize: [14,14], iconAnchor: [7,7]
   });
   try {
@@ -201,8 +195,8 @@ async function initDoualaMap() {
       districts.add(s.district || 'Douala');
       bounds.push([s.lat, s.lng]);
       L.marker([s.lat, s.lng], { icon }).addTo(map).bindPopup(
-        `<strong>${s.name}</strong><br><span style="color:#6b6280;font-size:12px">${s.district||''} · Douala</span><br>` +
-        `<span style="color:#7c3aed;font-weight:600;font-size:12px">${formatFcfa(s.avg_cost_per_day)}</span><br>` +
+        `<strong>${s.name}</strong><br><span style="color:#6b5c68;font-size:12px">${s.district||''} · Douala</span><br>` +
+        `<span style="color:#c2187a;font-weight:600;font-size:12px">${formatFcfa(s.avg_cost_per_day)}</span><br>` +
         `<a href="/destinations/${s.id}">View site →</a>`
       );
     });
